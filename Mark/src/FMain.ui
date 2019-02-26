@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FMain</class>
+ <widget class="QMainWindow" name="FMain">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>595</width>
+    <height>70</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FMain</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QPushButton" name="btAdd">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>96</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>96</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>96</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Добавить</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="mm">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>595</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mFile">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="aExit"/>
+   </widget>
+   <widget class="QMenu" name="mDebug">
+    <property name="title">
+     <string>Отладка</string>
+    </property>
+    <addaction name="aTest"/>
+   </widget>
+   <addaction name="mFile"/>
+   <addaction name="mDebug"/>
+  </widget>
+  <action name="aExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="aTest">
+   <property name="text">
+    <string>Проба</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
