@@ -1,0 +1,4 @@
+INCLUDEPATH +=  $$PWD
+DEPENDPATH  +=  $$PWD
+HEADERS += $$PWD/ZLogger.h
+SOURCES += $$PWD/ZLogger.cpp

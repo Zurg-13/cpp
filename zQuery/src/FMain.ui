@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FMain</class>
+ <widget class="QMainWindow" name="FMain">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>840</width>
+    <height>325</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>zQuery</string>
+  </property>
+  <widget class="QWidget" name="cw">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
+       <number>3</number>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="horizontalLayoutWidget">
+       <layout class="QHBoxLayout" name="lyLft">
+        <property name="spacing">
+         <number>2</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <layout class="QVBoxLayout" name="lyRgt">
+        <property name="spacing">
+         <number>2</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="mm">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>840</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mFile">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="aExit"/>
+   </widget>
+   <widget class="QMenu" name="mDebug">
+    <property name="title">
+     <string>Отладка</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="aTest"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Окна</string>
+    </property>
+    <addaction name="aConn"/>
+    <addaction name="separator"/>
+    <addaction name="aLog"/>
+   </widget>
+   <addaction name="mFile"/>
+   <addaction name="menu"/>
+   <addaction name="mDebug"/>
+  </widget>
+  <action name="aExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="aTest">
+   <property name="text">
+    <string>Проба</string>
+   </property>
+  </action>
+  <action name="aLog">
+   <property name="text">
+    <string>Лог</string>
+   </property>
+  </action>
+  <action name="aConn">
+   <property name="text">
+    <string>Подключение</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
