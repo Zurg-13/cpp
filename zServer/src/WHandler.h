@@ -21,9 +21,9 @@ public:
     QString path;
     ANSWER_TYPE answer_type = ANSWER_TYPE::TEXT;
 
-    explicit WHandler(QWidget *parent = 0);
+    explicit WHandler(QWidget *parent = nullptr);
              WHandler(QString type, QString path, QColor color, QString text
-               , QWidget *parent = 0 );
+               , QWidget *parent = nullptr );
             ~WHandler();
 
     QByteArray answer(void);
