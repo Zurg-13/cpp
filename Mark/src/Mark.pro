@@ -14,6 +14,7 @@ TARGET = Mark
 TEMPLATE = app
 
 include($$SRV/Srv/Srv.pri)
+include($$LIB/QGlobalShortcut/qglobalshortcut.pri)
 
 INCLUDEPATH += ../../
 DEPENDPATH  += ../../

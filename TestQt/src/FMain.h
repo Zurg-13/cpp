@@ -4,10 +4,9 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QMainWindow>
-#include <QAbstractNativeEventFilter>
 
-#include "_lib/QGlobalShortcut/qglobalshortcut.h"
-
+// NAMESPACE. ------------------------------------------------------------------
+//------------------------------------------------------------------------------
 namespace Ui { class FMain; }
 
 /* Главная форма. *************************************************************/
@@ -17,24 +16,25 @@ class FMain : public QMainWindow {
 
   public:
     explicit FMain(QWidget *parent = nullptr);
-            ~FMain();
-
-  protected:
-/*
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result);
-*/
+    ~FMain();
 
   private slots:
-    void global_hk(void);
-
-    void on_aExit_triggered();
     void on_aTest_triggered();
-    void on_btAdd_clicked();
+    void on_btAnimation_clicked();
+    void on_aExit_triggered();
+    void on_btSound_clicked();
+    void on_btVirtualD_clicked();
 
-  private:
+    void on_btProc_clicked();
+    void on_btTB_clicked();
+
+    void on_btLogger_clicked();
+    void on_pushButton_clicked();
+
+    void on_btCast_clicked();
+
+private:
     Ui::FMain *ui;
-    QGlobalShortcut *hkAct;
-
 };// FMain
 
 //------------------------------------------------------------------------------
