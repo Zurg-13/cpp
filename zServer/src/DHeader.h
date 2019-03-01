@@ -11,7 +11,7 @@ class DHeader : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DHeader(QWidget *parent = 0);
+    explicit DHeader(QWidget *parent = nullptr);
             ~DHeader();
 
     QString type(void);

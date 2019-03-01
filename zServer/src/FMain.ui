@@ -185,7 +185,7 @@ QSplitter { border: 0px; }</string>
           </font>
          </property>
          <property name="text">
-          <string>3333</string>
+          <string>314</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
