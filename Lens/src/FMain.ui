@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
-    <height>491</height>
+    <width>658</width>
+    <height>268</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,6 +32,12 @@
     </property>
     <item>
      <widget class="QLabel" name="lbImg">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -50,7 +56,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>867</width>
+     <width>658</width>
      <height>20</height>
     </rect>
    </property>

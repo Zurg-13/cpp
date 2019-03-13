@@ -8,7 +8,7 @@
 #include <QShortcut>
 
 namespace Ui { class FMain; }
-enum class State { Show, Edit };
+enum class State { Pick, Edit };
 
 /* Главная форма. *************************************************************/
 /******************************************************************************/
@@ -30,22 +30,24 @@ class FMain : public QMainWindow {
 
  private slots:
     void on_key_ESC(void);
+    void on_upd_sze(QRect geom);
 
     void on_aExit_triggered();
     void on_aTest_triggered();
 
-private:
+ private:
     Ui::FMain *ui;
-    QShortcut *keyESC;
+//    QShortcut *keyESC;
 
     QTime mouse_press_bgn;
     Qt::MouseButton mouse_press_btn;
 
     QPoint pos_bgn;
-    QRect geom_std;
+
+    QRect geom_old;
+    QPixmap pixmap_old;
 
     State state;
-    QPixmap pic, *old_pic = nullptr;
     int scale;
 
     void on_mouse_click(QMouseEvent *evt);

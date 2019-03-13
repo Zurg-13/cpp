@@ -1,5 +1,7 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include "_srv/Srv/dbg.h"
+
 #include "ui_WLens.h"
 #include "WLens.h"
 #include "FMain.h"
@@ -19,7 +21,7 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
     ui->frTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    this->setMaximumSize(QSize(0, 0));
+    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     //Инициализация.
     this->w = this->width(); this->h = this->height();
@@ -38,13 +40,14 @@ WLens::~WLens() {
 void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
     ui->lbImg->setPixmap(pic);
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
+    this->raise();
 }// setPic
 
 // Нажатие кнопки мыши. --------------------------------------------------------
 //------------------------------------------------------------------------------
 void WLens::mousePressEvent(QMouseEvent* /*evt*/) {
-    fmMain->setState(State::Show);
-    this->hideTool();
+//    fmMain->setState(State::Show);
+//    this->hideTool();
 }// mousePressEvent
 
 // Показать панель инструментов. -----------------------------------------------
@@ -53,7 +56,10 @@ void WLens::showTool(void) { ui->frTool->show(); }
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::hideTool(void) { ui->frTool->hide(); }
+void WLens::hideTool(void) {
+    FNC << "bgn";
+    ui->frTool->hide();
+}// hideTool
 
 //------------------------------------------------------------------------------
 
