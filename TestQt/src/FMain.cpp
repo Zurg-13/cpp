@@ -161,8 +161,6 @@ struct C : A, D {
 
 void FMain::on_btCast_clicked() {
 
-
-
   {
     C* pC = new C;
     A* pA = static_cast<A*>(pC);
@@ -188,3 +186,41 @@ void FMain::on_btCast_clicked() {
   }
 
 }// on_btCast_clicked
+
+
+#include "windows.h"
+
+// Разное. ---------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_bt_clicked() {
+    DBG << R"(/bgn)";
+
+
+    APPBARDATA pabd;
+    pabd.hWnd = reinterpret_cast<HWND>(this->winId());
+    pabd.uCallbackMessage = 40032;
+    pabd.cbSize = sizeof(pabd);
+
+    if(SHAppBarMessage(ABM_NEW, &pabd) == FALSE) {
+        DBG << "err abm_new";
+    }
+
+    pabd.uEdge = ABE_TOP;
+    pabd.rc.top = 0;
+    pabd.rc.left = 0;
+    pabd.rc.right = 800;
+    pabd.rc.bottom = 50;
+    pabd.hWnd = reinterpret_cast<HWND>(this->winId());
+    pabd.cbSize = sizeof(pabd);
+
+    if (SHAppBarMessage(ABM_SETPOS, &pabd) == FALSE) {
+        DBG << ("err abm_setpos");
+    }
+
+    this->setGeometry(0, 0, 800, 50);
+
+    DBG << R"(\end)";
+}// on_bt_clicked
+
+//------------------------------------------------------------------------------
+

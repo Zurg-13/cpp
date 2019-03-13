@@ -33,6 +33,8 @@ class FMain : public QMainWindow {
 
     void on_btCast_clicked();
 
+    void on_bt_clicked();
+
 private:
     Ui::FMain *ui;
 };// FMain
