@@ -162,10 +162,8 @@ void FMain::on_aTest_triggered() {
           , h = screen->virtualGeometry().height();
         this->pic = screen->grabWindow(0, x, y, w, h);
 
-        ui->lbImg->setPixmap(this->pic
-            .copy()
-            .scaled(
-                w, h, Qt::KeepAspectRatioByExpanding, Qt::FastTransformation) );
+        ui->lbImg->setPixmap(this->pic.copy().scaled(
+            w, h, Qt::KeepAspectRatioByExpanding, Qt::FastTransformation ));
 
         wgLens->show();
     }// if(screen)
