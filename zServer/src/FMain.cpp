@@ -37,7 +37,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/img/res/ico.ico"));
 
-    //Инитциализация.
+    //Инициализация.
     QNetworkProxyFactory::setUseSystemConfiguration(false);
     tcp = new QTcpServer(this);
     connect(tcp, &QTcpServer::newConnection, this, &FMain::new_connect);

@@ -75,26 +75,27 @@ bool ExecSQL(QSqlQuery &q) {
 //------------------------------------------------------------------------------
 ZSqlQuery::ZSqlQuery(
     const QString &sql, const QSqlDatabase &db, ZSqlQuery::PREPARE prep )
-  : sql(sql), QSqlQuery(db)
+  : QSqlQuery(db), sql(sql)
 { if(prep == PREPARE::YES) { prepare(); } }
 
 //Назначение параметров(ULONGLONG).---------------------------------------------
 //------------------------------------------------------------------------------
-void ZSqlQuery::operator ()(
-    const QString &fld, const qulonglong var )
-{
-    if(fld[0] != ':')
-        { QMessageBox::critical(0, SQL_NME_MSG, fld+"\n" + this->lastQuery()); }
+void ZSqlQuery::operator () (const QString &fld, const qulonglong var ) {
+    if(fld[0] != ':') {
+        QMessageBox::critical(
+            nullptr, SQL_NME_MSG, fld+"\n" + this->lastQuery() );
+    }// if(fld[0] != ':')
+
     this->bindValue(fld, QString::number(var));
 }// operator ()
 
 //Назначение параметров(VARIANT).-----------------------------------------------
 //------------------------------------------------------------------------------
-void ZSqlQuery::operator ()(
-    const QString &fld, const QVariant &var )
-{
-    if(fld[0] != ':')
-        { QMessageBox::critical(0, SQL_NME_MSG, fld+"\n" + this->lastQuery()); }
+void ZSqlQuery::operator () (const QString &fld, const QVariant &var ) {
+    if(fld[0] != ':') {
+        QMessageBox::critical(
+            nullptr, SQL_NME_MSG, fld+"\n" + this->lastQuery() );
+    }// if(fld[0] != ':')
     this->bindValue(fld, var);
 }// operator ()
 
@@ -147,6 +148,11 @@ ZTableView::ZTableView(QWidget *parent)
 
 }// ZTableView
 
+// Деструктор. -----------------------------------------------------------------
+//------------------------------------------------------------------------------
+ZTableView::~ZTableView() {
+
+}// ~ZTableView
 
 // Установить ширину колонки. --------------------------------------------------
 //------------------------------------------------------------------------------

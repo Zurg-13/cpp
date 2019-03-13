@@ -13,7 +13,7 @@ class WLog : public QWidget {
     Q_OBJECT
 
 public:
-    explicit WLog(QWidget *parent = 0);
+    explicit WLog(QWidget *parent = nullptr);
             ~WLog();
 
     void addPlainText(QString msg);
