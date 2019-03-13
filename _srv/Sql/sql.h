@@ -46,7 +46,8 @@ bool ExecSQL(QSqlQuery *q);
 // Расширение QSqlQuery. -------------------------------------------------------
 //------------------------------------------------------------------------------
 class ZSqlQuery : public QSqlQuery {
-public:
+
+ public:
     enum class PREPARE {YES, NOT };
 
     explicit ZSqlQuery(const QSqlDatabase &db): QSqlQuery(db) {}
@@ -70,7 +71,7 @@ public:
     void operator ()(const QString &fld, const QVariant &val);
     void operator ()(const QString &fld, const qulonglong val);
 
-private:
+ private:
     bool fl_prp = false;
     QString sql;
 
@@ -79,9 +80,10 @@ private:
 // Расширение QTableView. ------------------------------------------------------
 //------------------------------------------------------------------------------
 class ZTableView : public QTableView {
-public:
-    explicit ZTableView(QWidget *parent=0);
-            ~ZTableView() {}
+
+ public:
+    explicit ZTableView(QWidget *parent = nullptr);
+    virtual ~ZTableView();
 
     void     setSourceSQL(const QSqlQuery &sql) { mdl.setQuery(sql); }
     void     setSourceSQL(const QSqlQuery *sql) { mdl.setQuery(*sql); }
@@ -92,7 +94,7 @@ public:
     void     setFieldTitle (const QString &fld, const QString &ttl);
 
     QVariant curVal     (const QString &fld); // Считать текущее значение.
-    QVariant operator [](const QString &fld){ return curVal(fld); }
+    QVariant operator [](const QString &fld) { return curVal(fld); }
 
     void save(const QString &obj, QSettings *s); // Сохранить внешний вид.
     void rest(const QString &obj, QSettings *s); // Восстановить внешний вид.
@@ -100,7 +102,7 @@ public:
     QSqlQueryModel mdl;
     QSortFilterProxyModel prx;
 
-private:
+ private:
     void sec(const QStringList&, bool);
 
 };// ZTableView
