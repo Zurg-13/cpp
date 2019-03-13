@@ -22,13 +22,6 @@ void WAttention::on_timer(void) {
     ui->btExt->setVisible(visible);
 }// on_timer
 
-// Срабатывание таймера мерцания. ----------------------------------------------
-//------------------------------------------------------------------------------
-void WAttention::on_blink(void) {
-    if(this->isHidden()) { return; }
-    for(QFrame *frame : this->frm) { frame->setVisible(frame->isHidden()); }
-}// on_blink
-
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WAttention::WAttention(QWidget *parent)
@@ -50,15 +43,8 @@ WAttention::WAttention(QWidget *parent)
         wgt->setSizePolicy(sp); };
     RETAIN(ui->btExt); RETAIN(ui->lbTop); RETAIN(ui->btCls);
 
-    // Инициализация.
-    this->frm = {
-        ui->frTop, ui->frTLS, ui->frTRS
-      , ui->frLft, ui->frRgt
-      , ui->frBtm, ui->frBLS, ui->frBRS };
-
     //Подключение слотов.
     connect(&tmr, &QTimer::timeout, this, &WAttention::on_timer);
-    connect(&blink_tmr, &QTimer::timeout, this, &WAttention::on_blink);
 
 }// WAttention
 
@@ -66,7 +52,7 @@ WAttention::WAttention(QWidget *parent)
 //------------------------------------------------------------------------------
 void WAttention::showEvent(QShowEvent * /* evt */) {
     tmr.setInterval(500); tmr.start();
-    blink_tmr.setInterval(500);
+
 }// showEvent
 
 // Вызывается при скрытии формы. -----------------------------------------------
@@ -231,15 +217,4 @@ void WAttention::leaveEvent(QEvent * /* evt */) {
 // Скрыть форму. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WAttention::on_btCls_clicked() { this->hide(); }
-
-// Нажатие кнопки дополнительной функции. --------------------------------------
-//------------------------------------------------------------------------------
-void WAttention::on_btExt_clicked() {
-    for(QFrame *frame: this->frm) { frame->setVisible(true); }
-
-    if(blink_tmr.isActive()) { blink_tmr.stop(); }
-    else                     { blink_tmr.start(); }
-}// on_btExt_clicked
-
-//------------------------------------------------------------------------------
 

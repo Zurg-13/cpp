@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
-#include <QFrame>
+
 
 namespace Ui { class WAttention; }
 
@@ -30,18 +30,14 @@ protected:
     void mouseMoveEvent(QMouseEvent *evt);
 
 private slots:
-    void on_timer(void);
-    void on_blink(void);
-
     void on_btCls_clicked();
-    void on_btExt_clicked();
+    void on_timer(void);
 
 private:
     Ui::WAttention *ui;
     QPoint mpos;
     QSize msze;
-    QTimer tmr, blink_tmr;
-    QList<QFrame*> frm;
+    QTimer tmr;
 
     void (WAttention::*draw_ext)(QPainter&) = nullptr;
     void draw_free(QPainter &painter);
