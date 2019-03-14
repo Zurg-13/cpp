@@ -38,6 +38,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="cursor">
+       <cursorShape>CrossCursor</cursorShape>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>

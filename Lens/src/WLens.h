@@ -21,6 +21,7 @@ class WLens : public QWidget{
     void hideTool(void);
 
  protected:
+    void showEvent(QShowEvent *evt);
     void mousePressEvent(QMouseEvent* evt);
 
  private:

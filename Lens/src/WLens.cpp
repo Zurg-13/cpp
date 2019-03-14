@@ -22,12 +22,20 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
 
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+    this->raise();
 
     //Инициализация.
     this->w = this->width(); this->h = this->height();
     this->scale = 10;
 
 }// WLens
+
+// Выполняется при показе формы. -----------------------------------------------
+//------------------------------------------------------------------------------
+void WLens::showEvent(QShowEvent* /*evt*/) {
+    this->raise();
+}// showEvent
+
 
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -40,7 +48,6 @@ WLens::~WLens() {
 void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
     ui->lbImg->setPixmap(pic);
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
-    this->raise();
 }// setPic
 
 // Нажатие кнопки мыши. --------------------------------------------------------

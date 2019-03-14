@@ -24,9 +24,13 @@ class FMain : public QMainWindow {
  protected:
     void showEvent(QShowEvent *evt);
     void closeEvent(QCloseEvent *evt);
+
     bool eventFilter(QObject *obj, QEvent *evt);
     void mousePressEvent(QMouseEvent *evt);
     void mouseReleaseEvent(QMouseEvent *evt);
+
+    void enterEvent(QEvent *evt);
+    void leaveEvent(QEvent *evt);
 
  private slots:
     void on_key_ESC(void);
@@ -37,7 +41,6 @@ class FMain : public QMainWindow {
 
  private:
     Ui::FMain *ui;
-//    QShortcut *keyESC;
 
     QTime mouse_press_bgn;
     Qt::MouseButton mouse_press_btn;
@@ -47,10 +50,12 @@ class FMain : public QMainWindow {
     QRect geom_old;
     QPixmap pixmap_old;
 
-    State state;
-    int scale;
+    State state = State::Edit;
+    int scale = 10;
 
     void on_mouse_click(QMouseEvent *evt);
+
+    void stdShow(void);
 
 
 };// FMain

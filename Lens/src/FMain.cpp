@@ -32,24 +32,16 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     ui->setupUi(this);
 
     // Инициализация.
-//    this->keyESC = new QShortcut(this); this->keyESC->setKey(Qt::Key_Escape);
     qApp->installEventFilter(this);
 
     // CONNECT.
-//    connect(this->keyESC, &QShortcut::activated, this, &FMain::on_key_ESC);
 
 }// FMain
 
 // Выполняется при показе формы. -----------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::showEvent(QShowEvent* /*evt*/) {
-
-    // Инициализация.
-    this->scale = 10;
-    this->state = State::Edit;
-//    this->geom_std = this->geometry();
-
-    ui->lbImg->setFocus();
+    this->lower();
 }// showEvent
 
 // Выпрлняется при закрытии главного окна. -------------------------------------
@@ -59,10 +51,6 @@ void FMain::closeEvent(QCloseEvent* /*evt*/) { QApplication::quit(); }
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 FMain::~FMain() {
-/*
-    delete old_pic;
-*/
-
     delete ui;
 }//~FMain
 
@@ -88,18 +76,19 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
 
     // События мыши.
     if(evt->type() == QEvent::MouseMove) {
-       QMouseEvent *mEvt = static_cast<QMouseEvent*>(evt);
+        QMouseEvent *mEvt = static_cast<QMouseEvent*>(evt);
 
         if(this->state == State::Pick) {
 
-            int lw = 200, lh = 200;
+            int lw = 250, lh = 200;
             int x = mEvt->pos().x() - (lw/this->scale)/2;
             int y = mEvt->pos().y() - (lh/this->scale)/2;
 
             wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
-                ->copy(x, y, lw/this->scale, lh/this->scale));
+                ->copy(x, y, lw/this->scale, lh/this->scale)
+                 .scaled(lw, lh, Qt::KeepAspectRatio, Qt::FastTransformation));
 
-       }// if(!this->pic.isNull())
+        }// if(!this->pic.isNull())
 
     }// if (evt->type() == QEvent::MouseMove)
 
@@ -118,14 +107,21 @@ void FMain::mousePressEvent(QMouseEvent *evt) {
 // Отпускание кнопки мыши. -----------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::mouseReleaseEvent(QMouseEvent* evt) {
-
     // Разовый клик.
     if(this->mouse_press_btn == evt->button()
-    && this->mouse_press_bgn.msecsTo(QTime::currentTime()) < 500)
+    && this->mouse_press_bgn.msecsTo(QTime::currentTime()) < 100)
     {
         this->on_mouse_click(evt); this->mouse_press_btn = Qt::NoButton;
     } else {
-        DBG << "bgn:" << this->pos_bgn << "cur:" << QCursor::pos();
+        FNC << "bgn:" << this->pos_bgn << "cur:" << QCursor::pos();
+
+        int x = this->pos_bgn.x(), y = this->pos_bgn.y();
+        int w = abs(x - QCursor::pos().x()), h = abs(y - QCursor::pos().y());
+
+        FNC << x << y << w << h;
+
+        this->pixmap_old = ui->lbImg->pixmap()->copy(x, y, w, h);
+        this->stdShow();
     }// else // if(this->mouse_press_btn == evt->button()
 
 }// mouseReleaseEvent
@@ -133,12 +129,16 @@ void FMain::mouseReleaseEvent(QMouseEvent* evt) {
 // Клик мыши. ------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_mouse_click(QMouseEvent* /*evt*/) {
-    DBG << "on_mouse_click";
+    FNC << "bgn";
 
     if(this->state == State::Pick) {
+        FNC << "on pick";
+
         this->state = State::Edit;
         wgLens->showTool();
     } else {
+        FNC << "on edit";
+
         this->state = State::Pick;
         wgLens->hideTool();
     }// if(this->state == State::Show)
@@ -148,7 +148,6 @@ void FMain::on_mouse_click(QMouseEvent* /*evt*/) {
 // Отладка -> Проба. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_aTest_triggered() {
-//    int w = ui->lbImg->width(), h = ui->lbImg->height();
     QList<QScreen*> scr = QGuiApplication::screens();
     QScreen *screen = scr[0];
 
@@ -158,30 +157,25 @@ void FMain::on_aTest_triggered() {
 
         ui->mm->hide();
         this->geom_old = this->geometry();
+        this->pixmap_old = (ui->lbImg->pixmap() == nullptr
+            ? QPixmap() : *ui->lbImg->pixmap());
+
         this->setWindowFlags(
             Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-/*
         this->setGeometry(screen->virtualGeometry());
-*/
         this->show();
 
-
-/*
         int x = screen->virtualGeometry().x()
           , y = screen->virtualGeometry().y()
           , w = screen->virtualGeometry().width()
           , h = screen->virtualGeometry().height();
-*/
-
-        int x = 0
-          , y = 0
-          , w = screen->geometry().width()/2
-          , h = screen->geometry().height()/2;
-
-//        this->pic = screen->grabWindow(0, x, y, w, h);
         ui->lbImg->setPixmap(screen->grabWindow(0, x, y, w, h));
 
-        wgLens->show();
+        this->setState(State::Pick);
+        wgLens->hideTool(); wgLens->show();
+        this->eventFilter(nullptr, new QMouseEvent(
+            QEvent::MouseMove, QCursor::pos()
+          , Qt::NoButton, Qt::NoButton, Qt::NoModifier ));
     }// if(screen)
 
 }// on_aTest_triggered
@@ -189,24 +183,41 @@ void FMain::on_aTest_triggered() {
 // Нажатие ESC. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_key_ESC(void) {
-    DBG << "on_key_ESC";
+    FNC << "bgn";
 
     if(this->geom_old.isEmpty()) { return; }
 
-    ui->lbImg->setPixmap(QPixmap());
+    this->stdShow();
+}// on_key_ESC
+
+// Показ формы в стандартном виде. ---------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::stdShow(void) {
+    ui->lbImg->setPixmap(this->pixmap_old);
+
     this->setWindowFlags(Qt::Window);
-    ui->mm->show();
-    this->show();
+    ui->mm->show(); this->show();
 
     QApplication::processEvents();
 
     this->setGeometry(this->geom_old);
-}// on_key_ESC
+    this->adjustSize();
+}// stdShow
 
+//------------------------------------------------------------------------------
+void FMain::enterEvent(QEvent */*evt*/) {
+    if(ui->lbImg->pixmap() == nullptr) { wgLens->hide(); }
+    else                               { wgLens->show(); }
+}// enterEvent
+
+//------------------------------------------------------------------------------
+void FMain::leaveEvent(QEvent */*evt*/) {
+    if(this->state == State::Pick) { wgLens->hide(); }
+}// leaveEvent
 
 //------------------------------------------------------------------------------
 void FMain::on_upd_sze(QRect geom) {
-    FNC << "ok";
+    FNC << "bgn";
 
     this->setGeometry(geom);
 }
