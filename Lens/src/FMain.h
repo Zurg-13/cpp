@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QTime>
 #include <QShortcut>
+#include <QRubberBand>
 
 namespace Ui { class FMain; }
 enum class State { Pick, Edit };
@@ -42,6 +43,7 @@ class FMain : public QMainWindow {
  private:
     Ui::FMain *ui;
 
+    QRubberBand *rubb_band;
     QTime mouse_press_bgn;
     Qt::MouseButton mouse_press_btn;
 

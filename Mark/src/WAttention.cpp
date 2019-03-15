@@ -158,7 +158,6 @@ void WAttention::mousePressEvent(QMouseEvent *evt) {
 void WAttention::mouseMoveEvent(QMouseEvent *evt) {
 //    DBG << "mouseMoveEvent" << QTime::currentTime();
 
-
     if(evt->buttons() && Qt::LeftButton) {
         int dx = evt->pos().x() - mpos.x(), dy = evt->pos().y() - mpos.y();
 

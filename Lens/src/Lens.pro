@@ -21,14 +21,17 @@ DEPENDPATH  += ../../
 
 HEADERS += \
     FMain.h         \
-    WLens.h
+    WLens.h \
+    WClr.h
 
 SOURCES += \
     main.cpp        \
     FMain.cpp \
-    WLens.cpp
+    WLens.cpp \
+    WClr.cpp
 
 
 FORMS += \
     FMain.ui        \
-    WLens.ui
+    WLens.ui \
+    WClr.ui

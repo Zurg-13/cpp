@@ -33,6 +33,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
 
     // Инициализация.
     qApp->installEventFilter(this);
+    this->rubb_band = new QRubberBand(QRubberBand::Rectangle, this);
 
     // CONNECT.
 
@@ -80,6 +81,7 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
 
         if(this->state == State::Pick) {
 
+            // Отрисовка линзы.
             int lw = 250, lh = 200;
             int x = mEvt->pos().x() - (lw/this->scale)/2;
             int y = mEvt->pos().y() - (lh/this->scale)/2;
@@ -87,6 +89,12 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
             wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
                 ->copy(x, y, lw/this->scale, lh/this->scale)
                  .scaled(lw, lh, Qt::KeepAspectRatio, Qt::FastTransformation));
+
+            // Отрисовка выделения.
+            if(mEvt->buttons() == Qt::MouseButton::LeftButton) {
+                this->rubb_band->setGeometry(
+                    QRect(this->pos_bgn, mEvt->pos()).normalized() );
+            }// if(mEvt->button() == Qt::MouseButton::LeftButton)
 
         }// if(!this->pic.isNull())
 
@@ -100,8 +108,14 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
 void FMain::mousePressEvent(QMouseEvent *evt) {
     this->mouse_press_bgn = QTime::currentTime();
     this->mouse_press_btn = evt->button();
+    this->pos_bgn = evt->pos();
 
-    this->pos_bgn = QCursor::pos();
+    // Отрисовка выделения.
+    if(this->state == State::Pick) {
+        this->rubb_band->setGeometry(QRect(this->pos_bgn, QSize()));
+        this->rubb_band->show();
+    }// if(this->state == State::Pick)
+
 }// mousePressEvent
 
 // Отпускание кнопки мыши. -----------------------------------------------------
@@ -109,17 +123,15 @@ void FMain::mousePressEvent(QMouseEvent *evt) {
 void FMain::mouseReleaseEvent(QMouseEvent* evt) {
     // Разовый клик.
     if(this->mouse_press_btn == evt->button()
-    && this->mouse_press_bgn.msecsTo(QTime::currentTime()) < 100)
+    && this->mouse_press_bgn.msecsTo(QTime::currentTime()) < 200 )
     {
         this->on_mouse_click(evt); this->mouse_press_btn = Qt::NoButton;
-    } else {
+    } else if(ui->lbImg->pixmap() != nullptr) {
         FNC << "bgn:" << this->pos_bgn << "cur:" << QCursor::pos();
 
         int x = this->pos_bgn.x(), y = this->pos_bgn.y();
         int w = abs(x - QCursor::pos().x()), h = abs(y - QCursor::pos().y());
-
-        FNC << x << y << w << h;
-
+        this->rubb_band->hide();
         this->pixmap_old = ui->lbImg->pixmap()->copy(x, y, w, h);
         this->stdShow();
     }// else // if(this->mouse_press_btn == evt->button()
@@ -131,6 +143,7 @@ void FMain::mouseReleaseEvent(QMouseEvent* evt) {
 void FMain::on_mouse_click(QMouseEvent* /*evt*/) {
     FNC << "bgn";
 
+    if(ui->lbImg->pixmap() == nullptr) { return; }
     if(this->state == State::Pick) {
         FNC << "on pick";
 

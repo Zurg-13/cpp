@@ -6,10 +6,20 @@
 #include "WLens.h"
 #include "FMain.h"
 
+
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
 extern FMain *fmMain;
 
+// Удалить цветовую плашку. ----------------------------------------------------
+//------------------------------------------------------------------------------
+void WLens::remove_clr(WClr *clr) {
+    for(QList<WClr*>::iterator it = plt.begin(); it != plt.end(); it++)
+        { if((*it) == clr) { plt.erase(it); }}
+    delete clr;
+
+    FNC << "size:" << plt.size();
+}// remove_clr
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -17,8 +27,8 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
 
     // Внешний вид.
     ui->setupUi(this);
-    ui->frTool->setAttribute(Qt::WA_TranslucentBackground, true);
-    ui->frTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    ui->wgTool->setAttribute(Qt::WA_TranslucentBackground, true);
+    ui->wgTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -36,7 +46,6 @@ void WLens::showEvent(QShowEvent* /*evt*/) {
     this->raise();
 }// showEvent
 
-
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WLens::~WLens() {
@@ -52,21 +61,35 @@ void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
 
 // Нажатие кнопки мыши. --------------------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::mousePressEvent(QMouseEvent* /*evt*/) {
-//    fmMain->setState(State::Show);
-//    this->hideTool();
+void WLens::mousePressEvent(QMouseEvent *evt) {
+
+    // Добавить цветовую плашку.
+    if(ui->lbImg->geometry().contains(evt->pos())) {
+        WClr *plate = new WClr(
+            this, ui->lbImg->pixmap()->toImage().pixelColor(
+                ui->lbImg->mapFromParent(evt->pos()) ));
+        ui->lyPlt->insertWidget(0, plate);
+        this->plt.append(plate);
+        if(this->plt.size() > this->clr_plate_max)
+            {  this->plt.first()->deleteLater(); this->plt.removeFirst(); }
+        connect(plate, &WClr::remove, this, &WLens::remove_clr);
+    }// if(ui->lbImg->geometry().contains(evt->pos()))
+
 }// mousePressEvent
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::showTool(void) { ui->frTool->show(); }
+void WLens::showTool(void) { ui->wgTool->show(); }
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
 void WLens::hideTool(void) {
     FNC << "bgn";
-    ui->frTool->hide();
+    ui->wgTool->hide();
 }// hideTool
 
+// Нажатие кнопки: Пипетка. ----------------------------------------------------
 //------------------------------------------------------------------------------
-
+void WLens::on_btPipet_clicked() {
+    FNC << "bgn";
+}

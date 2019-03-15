@@ -4,6 +4,9 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QWidget>
+#include <QMouseEvent>
+
+#include "WClr.h"
 
 namespace Ui { class WLens; }
 
@@ -24,9 +27,17 @@ class WLens : public QWidget{
     void showEvent(QShowEvent *evt);
     void mousePressEvent(QMouseEvent* evt);
 
- private:
+ private slots:
+    void remove_clr(WClr *clr);
+    void on_btPipet_clicked();
+
+private:
     Ui::WLens *ui;
     int w, h, scale, shift = 10;
+    int clr_plate_max = 3;
+
+    QList<WClr*> plt;
+
 
 };// WLens
 
