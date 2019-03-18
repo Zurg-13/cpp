@@ -25,6 +25,7 @@ class WClr : public QWidget {
 
 private slots:
     void on_btClose_clicked();
+    void on_edColor_focused();
 
 private:
     Ui::WClr *ui;

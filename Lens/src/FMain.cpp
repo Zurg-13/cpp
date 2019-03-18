@@ -165,23 +165,18 @@ void FMain::on_aTest_triggered() {
     QScreen *screen = scr[0];
 
     if(screen) {
-
-        FNC << "g:" << this->geometry() << "fg:" << this->frameGeometry();
+        QRect geom = screen->geometry() /*virtualGeometry()*/;
 
         ui->mm->hide();
         this->geom_old = this->geometry();
         this->pixmap_old = (ui->lbImg->pixmap() == nullptr
             ? QPixmap() : *ui->lbImg->pixmap());
-
         this->setWindowFlags(
             Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-        this->setGeometry(screen->virtualGeometry());
-        this->show();
+        this->setGeometry(geom); this->show();
 
-        int x = screen->virtualGeometry().x()
-          , y = screen->virtualGeometry().y()
-          , w = screen->virtualGeometry().width()
-          , h = screen->virtualGeometry().height();
+        int x = geom.x(), y = geom.y()
+          , w = geom.width() , h = geom.height();
         ui->lbImg->setPixmap(screen->grabWindow(0, x, y, w, h));
 
         this->setState(State::Pick);
