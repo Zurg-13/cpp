@@ -15,6 +15,7 @@
 #include "FProc.h"
 #include "WTextBrowzer.h"
 #include "WAttention.h"
+#include "WActive.h"
 
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ extern WSound *wgSound;
 extern FProc *fmProc;
 extern WTextBrowzer *wgTextBrowzer;
 extern WAttention *wgAttention;
+extern WActive *wgActive;
 
 
 
@@ -222,5 +224,10 @@ void FMain::on_bt_clicked() {
     DBG << R"(\end)";
 }// on_bt_clicked
 
+// ActiveX. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+void FMain::on_btActiveX_clicked() {
+    wgActive->show();
+}// on_btActiveX_clicked
 
+//------------------------------------------------------------------------------

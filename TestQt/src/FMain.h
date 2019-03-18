@@ -32,6 +32,7 @@ class FMain : public QMainWindow {
     void on_pushButton_clicked();
 
     void on_btCast_clicked();
+    void on_btActiveX_clicked();
 
     void on_bt_clicked();
 

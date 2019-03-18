@@ -26,7 +26,8 @@ HEADERS += \
     WSound.h        \
     FProc.h         \
     WTextBrowzer.h \
-    WAttention.h
+    WAttention.h \
+    WActive.h
 
 SOURCES += \
     main.cpp        \
@@ -35,7 +36,8 @@ SOURCES += \
     WSound.cpp      \
     FProc.cpp       \
     WTextBrowzer.cpp \
-    WAttention.cpp
+    WAttention.cpp \
+    WActive.cpp
 
 FORMS += \
     FMain.ui        \
@@ -43,4 +45,5 @@ FORMS += \
     WSound.ui       \
     FProc.ui        \
     WTextBrowzer.ui \
-    WAttention.ui
+    WAttention.ui \
+    WActive.ui
