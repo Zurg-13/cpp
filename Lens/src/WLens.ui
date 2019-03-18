@@ -75,7 +75,7 @@
            <string notr="true">border-color: gray;</string>
           </property>
           <property name="text">
-           <string>отправка</string>
+           <string>принять</string>
           </property>
          </widget>
         </item>
@@ -91,64 +91,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_5">
-          <property name="minimumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string>border-color: gray;</string>
-          </property>
-          <property name="text">
-           <string>т</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="minimumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string>border-color: gray;</string>
-          </property>
-          <property name="text">
-           <string>ст</string>
-          </property>
-         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_2">
@@ -175,7 +117,7 @@
            <string>border-color: gray;</string>
           </property>
           <property name="text">
-           <string>пр</string>
+           <string>кр</string>
           </property>
          </widget>
         </item>
@@ -213,7 +155,7 @@
       <item>
        <layout class="QVBoxLayout" name="lyPlt">
         <property name="spacing">
-         <number>0</number>
+         <number>1</number>
         </property>
        </layout>
       </item>

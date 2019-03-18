@@ -14,11 +14,9 @@ extern FMain *fmMain;
 // Удалить цветовую плашку. ----------------------------------------------------
 //------------------------------------------------------------------------------
 void WLens::remove_clr(WClr *clr) {
-    for(QList<WClr*>::iterator it = plt.begin(); it != plt.end(); it++)
-        { if((*it) == clr) { plt.erase(it); }}
+    QMutableListIterator<WClr*> it(plt);
+    while(it.hasNext()) { if(it.next() == clr) { it.remove(); }}
     delete clr;
-
-    FNC << "size:" << plt.size();
 }// remove_clr
 
 // Конструктор. ----------------------------------------------------------------
@@ -28,10 +26,8 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
     // Внешний вид.
     ui->setupUi(this);
     ui->wgTool->setAttribute(Qt::WA_TranslucentBackground, true);
-//    ui->wgTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
     this->raise();
 
@@ -66,6 +62,21 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
     // Добавить цветовую плашку.
     if(ui->lbImg->geometry().contains(evt->pos())) {
+
+        switch(evt->button()) {
+         case Qt::LeftButton:
+            FNC << "Qt::LeftButton";
+            break;
+
+         case Qt::RightButton:
+            FNC << "Qt::RightButton";
+            break;
+
+         default:
+            break;
+
+        }// switch(evt->button())
+
         WClr *plate = new WClr(
             this, ui->lbImg->pixmap()->toImage().pixelColor(
                 ui->lbImg->mapFromParent(evt->pos()) ));
