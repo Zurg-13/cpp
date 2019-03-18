@@ -41,7 +41,6 @@ WAttention::WAttention(QWidget *parent)
     this->setParent(nullptr);
     this->setWindowFlags(
         Qt::Widget| Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-
     this->setAttribute(Qt::WA_NoSystemBackground);
     this->setAttribute(Qt::WA_TranslucentBackground);
 

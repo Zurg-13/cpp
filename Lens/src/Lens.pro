@@ -20,18 +20,20 @@ INCLUDEPATH += ../../
 DEPENDPATH  += ../../
 
 HEADERS += \
+    AdvanceEdit.h   \
     FMain.h         \
-    WLens.h \
-    WClr.h
+    WLens.h         \
+    WClr.h          \
 
 SOURCES += \
+    AdvanceEdit.cpp \
     main.cpp        \
-    FMain.cpp \
-    WLens.cpp \
-    WClr.cpp
+    FMain.cpp       \
+    WLens.cpp       \
+    WClr.cpp        \
 
 
 FORMS += \
     FMain.ui        \
-    WLens.ui \
-    WClr.ui
+    WLens.ui        \
+    WClr.ui         \

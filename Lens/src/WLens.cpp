@@ -28,9 +28,10 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
     // Внешний вид.
     ui->setupUi(this);
     ui->wgTool->setAttribute(Qt::WA_TranslucentBackground, true);
-    ui->wgTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+//    ui->wgTool->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
     this->raise();
 
@@ -83,10 +84,7 @@ void WLens::showTool(void) { ui->wgTool->show(); }
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::hideTool(void) {
-    FNC << "bgn";
-    ui->wgTool->hide();
-}// hideTool
+void WLens::hideTool(void) { ui->wgTool->hide(); }
 
 // Нажатие кнопки: Пипетка. ----------------------------------------------------
 //------------------------------------------------------------------------------
