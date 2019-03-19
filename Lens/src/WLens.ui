@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <item>
     <widget class="QLabel" name="lbImg">
      <property name="frameShape">
@@ -29,7 +29,7 @@
    </item>
    <item>
     <widget class="QWidget" name="wgTool" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
       <property name="spacing">
        <number>1</number>
       </property>
@@ -93,6 +93,32 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="btColor">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>цв</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_2">
           <property name="minimumSize">
            <size>
@@ -152,18 +178,22 @@
         </item>
        </layout>
       </item>
-      <item>
-       <layout class="QVBoxLayout" name="lyPlt">
-        <property name="spacing">
-         <number>1</number>
-        </property>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="WBox" name="wgPlt" native="true"/>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WBox</class>
+   <extends>QWidget</extends>
+   <header>WBox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

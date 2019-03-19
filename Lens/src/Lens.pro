@@ -13,7 +13,7 @@ CONFIG += c++14
 TARGET = Lens
 TEMPLATE = app
 
-include($$SRV/Srv.pri)
+include($$SRV/Srv/Srv.pri)
 include($$WGT/Log/WLog.pri)
 
 INCLUDEPATH += ../../
@@ -24,6 +24,7 @@ HEADERS += \
     FMain.h         \
     WLens.h         \
     WClr.h          \
+    WBox.h
 
 SOURCES += \
     AdvanceEdit.cpp \
@@ -31,9 +32,11 @@ SOURCES += \
     FMain.cpp       \
     WLens.cpp       \
     WClr.cpp        \
+    WBox.cpp
 
 
 FORMS += \
     FMain.ui        \
     WLens.ui        \
     WClr.ui         \
+    WBox.ui

@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 #include <QWidget>
 #include <QMouseEvent>
+#include <QImage>
 
 #include "WClr.h"
 
@@ -30,11 +31,14 @@ class WLens : public QWidget{
  private slots:
     void remove_clr(WClr *clr);
     void on_btPipet_clicked();
+    void on_btColor_clicked();
 
 private:
     Ui::WLens *ui;
     int w, h, scale, shift = 10;
     int clr_plate_max = 3;
+    QImage img;
+    QColor color;
 
     QList<WClr*> plt;
 

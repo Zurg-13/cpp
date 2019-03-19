@@ -16,16 +16,22 @@ class WClr : public QWidget {
  public:
             WClr(QWidget *parent, QColor color);
            ~WClr();
+    WClr*   fixed(bool fix);
+
 
     void    setColor(const QColor &clr);
     QColor  getColor(void) { return color; }
+    bool    isFixed(void);
 
  signals:
-    void    remove(WClr *);    // Попытка удаления.
+    void    remove(WClr*);    // Попытка удаления.
+    void    change_fix(WClr*);// Изменение фиксации.
 
 private slots:
     void on_btClose_clicked();
     void on_edColor_focused();
+
+    void on_cbFix_stateChanged(int arg1);
 
 private:
     Ui::WClr *ui;

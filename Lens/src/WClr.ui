@@ -52,6 +52,25 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="cbFix">
+     <property name="minimumSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="lbColor">
      <property name="minimumSize">
       <size>

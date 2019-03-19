@@ -1,10 +1,13 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <QColorDialog>
+
 #include "_srv/Srv/dbg.h"
 
 #include "ui_WLens.h"
 #include "WLens.h"
 #include "FMain.h"
+//#include "
 
 
 // Глобальные переменные. ------------------------------------------------------
@@ -53,6 +56,7 @@ WLens::~WLens() {
 //------------------------------------------------------------------------------
 void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
     ui->lbImg->setPixmap(pic);
+    this->img = pic.toImage();
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
 }// setPic
 
@@ -62,29 +66,31 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
     // Добавить цветовую плашку.
     if(ui->lbImg->geometry().contains(evt->pos())) {
+        QPoint pos = ui->lbImg->mapFromParent(evt->pos());
 
         switch(evt->button()) {
-         case Qt::LeftButton:
-            FNC << "Qt::LeftButton";
-            break;
+
+         case Qt::LeftButton: {
+
+            for(int x=(pos.x()/10)*10; x<(1 + pos.x()/10)*10; x++) {
+                for(int y=(pos.y()/10)*10; y<(1 + pos.y()/10)*10; y++) {
+                    this->img.setPixel(x, y, qRgb(0,0,0));
+                }
+            }// i
+
+            ui->lbImg->setPixmap(QPixmap::fromImage(img));
+         } break;
 
          case Qt::RightButton:
-            FNC << "Qt::RightButton";
-            break;
+            ui->wgPlt->addPlate(new WClr(
+                this, this->img.pixelColor(pos) ));
+         break;
 
          default:
             break;
 
         }// switch(evt->button())
 
-        WClr *plate = new WClr(
-            this, ui->lbImg->pixmap()->toImage().pixelColor(
-                ui->lbImg->mapFromParent(evt->pos()) ));
-        ui->lyPlt->insertWidget(0, plate);
-        this->plt.append(plate);
-        if(this->plt.size() > this->clr_plate_max)
-            {  this->plt.first()->deleteLater(); this->plt.removeFirst(); }
-        connect(plate, &WClr::remove, this, &WLens::remove_clr);
     }// if(ui->lbImg->geometry().contains(evt->pos()))
 
 }// mousePressEvent
@@ -101,4 +107,15 @@ void WLens::hideTool(void) { ui->wgTool->hide(); }
 //------------------------------------------------------------------------------
 void WLens::on_btPipet_clicked() {
     FNC << "bgn";
-}
+}// on_btPipet_clicked
+
+// Нажатие кнопки: Цвет. -------------------------------------------------------
+//------------------------------------------------------------------------------
+void WLens::on_btColor_clicked() {
+    this->color = QColorDialog::getColor(this->color, this);
+    ui->wgPlt->addPlate((new WClr(
+        this, this->color))->fixed(true) );
+}// on_btColor_clicked
+
+//------------------------------------------------------------------------------
+
