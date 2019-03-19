@@ -1,5 +1,7 @@
 #include <QTimer>
 
+#include "_srv/Srv/dbg.h"
+
 #include "ui_WClr.h"
 #include "WClr.h"
 

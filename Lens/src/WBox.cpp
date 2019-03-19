@@ -1,22 +1,20 @@
-// INCLUDE. --------------------------------------------------------------------
+// INCLUDE. ------------------------------------------------------------------
 //------------------------------------------------------------------------------
-#include <QLayout>
+//#include <QLayout>
 
 #include "_srv/Srv/dbg.h"
 
 #include "ui_WBox.h"
 #include "WBox.h"
 
+
 // Добавить плашку. -------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WBox::addPlate(WClr *plate) {
     (plate->isFixed() ? ui->lyFix : ui->lyStd)->insertWidget(0, plate);
 
-    FNC << ui->lyFix->count();
-
-
-//    QObjectList cld = ui->lyStd->children();
-//    while(cld.size() > this->size) { cld.last()->deleteLater(); }
+    while(ui->lyStd->count() > this->size)
+        { ui->lyStd->takeAt(ui->lyStd->count()-1)->widget()->deleteLater(); }
 
     connect(plate, &WClr::remove, this, &WBox::remove_clr);
     connect(plate, &WClr::change_fix, this, &WBox::chahge_fix);
