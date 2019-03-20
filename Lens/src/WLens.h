@@ -13,8 +13,10 @@ namespace Ui { class WLens; }
 
 /* Класс отображения увеличенного изображения. ********************************/
 /******************************************************************************/
-class WLens : public QWidget{
+class WLens : public QWidget {
     Q_OBJECT
+
+    enum class State { Pick, Edit };
 
  public:
     explicit WLens(QWidget *parent = nullptr);
@@ -24,24 +26,25 @@ class WLens : public QWidget{
     void showTool(void);
     void hideTool(void);
 
+    int  scale(void) { return S; }
+
+//    void paintEvent(QPaintEvent*);
+
  protected:
     void showEvent(QShowEvent *evt);
     void mousePressEvent(QMouseEvent* evt);
 
  private slots:
-    void remove_clr(WClr *clr);
     void on_btPipet_clicked();
     void on_btColor_clicked();
 
 private:
     Ui::WLens *ui;
-    int w, h, scale, shift = 10;
+    State state = State::Pick;
+    int w, h, S, shift = 10;
     int clr_plate_max = 3;
     QImage img;
     QColor color;
-
-    QList<WClr*> plt;
-
 
 };// WLens
 

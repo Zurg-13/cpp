@@ -1,6 +1,7 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QColorDialog>
+#include <QPainter>
 
 #include "_srv/Srv/dbg.h"
 
@@ -14,14 +15,22 @@
 //------------------------------------------------------------------------------
 extern FMain *fmMain;
 
-// Удалить цветовую плашку. ----------------------------------------------------
+// Событие отрисовки. ----------------------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::remove_clr(WClr *clr) {
-    QMutableListIterator<WClr*> it(plt);
-    while(it.hasNext()) { if(it.next() == clr) { it.remove(); }}
-    delete clr;
-}// remove_clr
+/*
+void WLens::paintEvent(QPaintEvent* evt) {
+    QPainter painter(this);
 
+    if(this->state == State::Pick) {
+        int w = this->width(), h = this->height();
+        int x = w/2, y = h/2;
+
+        painter.drawLine(0, y, w, y);
+        painter.drawLine(x, 0, x, h);
+    }// if(this->state == State::Pick)
+
+}// paintEvent
+*/
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
@@ -34,9 +43,12 @@ WLens::WLens(QWidget *parent) : QWidget(parent), ui(new Ui::WLens) {
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
     this->raise();
 
+    ui->wgPlt->addPlate((new WClr(this, Qt::black))
+        ->fix(true)->sel(true) );
+
     //Инициализация.
     this->w = this->width(); this->h = this->height();
-    this->scale = 10;
+    this->S = 13; // scale
 
 }// WLens
 
@@ -55,8 +67,23 @@ WLens::~WLens() {
 // Задать изображение. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
-    ui->lbImg->setPixmap(pic);
-    this->img = pic.toImage();
+    int w = pic.width()*S, h = pic.height()*S;
+
+    if(this->state == State::Pick) {
+//        int w = ui->lbImg->width(), h = ui->lbImg->height();
+        int x = w/2 - 1, y = h/2 - 1;
+        QImage img(pic.scaled(w, h).toImage());
+        QPainter painter(&img);
+
+        painter.setPen(Qt::red);
+        painter.drawLine(0, y, w, y);
+        painter.drawLine(x, 0, x, h);
+
+        ui->lbImg->setPixmap(QPixmap::fromImage(img));
+    } else {
+        ui->lbImg->setPixmap(pic.scaled(w, h));
+    }// if(this->state == State::Pick)
+
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
 }// setPic
 
@@ -72,11 +99,11 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
          case Qt::LeftButton: {
 
-            for(int x=(pos.x()/10)*10; x<(1 + pos.x()/10)*10; x++) {
-                for(int y=(pos.y()/10)*10; y<(1 + pos.y()/10)*10; y++) {
-                    this->img.setPixel(x, y, qRgb(0,0,0));
-                }
-            }// i
+            for(int x=(pos.x()/S)*S; x<(1 + pos.x()/S)*S; x++) {
+                for(int y=(pos.y()/S)*S; y<(1 + pos.y()/S)*S; y++) {
+                    this->img.setPixel(x, y, ui->wgPlt->color().rgb());
+                }// y
+            }// x
 
             ui->lbImg->setPixmap(QPixmap::fromImage(img));
          } break;
@@ -97,11 +124,14 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::showTool(void) { ui->wgTool->show(); }
+void WLens::showTool(void) {
+    this->img = ui->lbImg->pixmap()->toImage();
+    ui->wgTool->show(); this->state = State::Edit;
+}// showTool
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::hideTool(void) { ui->wgTool->hide(); }
+void WLens::hideTool(void) { ui->wgTool->hide(); this->state = State::Pick; }
 
 // Нажатие кнопки: Пипетка. ----------------------------------------------------
 //------------------------------------------------------------------------------
@@ -114,7 +144,7 @@ void WLens::on_btPipet_clicked() {
 void WLens::on_btColor_clicked() {
     this->color = QColorDialog::getColor(this->color, this);
     ui->wgPlt->addPlate((new WClr(
-        this, this->color))->fixed(true) );
+        this, this->color))->fix(true)->sel(true) );
 }// on_btColor_clicked
 
 //------------------------------------------------------------------------------

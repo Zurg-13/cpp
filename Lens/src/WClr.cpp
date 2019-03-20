@@ -1,4 +1,5 @@
 #include <QTimer>
+#include <QPainter>
 
 #include "_srv/Srv/dbg.h"
 
@@ -21,17 +22,44 @@ void WClr::setColor(const QColor &clr) {
 
 // Зафиксировать цвет. ---------------------------------------------------------
 //------------------------------------------------------------------------------
-WClr* WClr::fixed(bool fix) { ui->cbFix->setChecked(fix); return this; }
+WClr* WClr::fix(bool fix) { ui->cbFix->setChecked(fix); return this; }
+
+// Нажатие кнопки мыши. --------------------------------------------------------
+//------------------------------------------------------------------------------
+void WClr::mousePressEvent(QMouseEvent* evt) {
+    if(ui->lbColor->geometry().contains(evt->pos())) {
+        this->selected = true;
+        emit select(this);
+    }// if(ui->lbColor->geometry().contains(evt->pos()))
+
+}// mousePressEvent
+
+// Событие отрисовки. ----------------------------------------------------------
+//------------------------------------------------------------------------------
+void WClr::paintEvent(QPaintEvent */*evt*/) {
+
+    if(this->selected) {
+        QPen pen(Qt::red); pen.setWidth(10);
+        QPainter painter(this); painter.setPen(pen);
+        painter.drawRect(this->rect());
+    }// if(this->selected)
+
+}// paintEvent
+
+// Установить признак выбора. --------------------------------------------------
+//------------------------------------------------------------------------------
+void WClr::setSelected(bool selected)
+    { this->selected = selected; this->repaint(); }
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WClr::WClr(QWidget *parent, QColor color)
-    : QWidget(parent), ui(new Ui::WClr), color(color)
+    : QWidget(parent), ui(new Ui::WClr), clr(color)
 {
     // Внешний вид.
     ui->setupUi(this);
     ui->edColor->clear();
-    this->setColor(this->color);
+    this->setColor(this->clr);
 
     // Инициализация.
     connect(ui->edColor, &AdvanceEdit::focused, this, &WClr::on_edColor_focused);
@@ -51,8 +79,11 @@ void WClr::on_btClose_clicked() { emit(remove(this)); }
 void WClr::on_edColor_focused()
     { QTimer::singleShot(0, ui->edColor, &AdvanceEdit::selectAll); }
 
-// Изменить фиксацию. ----------------------------------------------------------
+// Изменение состояния фиксации. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WClr::on_cbFix_stateChanged(int /*arg*/) { emit change_fix(this); }
+void WClr::on_cbFix_stateChanged(int /*arg*/) {
+    emit change_fix(this);
+}// on_cbFix_stateChanged
 
 //------------------------------------------------------------------------------
+

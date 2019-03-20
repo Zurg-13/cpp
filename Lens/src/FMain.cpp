@@ -81,14 +81,21 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
 
         if(this->state == State::Pick) {
 
+/*
             // Отрисовка линзы.
-            int lw = 250, lh = 200;
+            int lw = 247, lh = 195;
             int x = mEvt->pos().x() - (lw/this->scale)/2;
             int y = mEvt->pos().y() - (lh/this->scale)/2;
 
             wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
                 ->copy(x, y, lw/this->scale, lh/this->scale)
                  .scaled(lw, lh, Qt::KeepAspectRatio, Qt::FastTransformation));
+*/
+            int lw = 247/wgLens->scale(), lh = 195/wgLens->scale();
+            int x = mEvt->pos().x() - lw/2;
+            int y = mEvt->pos().y() - lh/2;
+            wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
+                ->copy(x, y, lw, lh) );
 
             // Отрисовка выделения.
             if(mEvt->buttons() == Qt::MouseButton::LeftButton) {

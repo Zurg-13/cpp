@@ -53,7 +53,7 @@ class FMain : public QMainWindow {
     QPixmap pixmap_old;
 
     State state = State::Edit;
-    int scale = 10;
+    int scale = 13;
 
     void on_mouse_click(QMouseEvent *evt);
 

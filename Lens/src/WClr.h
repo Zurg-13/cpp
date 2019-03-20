@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 #include <QWidget>
 #include <QColor>
+#include <QMouseEvent>
+#include <QPaintEvent>
 
 namespace Ui { class WClr; }
 
@@ -16,27 +18,31 @@ class WClr : public QWidget {
  public:
             WClr(QWidget *parent, QColor color);
            ~WClr();
-    WClr*   fixed(bool fix);
+    WClr*   fix(bool fix);
+    WClr*   sel(bool sel) { this->selected = sel; return this; }
 
-
+    QColor  color(void) { return clr; }
     void    setColor(const QColor &clr);
-    QColor  getColor(void) { return color; }
     bool    isFixed(void);
+    void    setSelected(bool selected);
+
+    void    mousePressEvent(QMouseEvent *evt);
+    void    paintEvent(QPaintEvent *evt);
 
  signals:
-    void    remove(WClr*);    // Попытка удаления.
-    void    change_fix(WClr*);// Изменение фиксации.
-
+    void    remove(WClr*);      // Попытка удаления.
+    void    change_fix(WClr*);  // Изменение фиксации.
+    void    select(WClr*);      // Выбран.
 
 private slots:
     void on_btClose_clicked();
     void on_edColor_focused();
-    void on_cbFix_stateChanged(int arg);
-
+    void on_cbFix_stateChanged(int);
 
 private:
     Ui::WClr *ui;
-    QColor color;
+    QColor clr;
+    bool selected = false;
 
 };// WClr
 
