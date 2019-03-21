@@ -70,7 +70,6 @@ void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
     int w = pic.width()*S, h = pic.height()*S;
 
     if(this->state == State::Pick) {
-//        int w = ui->lbImg->width(), h = ui->lbImg->height();
         int x = w/2 - 1, y = h/2 - 1;
         QImage img(pic.scaled(w, h).toImage());
         QPainter painter(&img);
@@ -108,13 +107,14 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
             ui->lbImg->setPixmap(QPixmap::fromImage(img));
          } break;
 
-         case Qt::RightButton:
-            ui->wgPlt->addPlate(new WClr(
-                this, this->img.pixelColor(pos) ));
-         break;
+         case Qt::RightButton: {
+            QColor clr = this->img.pixelColor(pos);
+            if(ui->wgPlt->contain(clr)) { ui->wgPlt->select(clr); }
+            else { ui->wgPlt->addPlate((new WClr(this, clr))->sel(true)); }
+         } break;
 
-         default:
-            break;
+         default: {
+         } break;
 
         }// switch(evt->button())
 

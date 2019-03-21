@@ -24,6 +24,7 @@ class WClr : public QWidget {
     QColor  color(void) { return clr; }
     void    setColor(const QColor &clr);
     bool    isFixed(void);
+    bool    isSelect(void) { return selected; }
     void    setSelected(bool selected);
 
     void    mousePressEvent(QMouseEvent *evt);

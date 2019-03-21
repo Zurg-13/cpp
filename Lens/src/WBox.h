@@ -20,6 +20,8 @@ class WBox : public QWidget {
 
     void     addPlate(WClr *plate);
     QColor   color() { return (plate_sel ? plate_sel->color() : Qt::black); }
+    bool     contain(const QColor &clr);
+    void     select(const QColor &clr);
 
  private slots:
    void remove_clr(WClr *clr);
