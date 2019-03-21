@@ -19,12 +19,12 @@ class WClr : public QWidget {
             WClr(QWidget *parent, QColor color);
            ~WClr();
     WClr*   fix(bool fix);
-    WClr*   sel(bool sel) { this->selected = sel; return this; }
+    WClr*   sel(bool sel) { this->fl_select = sel; return this; }
 
     QColor  color(void) { return clr; }
     void    setColor(const QColor &clr);
     bool    isFixed(void);
-    bool    isSelect(void) { return selected; }
+    bool    isSelect(void) { return fl_select; }
     void    setSelected(bool selected);
 
     void    mousePressEvent(QMouseEvent *evt);
@@ -33,7 +33,7 @@ class WClr : public QWidget {
  signals:
     void    remove(WClr*);      // Попытка удаления.
     void    change_fix(WClr*);  // Изменение фиксации.
-    void    select(WClr*);      // Выбран.
+    void    select_chg(WClr*);  // Изменение статуса выбора.
 
 private slots:
     void on_btClose_clicked();
@@ -43,7 +43,7 @@ private slots:
 private:
     Ui::WClr *ui;
     QColor clr;
-    bool selected = false;
+    bool fl_select = false;
 
 };// WClr
 

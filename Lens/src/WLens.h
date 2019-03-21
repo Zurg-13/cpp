@@ -22,7 +22,8 @@ class WLens : public QWidget {
     explicit WLens(QWidget *parent = nullptr);
             ~WLens();
 
-    void setPic(const QPoint &pos, const QPixmap &pic);
+    void setImg(const QPoint &pos, const QImage &img);
+
     void showTool(void);
     void hideTool(void);
 

@@ -12,9 +12,7 @@
 //------------------------------------------------------------------------------
 void WBox::addPlate(WClr *plate) {
 
-    FNC << "sel:" << plate->isSelect() << "cnt:" << ui->lyStd->count();
-
-    for(int i=ui->lyStd->count(); i > this->size; i--) {
+    for(int i=ui->lyStd->count(); i >= this->size; i--) {
         WClr *plate = static_cast<WClr*>(ui->lyStd->itemAt(i-1)->widget());
         if(!plate->isSelect()) { plate->deleteLater(); }
     }// i
@@ -22,10 +20,10 @@ void WBox::addPlate(WClr *plate) {
     (plate->isFixed() ? ui->lyFix : ui->lyStd)->insertWidget(0, plate);
     connect(plate, &WClr::remove, this, &WBox::remove_clr);
     connect(plate, &WClr::change_fix, this, &WBox::chahge_fix);
-    connect(plate, &WClr::select, this, &WBox::select_clr);
+    connect(plate, &WClr::select_chg, this, &WBox::select_cng);
 
-    if(plate->isSelect()) { this->select_clr(plate); }
     if(!this->plate_sel) { this->plate_sel = plate; }
+    if(plate->isSelect()) { this->select_cng(plate); }
 }// addPlate
 
 // Удалить контрол. ------------------------------------------------------------
@@ -40,7 +38,7 @@ void WBox::chahge_fix(WClr *clr) {
 
 // Выбор контрола. -------------------------------------------------------------
 //------------------------------------------------------------------------------
-void WBox::select_clr(WClr *clr) {
+void WBox::select_cng(WClr *clr) {
     if(plate_sel) { plate_sel->setSelected(false); }
     clr->setSelected(true);
     plate_sel = clr;

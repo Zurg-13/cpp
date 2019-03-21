@@ -66,25 +66,25 @@ WLens::~WLens() {
 
 // Задать изображение. ---------------------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::setPic(const QPoint &pos, const QPixmap &pic) {
-    int w = pic.width()*S, h = pic.height()*S;
+void WLens::setImg(const QPoint &pos, const QImage &img) {
+    int w = img.width()*S, h = img.height()*S;
 
     if(this->state == State::Pick) {
         int x = w/2 - 1, y = h/2 - 1;
-        QImage img(pic.scaled(w, h).toImage());
-        QPainter painter(&img);
+        QImage big(img.scaled(w, h));
+        QPainter painter(&big);
 
         painter.setPen(Qt::red);
         painter.drawLine(0, y, w, y);
         painter.drawLine(x, 0, x, h);
 
-        ui->lbImg->setPixmap(QPixmap::fromImage(img));
+        ui->lbImg->setPixmap(QPixmap::fromImage(big));
     } else {
-        ui->lbImg->setPixmap(pic.scaled(w, h));
+        ui->lbImg->setPixmap(QPixmap::fromImage(img.scaled(w, h)));
     }// if(this->state == State::Pick)
 
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
-}// setPic
+}// setImg
 
 // Нажатие кнопки мыши. --------------------------------------------------------
 //------------------------------------------------------------------------------

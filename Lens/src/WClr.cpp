@@ -27,18 +27,15 @@ WClr* WClr::fix(bool fix) { ui->cbFix->setChecked(fix); return this; }
 // Нажатие кнопки мыши. --------------------------------------------------------
 //------------------------------------------------------------------------------
 void WClr::mousePressEvent(QMouseEvent* evt) {
-    if(ui->lbColor->geometry().contains(evt->pos())) {
-        this->selected = true;
-        emit select(this);
-    }// if(ui->lbColor->geometry().contains(evt->pos()))
-
+    this->setSelected(
+        ui->lbColor->geometry().contains(evt->pos()) );
 }// mousePressEvent
 
 // Событие отрисовки. ----------------------------------------------------------
 //------------------------------------------------------------------------------
 void WClr::paintEvent(QPaintEvent */*evt*/) {
 
-    if(this->selected) {
+    if(this->fl_select) {
         QPen pen(Qt::red); pen.setWidth(10);
         QPainter painter(this); painter.setPen(pen);
         painter.drawRect(this->rect());
@@ -49,7 +46,7 @@ void WClr::paintEvent(QPaintEvent */*evt*/) {
 // Установить признак выбора. --------------------------------------------------
 //------------------------------------------------------------------------------
 void WClr::setSelected(bool selected)
-    { this->selected = selected; this->repaint(); }
+    { this->fl_select = selected; this->repaint(); emit select_chg(this); }
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------

@@ -81,21 +81,14 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
 
         if(this->state == State::Pick) {
 
-/*
             // Отрисовка линзы.
-            int lw = 247, lh = 195;
-            int x = mEvt->pos().x() - (lw/this->scale)/2;
-            int y = mEvt->pos().y() - (lh/this->scale)/2;
-
-            wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
-                ->copy(x, y, lw/this->scale, lh/this->scale)
-                 .scaled(lw, lh, Qt::KeepAspectRatio, Qt::FastTransformation));
-*/
             int lw = 247/wgLens->scale(), lh = 195/wgLens->scale();
             int x = mEvt->pos().x() - lw/2;
             int y = mEvt->pos().y() - lh/2;
-            wgLens->setPic(QCursor::pos(), ui->lbImg->pixmap()
-                ->copy(x, y, lw, lh) );
+
+            wgLens->setImg(
+                QCursor::pos()
+              , ui->lbImg->pixmap()->toImage().copy(x, y, lw, lh));
 
             // Отрисовка выделения.
             if(mEvt->buttons() == Qt::MouseButton::LeftButton) {
@@ -134,12 +127,11 @@ void FMain::mouseReleaseEvent(QMouseEvent* evt) {
     {
         this->on_mouse_click(evt); this->mouse_press_btn = Qt::NoButton;
     } else if(ui->lbImg->pixmap() != nullptr) {
-        FNC << "bgn:" << this->pos_bgn << "cur:" << QCursor::pos();
-
         int x = this->pos_bgn.x(), y = this->pos_bgn.y();
-        int w = abs(x - QCursor::pos().x()), h = abs(y - QCursor::pos().y());
-        this->rubb_band->hide();
+        int w = abs(x - evt->pos().x()), h = abs(y - evt->pos().y());
+
         this->pixmap_old = ui->lbImg->pixmap()->copy(x, y, w, h);
+        this->rubb_band->hide();
         this->stdShow();
     }// else // if(this->mouse_press_btn == evt->button()
 
@@ -169,7 +161,7 @@ void FMain::on_mouse_click(QMouseEvent* /*evt*/) {
 //------------------------------------------------------------------------------
 void FMain::on_aTest_triggered() {
     QList<QScreen*> scr = QGuiApplication::screens();
-    QScreen *screen = scr[0];
+    QScreen *screen = scr[1];
 
     if(screen) {
         QRect geom = screen->geometry() /*virtualGeometry()*/;
@@ -187,7 +179,7 @@ void FMain::on_aTest_triggered() {
         ui->lbImg->setPixmap(screen->grabWindow(0, x, y, w, h));
 
         this->setState(State::Pick);
-        wgLens->hideTool(); wgLens->show();
+        wgLens->hideTool();
         this->eventFilter(nullptr, new QMouseEvent(
             QEvent::MouseMove, QCursor::pos()
           , Qt::NoButton, Qt::NoButton, Qt::NoModifier ));
@@ -232,10 +224,8 @@ void FMain::leaveEvent(QEvent */*evt*/) {
 
 //------------------------------------------------------------------------------
 void FMain::on_upd_sze(QRect geom) {
-    FNC << "bgn";
-
     this->setGeometry(geom);
-}
+}// on_upd_sze
 
 //------------------------------------------------------------------------------
 

@@ -26,11 +26,11 @@ class WBox : public QWidget {
  private slots:
    void remove_clr(WClr *clr);
    void chahge_fix(WClr *clr);
-   void select_clr(WClr *clr);
+   void select_cng(WClr *clr);
 
  private:
     Ui::WBox *ui;
-    int size = 4;
+    int size = 2;
 
     WClr *plate_sel = nullptr;
 
