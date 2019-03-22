@@ -159,7 +159,8 @@ void FMain::on_mouse_click(QMouseEvent *evt) {
         wgLens->hideTool();
     }// if(this->state == State::Show)
 
-    this->sendImg(evt->pos());
+    //todo: разобраться со смещением.
+//    this->sendImg(evt->pos());
 }// on_mouse_click
 
 // Отладка -> Проба. -----------------------------------------------------------

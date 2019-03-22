@@ -70,7 +70,7 @@ void WLens::setImg(const QPoint &pos, const QImage &img) {
     int w = img.width()*S, h = img.height()*S;
 
     if(this->state == State::Pick) {
-        int x = w/2 - 1, y = h/2 - 1;
+        int x = w/2, y = h/2;
         QImage big(img.scaled(w, h));
         QPainter painter(&big);
 
