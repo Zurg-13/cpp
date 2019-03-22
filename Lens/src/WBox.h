@@ -30,7 +30,7 @@ class WBox : public QWidget {
 
  private:
     Ui::WBox *ui;
-    int size = 2;
+    int size = 3;
 
     WClr *plate_sel = nullptr;
 

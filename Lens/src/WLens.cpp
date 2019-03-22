@@ -109,8 +109,8 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
          case Qt::RightButton: {
             QColor clr = this->img.pixelColor(pos);
-            if(ui->wgPlt->contain(clr)) { ui->wgPlt->select(clr); }
-            else { ui->wgPlt->addPlate((new WClr(this, clr))->sel(true)); }
+            if(ui->wgPlt->contain(clr)) { /*ui->wgPlt->select(clr);*/ }
+            else { ui->wgPlt->addPlate((new WClr(this, clr))/*->sel(true)*/); }
          } break;
 
          default: {
@@ -142,9 +142,13 @@ void WLens::on_btPipet_clicked() {
 // Нажатие кнопки: Цвет. -------------------------------------------------------
 //------------------------------------------------------------------------------
 void WLens::on_btColor_clicked() {
-    this->color = QColorDialog::getColor(this->color, this);
-    ui->wgPlt->addPlate((new WClr(
-        this, this->color))->fix(true)->sel(true) );
+    QColor color = QColorDialog::getColor(this->color, this);
+
+    if(color.isValid()) {
+        this->color = color;
+        ui->wgPlt->addPlate((new WClr(this, this->color))
+            ->fix(true)->sel(true) );
+    }// if(color.isValid())
 }// on_btColor_clicked
 
 //------------------------------------------------------------------------------

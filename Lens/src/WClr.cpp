@@ -45,8 +45,10 @@ void WClr::paintEvent(QPaintEvent */*evt*/) {
 
 // Установить признак выбора. --------------------------------------------------
 //------------------------------------------------------------------------------
-void WClr::setSelected(bool selected)
-    { this->fl_select = selected; this->repaint(); emit select_chg(this); }
+void WClr::setSelected(bool selected){
+    if(this->fl_select != selected)
+        { this->fl_select = selected; this->repaint(); emit select_chg(this); }
+}// setSelected
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------

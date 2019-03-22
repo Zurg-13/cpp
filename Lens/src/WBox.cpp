@@ -22,13 +22,15 @@ void WBox::addPlate(WClr *plate) {
     connect(plate, &WClr::change_fix, this, &WBox::chahge_fix);
     connect(plate, &WClr::select_chg, this, &WBox::select_cng);
 
-    if(!this->plate_sel) { this->plate_sel = plate; }
-    if(plate->isSelect()) { this->select_cng(plate); }
+    this->select_cng(plate);
 }// addPlate
 
 // Удалить контрол. ------------------------------------------------------------
 //------------------------------------------------------------------------------
-void WBox::remove_clr(WClr *clr) { delete clr; }
+void WBox::remove_clr(WClr *clr) {
+    if(plate_sel == clr) { plate_sel = nullptr; }
+    clr->deleteLater();
+}// remove_clr
 
 // Изменение фиксации. ---------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -39,9 +41,13 @@ void WBox::chahge_fix(WClr *clr) {
 // Выбор контрола. -------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WBox::select_cng(WClr *clr) {
-    if(plate_sel) { plate_sel->setSelected(false); }
-    clr->setSelected(true);
-    plate_sel = clr;
+
+    if(clr->isSelect()) {
+        if(plate_sel != nullptr) { plate_sel->setSelected(false); }
+        clr->repaint();
+        plate_sel = clr;
+    }// if(clr->isSelect())
+
 }// select_clr
 
 // Проверка на содержание цвета в контейнере. ----------------------------------

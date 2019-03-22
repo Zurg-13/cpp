@@ -49,6 +49,17 @@ void FMain::showEvent(QShowEvent* /*evt*/) {
 //------------------------------------------------------------------------------
 void FMain::closeEvent(QCloseEvent* /*evt*/) { QApplication::quit(); }
 
+// Передать изображение в линзу. -----------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::sendImg(const QPoint &pos) {
+    int lw = 247/wgLens->scale(), lh = 195/wgLens->scale();
+    int x = pos.x() - lw/2, y = pos.y() - lh/2;
+
+    wgLens->setImg(
+        QCursor::pos()
+      , ui->lbImg->pixmap()->toImage().copy(x, y, lw, lh));
+}// sendImg
+
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 FMain::~FMain() {
@@ -82,13 +93,7 @@ bool FMain::eventFilter(QObject */*obj*/, QEvent *evt) {
         if(this->state == State::Pick) {
 
             // Отрисовка линзы.
-            int lw = 247/wgLens->scale(), lh = 195/wgLens->scale();
-            int x = mEvt->pos().x() - lw/2;
-            int y = mEvt->pos().y() - lh/2;
-
-            wgLens->setImg(
-                QCursor::pos()
-              , ui->lbImg->pixmap()->toImage().copy(x, y, lw, lh));
+            this->sendImg(mEvt->pos());
 
             // Отрисовка выделения.
             if(mEvt->buttons() == Qt::MouseButton::LeftButton) {
@@ -139,29 +144,29 @@ void FMain::mouseReleaseEvent(QMouseEvent* evt) {
 
 // Клик мыши. ------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_mouse_click(QMouseEvent* /*evt*/) {
-    FNC << "bgn";
-
+void FMain::on_mouse_click(QMouseEvent *evt) {
     if(ui->lbImg->pixmap() == nullptr) { return; }
+
     if(this->state == State::Pick) {
-        FNC << "on pick";
+        FNC << "wgLens->showTool";
 
         this->state = State::Edit;
         wgLens->showTool();
     } else {
-        FNC << "on edit";
+        FNC << "wgLens->hideTool";
 
         this->state = State::Pick;
         wgLens->hideTool();
     }// if(this->state == State::Show)
 
+    this->sendImg(evt->pos());
 }// on_mouse_click
 
 // Отладка -> Проба. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_aTest_triggered() {
     QList<QScreen*> scr = QGuiApplication::screens();
-    QScreen *screen = scr[1];
+    QScreen *screen = scr[0];
 
     if(screen) {
         QRect geom = screen->geometry() /*virtualGeometry()*/;

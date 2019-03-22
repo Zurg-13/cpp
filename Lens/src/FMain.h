@@ -56,8 +56,8 @@ class FMain : public QMainWindow {
     int scale = 13;
 
     void on_mouse_click(QMouseEvent *evt);
-
     void stdShow(void);
+    void sendImg(const QPoint &pos);
 
 
 };// FMain
