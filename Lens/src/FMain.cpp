@@ -8,12 +8,12 @@
 #include <QCursor>
 #include <QTimer>
 
-
 #include "_srv/Srv/dbg.h"
 
 #include "ui_FMain.h"
 #include "FMain.h"
 #include "WLens.h"
+
 
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
 
     // Внешний вид.
     ui->setupUi(this);
+    this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // Инициализация.
     qApp->installEventFilter(this);
@@ -42,7 +43,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
 // Выполняется при показе формы. -----------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::showEvent(QShowEvent* /*evt*/) {
-    this->lower();
+//    this->lower();
 }// showEvent
 
 // Выпрлняется при закрытии главного окна. -------------------------------------
@@ -56,9 +57,27 @@ void FMain::sendImg(const QPoint &pos) {
     int x = pos.x() - lw/2, y = pos.y() - lh/2;
 
     wgLens->setImg(
-        QCursor::pos()
+        QCursor::pos() - QPoint(lw/2, lh/2)
       , ui->lbImg->pixmap()->toImage().copy(x, y, lw, lh));
 }// sendImg
+
+// Врисовать изображение. ------------------------------------------------------
+//------------------------------------------------------------------------------
+#include <QPainter>
+void FMain::insertImg(const QPoint &pos,  const QImage& img) {
+    FNC << "bgn";
+
+    FNC << pos;
+    QPixmap pix(*ui->lbImg->pixmap());
+
+    QPainter painter(&pix);
+    painter.drawImage(
+        ui->lbImg->mapFromGlobal(pos)
+      , img);
+    painter.end();
+    ui->lbImg->setPixmap(pix);
+
+}// insertImg
 
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -148,19 +167,15 @@ void FMain::on_mouse_click(QMouseEvent *evt) {
     if(ui->lbImg->pixmap() == nullptr) { return; }
 
     if(this->state == State::Pick) {
-        FNC << "wgLens->showTool";
-
         this->state = State::Edit;
         wgLens->showTool();
     } else {
-        FNC << "wgLens->hideTool";
-
         this->state = State::Pick;
         wgLens->hideTool();
     }// if(this->state == State::Show)
 
     //todo: разобраться со смещением.
-//    this->sendImg(evt->pos());
+    this->sendImg(ui->lbImg->mapFrom(this, evt->pos()));
 }// on_mouse_click
 
 // Отладка -> Проба. -----------------------------------------------------------
@@ -208,7 +223,7 @@ void FMain::on_key_ESC(void) {
 void FMain::stdShow(void) {
     ui->lbImg->setPixmap(this->pixmap_old);
 
-    this->setWindowFlags(Qt::Window);
+    this->setWindowFlags(Qt::Window /*| Qt::WindowStaysOnTopHint*/);
     ui->mm->show(); this->show();
 
     QApplication::processEvents();
@@ -217,12 +232,14 @@ void FMain::stdShow(void) {
     this->adjustSize();
 }// stdShow
 
+// Курсор попадает на форму. ---------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::enterEvent(QEvent */*evt*/) {
     if(ui->lbImg->pixmap() == nullptr) { wgLens->hide(); }
     else                               { wgLens->show(); }
 }// enterEvent
 
+// Курсор покидает форму. ------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::leaveEvent(QEvent */*evt*/) {
     if(this->state == State::Pick) { wgLens->hide(); }

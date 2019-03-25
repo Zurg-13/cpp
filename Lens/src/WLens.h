@@ -38,13 +38,15 @@ class WLens : public QWidget {
  private slots:
     void on_btPipet_clicked();
     void on_btColor_clicked();
+    void on_btReset_clicked();
 
 private:
     Ui::WLens *ui;
     State state = State::Pick;
     int w, h, S, shift = 10;
     int clr_plate_max = 3;
-    QImage img;
+    QImage img, orig_img;
+    QPoint pos;
     QColor color;
 
 };// WLens

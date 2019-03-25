@@ -48,7 +48,7 @@
          <number>1</number>
         </property>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="btReset">
           <property name="minimumSize">
            <size>
             <width>72</width>
@@ -72,7 +72,7 @@
            <string notr="true">border-color: gray;</string>
           </property>
           <property name="text">
-           <string>принять</string>
+           <string>сброс</string>
           </property>
          </widget>
         </item>

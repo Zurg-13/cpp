@@ -21,6 +21,7 @@ class FMain : public QMainWindow {
             ~FMain();
 
     void setState(State state) { this->state = state; }
+    void insertImg(const QPoint &pos,  const QImage& img);
 
  protected:
     void showEvent(QShowEvent *evt);

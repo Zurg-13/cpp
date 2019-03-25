@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 extern FMain *fmMain;
 
+
 // Событие отрисовки. ----------------------------------------------------------
 //------------------------------------------------------------------------------
 /*
@@ -81,6 +82,8 @@ void WLens::setImg(const QPoint &pos, const QImage &img) {
         ui->lbImg->setPixmap(QPixmap::fromImage(big));
     } else {
         ui->lbImg->setPixmap(QPixmap::fromImage(img.scaled(w, h)));
+        this->img = img; this->orig_img = img;
+        this->pos = pos;
     }// if(this->state == State::Pick)
 
     this->setGeometry(pos.x() + shift, pos.y() + shift, w, h);
@@ -93,22 +96,19 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
     // Добавить цветовую плашку.
     if(ui->lbImg->geometry().contains(evt->pos())) {
         QPoint pos = ui->lbImg->mapFromParent(evt->pos());
+        int x = pos.x()/S, y = pos.y()/S;
 
         switch(evt->button()) {
 
          case Qt::LeftButton: {
-
-            for(int x=(pos.x()/S)*S; x<(1 + pos.x()/S)*S; x++) {
-                for(int y=(pos.y()/S)*S; y<(1 + pos.y()/S)*S; y++) {
-                    this->img.setPixel(x, y, ui->wgPlt->color().rgb());
-                }// y
-            }// x
-
-            ui->lbImg->setPixmap(QPixmap::fromImage(img));
+            this->img.setPixel(x, y, ui->wgPlt->color().rgb());
+            ui->lbImg->setPixmap(QPixmap::fromImage(img).scaled(
+                this->img.size()*S ));
+            fmMain->insertImg(this->pos, this->img);
          } break;
 
          case Qt::RightButton: {
-            QColor clr = this->img.pixelColor(pos);
+            QColor clr = this->img.pixelColor(x, y);
             if(ui->wgPlt->contain(clr)) { /*ui->wgPlt->select(clr);*/ }
             else { ui->wgPlt->addPlate((new WClr(this, clr))/*->sel(true)*/); }
          } break;
@@ -124,10 +124,7 @@ void WLens::mousePressEvent(QMouseEvent *evt) {
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
-void WLens::showTool(void) {
-    this->img = ui->lbImg->pixmap()->toImage();
-    ui->wgTool->show(); this->state = State::Edit;
-}// showTool
+void WLens::showTool(void) { ui->wgTool->show(); this->state = State::Edit; }
 
 // Показать панель инструментов. -----------------------------------------------
 //------------------------------------------------------------------------------
@@ -150,6 +147,14 @@ void WLens::on_btColor_clicked() {
             ->fix(true)->sel(true) );
     }// if(color.isValid())
 }// on_btColor_clicked
+
+// Нажатие кнопки СБРОС. -------------------------------------------------------
+//------------------------------------------------------------------------------
+void WLens::on_btReset_clicked() {
+    this->img = this->orig_img;
+    ui->lbImg->setPixmap(QPixmap::fromImage(img).scaled(this->img.size()*S));
+    fmMain->insertImg(this->pos, this->img);
+}// on_btReset_clicked
 
 //------------------------------------------------------------------------------
 
