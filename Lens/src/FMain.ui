@@ -60,6 +60,54 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="lyTool">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btSend">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Отправить</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btSendMnu">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="spc">
         <property name="orientation">
@@ -135,6 +183,38 @@
   <action name="aTest">
    <property name="text">
     <string>Проба</string>
+   </property>
+  </action>
+  <action name="aFileDest">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Файл</string>
+   </property>
+  </action>
+  <action name="aGoogleDest">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Google</string>
+   </property>
+  </action>
+  <action name="aYandexDest">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Яндекс</string>
+   </property>
+  </action>
+  <action name="aFormat">
+   <property name="text">
+    <string>Формат</string>
    </property>
   </action>
  </widget>

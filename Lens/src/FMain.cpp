@@ -7,6 +7,8 @@
 #include <QMouseEvent>
 #include <QCursor>
 #include <QTimer>
+#include <QMenu>
+#include <QActionGroup>
 
 #include "_srv/Srv/dbg.h"
 
@@ -31,6 +33,20 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     // Внешний вид.
     ui->setupUi(this);
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    // Меню (получатели)
+    QActionGroup *grDest = new QActionGroup(this);
+    QMenu *dest = new QMenu("Получатели", this);
+    dest->addAction(ui->aFileDest); grDest->addAction(ui->aFileDest);
+    dest->addAction(ui->aYandexDest); grDest->addAction(ui->aYandexDest);
+    dest->addAction(ui->aGoogleDest); grDest->addAction(ui->aGoogleDest);
+
+    // Меню (отправить).
+    QMenu *send = new QMenu(this);
+    send->addMenu(dest);
+    send->addSeparator(); //----------------
+    send->addAction(ui->aFormat);
+    ui->btSendMnu->setMenu(send);
 
     // Инициализация.
     qApp->installEventFilter(this);
