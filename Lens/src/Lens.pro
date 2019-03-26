@@ -24,7 +24,8 @@ HEADERS += \
     FMain.h         \
     WLens.h         \
     WClr.h          \
-    WBox.h
+    WBox.h \
+    ZLabel.h
 
 SOURCES += \
     AdvanceEdit.cpp \
@@ -32,7 +33,8 @@ SOURCES += \
     FMain.cpp       \
     WLens.cpp       \
     WClr.cpp        \
-    WBox.cpp
+    WBox.cpp \
+    ZLabel.cpp
 
 
 FORMS += \
