@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WLine</class>
+ <widget class="QWidget" name="WLine">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>666</width>
+    <height>177</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>-1</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>WLine</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: skyblue;</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
