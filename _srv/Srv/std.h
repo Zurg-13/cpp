@@ -4,7 +4,8 @@
 // INCLUDE ---------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QString>
-
+#include <QApplication>
+#include <QDesktopWidget>
 
 /* Константы. *****************************************************************/
 /******************************************************************************/
@@ -26,11 +27,17 @@ const QString EMPTY_STR("");
 
 #define FCS(c) do { c->selectAll(); c->setFocus(); } while(false)
 #define SELECT_ROW(v, r) do { v->selectRow(r); v->scrollTo(v->currentIndex()); } while(false)
-#define TO_CENTER(r) move(r.center()-rect().center())
+#define TO_CENTER(r) this->move(r.center() - this->rect().center())
 #define DESKTOP qApp->desktop()->availableGeometry(this)
 
 #define ACCEPT QDialog::Accepted
 #define REJECT QDialog::Rejected
+
+#define FIRST_RUN ([] {                     \
+    static bool is_first_time = true;       \
+    bool was_first_time = is_first_time;    \
+    is_first_time = false;                  \
+    return was_first_time; } ())
 
 /* Служебные функции. *********************************************************/
 /******************************************************************************/

@@ -40,7 +40,7 @@ class WLens : public QWidget {
     void on_btColor_clicked();
     void on_btReset_clicked();
 
-private:
+ private:
     Ui::WLens *ui;
     State state = State::Pick;
     int w, h, S, shift = 10;
