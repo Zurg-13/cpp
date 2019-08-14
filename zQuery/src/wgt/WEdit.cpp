@@ -60,7 +60,7 @@ WEdit::~WEdit() {
 //------------------------------------------------------------------------------
 void WEdit::on_aOpen_triggered() {
     QFile file(QFileDialog::getOpenFileName(
-        0, "Открыть", "d:/temp/12", "*.sql") );
+        nullptr, "Открыть", "d:/temp/12", "*.sql") );
     if(file.open(QFile::ReadOnly | QFile::Text))
         { ui->edSql->setPlainText(file.readAll()); }
 }// on_aOpen_triggered()
@@ -118,7 +118,7 @@ void WEdit::on_aExec_triggered() {
     out->show();
 }// on_aExec_triggered
 
-// Извлеч и подготовить запрос. ------------------------------------------------
+// Извлечь и подготовить запрос. -----------------------------------------------
 //------------------------------------------------------------------------------
 QString WEdit::curSql(void) {
     static QRegExp QUO(R"(/\*(.*)\*/)");

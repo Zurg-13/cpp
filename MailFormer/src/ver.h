@@ -3,7 +3,7 @@
 #define PRODUCTNAME_STR  "Генерация почтовой рассылки\0"
 
 #define MAJOR_STR        "1"
-#define MINOR_STR        "2"
+#define MINOR_STR        "3"
 #define REVISION_STR     "???"
 #define VERSION_STR      MAJOR_STR "." MINOR_STR " ревизия: " REVISION_STR "\0"
 

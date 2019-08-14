@@ -16,7 +16,7 @@ private:
     QAbstractButton *btn;
     QString text;
 
-};
+};// ButtonStopper
 
 //------------------------------------------------------------------------------
 #endif // BUTTONSTOPPER_H

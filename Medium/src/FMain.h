@@ -28,7 +28,6 @@ public:
 
     void SET_PRM(QList<QString>);   // Передать аргументы командной строки.
 
-    void initDev(void); //отладка
     bool openDev(void);
     bool closeDev(void);
     void read(QByteArray *buf);
@@ -44,12 +43,16 @@ private slots:
 
     void on_aExit_triggered();
     void on_aTest_triggered();
+    void on_aHide_triggered();
 
     void on_btNotifyUSB_clicked();
     void on_btOpen_clicked();
     void on_btRead_clicked();
-    void on_btWrite_clicked();
     void on_btListDev_clicked();
+    void on_btConfig_clicked();
+    void on_aTestInit_triggered();
+    void on_aDemugMode_triggered();
+    void on_btClose_clicked();
 
 private:
     Ui::FMain *ui;
@@ -57,7 +60,6 @@ private:
     QTimer timer;
 
     bool isDeviceOpened = false;
-    QUsbManager *usb = nullptr;
     QUsbDevice *dev = nullptr;
 
     QtUsb::DeviceFilter fltr;
@@ -68,9 +70,14 @@ private:
 
     ZLogger *log = nullptr;
 
+    void testInitDev(void); //отладка
+
     void CONNECT(void); // Подключить сигналы/слоты.
     void DEV_INIT(void); // Инициализировать сканер.
     void LOG(const QString nme);
+
+    QtUsb::DeviceConfig takeConf(const QtUsb::DeviceFilter &fltr);
+
 };// FMain
 
 //------------------------------------------------------------------------------

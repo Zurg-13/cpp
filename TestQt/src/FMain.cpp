@@ -57,6 +57,13 @@ void FMain::on_aExit_triggered() {
 void FMain::on_aTest_triggered() {
     FNC << R"(/ bgn)";
 
+    uint8_t x = (1<<2) | (0<<4) | (1<<6);
+
+
+
+    if(x & (1<<2)) { FNC << "2"; }
+    if(x & (1<<4)) { FNC << "4"; }
+    if(x & (1<<6)) { FNC << "6"; }
 
     FNC << R"(\ end)";
 }// on_aTest_triggered

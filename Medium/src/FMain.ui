@@ -14,7 +14,22 @@
    <string>FMain</string>
   </property>
   <widget class="QWidget" name="cw">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
+    <property name="spacing">
+     <number>2</number>
+    </property>
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
     <item>
      <widget class="QPushButton" name="btNotifyUSB">
       <property name="minimumSize">
@@ -30,7 +45,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Прослушивание USB</string>
+       <string>Остановить рослушивание USB</string>
       </property>
      </widget>
     </item>
@@ -54,77 +69,115 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="btOpen">
-      <property name="minimumSize">
-       <size>
-        <width>192</width>
-        <height>30</height>
-       </size>
+     <layout class="QHBoxLayout" name="lyDev">
+      <property name="spacing">
+       <number>2</number>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Открыть</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btRead">
-      <property name="minimumSize">
-       <size>
-        <width>192</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Считать</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btWrite">
-      <property name="minimumSize">
-       <size>
-        <width>192</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Записать</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="edWrite">
-      <property name="minimumSize">
-       <size>
-        <width>192</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>30</height>
-       </size>
-      </property>
-     </widget>
+      <item>
+       <widget class="QPushButton" name="btConfig">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Задать</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btOpen">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Открыть</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btClose">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Закрыть</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btRead">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Считать</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="WLog" name="wgLog" native="true"/>
@@ -151,9 +204,18 @@
      <string>Отладка</string>
     </property>
     <addaction name="aTest"/>
+    <addaction name="aTestInit"/>
+    <addaction name="aDemugMode"/>
+   </widget>
+   <widget class="QMenu" name="mTool">
+    <property name="title">
+     <string>Инструменты</string>
+    </property>
+    <addaction name="aHide"/>
    </widget>
    <addaction name="mFile"/>
    <addaction name="mDebug"/>
+   <addaction name="mTool"/>
   </widget>
   <action name="aExit">
    <property name="text">
@@ -163,6 +225,21 @@
   <action name="aTest">
    <property name="text">
     <string>Проба</string>
+   </property>
+  </action>
+  <action name="aHide">
+   <property name="text">
+    <string>Скрыть</string>
+   </property>
+  </action>
+  <action name="aTestInit">
+   <property name="text">
+    <string>Тестовая инициализация</string>
+   </property>
+  </action>
+  <action name="aDemugMode">
+   <property name="text">
+    <string>Режим отладки</string>
    </property>
   </action>
  </widget>

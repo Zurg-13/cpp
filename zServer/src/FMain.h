@@ -47,7 +47,8 @@ private slots:
     void on_btLoad_clicked();
     void on_aClearHdl_triggered();
     void on_btUp_clicked();
-};
+
+};// FMain
 
 //------------------------------------------------------------------------------
 #endif // FMAIN_H

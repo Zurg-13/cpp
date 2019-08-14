@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QCommandLineParser>
 #include <QTimer>
 #include <QNetworkProxy>
@@ -13,6 +14,7 @@
 
 #include "ui_FMain.h"
 #include "FMain.h"
+
 
 
 // Макросы. --------------------------------------------------------------------
@@ -101,14 +103,19 @@ void FMain::SET_PRM(QList<QString> args) {
         -> QString { return parser.value(nme).trimmed(); };
     auto LOG = [=](QString nme)
         -> void {
-            ui->wgLog->add(STR("%1: %2").arg(nme).arg(VAL(nme)));
-            INF(STR("%1: %2").arg(nme).arg(VAL(nme)));
-        };
-
-    FNC << "args:" << args;
+            const QString msg("%1: %2");
+            ui->wgLog->add(msg.arg(nme).arg(VAL(nme)));
+            INF(msg.arg(nme).arg(VAL(nme)));
+        };// LOG
+    auto REQ = [=](QString nme)
+        -> bool {
+            const QString msg("Отсутствует обязательный параметр: %1");
+            if(HVE(nme)) { return true; }
+            ui->wgLog->add(msg.arg(nme)); INF(msg.arg(nme));
+            return false;
+        };// REQ
 
     parser.setApplicationDescription("Агент прослушивания сканера кодов.");
-
     parser.addOptions({
         {{"s", "show"}, tr("Показать интерфейс."), "show" }
 
@@ -138,14 +145,14 @@ void FMain::SET_PRM(QList<QString> args) {
     if(HVE("dir")) { log = new ZLogger(QDir(VAL("dir")), "medium", LOGSIZE); }
 
     // host.
-    if(HVE("url")) {
+    if(REQ("url")) {
         req.setUrl(QUrl(SURROUND(VAL("url"), { PR("id", VAL("num")) })));
         req.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
     }// if(HVE("url"))
 
     // fltr.
-    if(HVE("vid")) { fltr.vid = static_cast<quint16>(NUM(VAL("vid"))); }
-    if(HVE("pid")) { fltr.pid = static_cast<quint16>(NUM(VAL("pid"))); }
+    if(REQ("vid")) { fltr.vid = static_cast<quint16>(NUM(VAL("vid"))); }
+    if(REQ("pid")) { fltr.pid = static_cast<quint16>(NUM(VAL("pid"))); }
 
     // conf.
     if(HVE("alternate"))
@@ -176,19 +183,37 @@ void FMain::on_poll(void) {
     if(this->isDeviceOpened) {
         dev->read(&arr, BUFSIZE);
     } else {
-        if(QtUsb::deviceOK  != this->usb->openDevice(dev, fltr, conf)) {
-            QString msg("Не удалось подключиться к сканеру.");
-            ui->wgLog->add(msg, Qt::red); ERR(msg);
 
-            this->isDeviceOpened = false;
-            this->timer.setInterval(30*SEC);
-        } else {
+/*
+        if(QtUsb::deviceOK == this->usb->openDevice(dev, fltr, conf)) {
             QString msg("Подключение к сканеру установлено.");
             ui->wgLog->add(msg, Qt::green); INF(msg);
 
             this->isDeviceOpened = true;
             this->timer.setInterval(500);
+        } else {
+            QString msg("Не удалось подключиться к сканеру.");
+            ui->wgLog->add(msg, Qt::red); ERR(msg);
+
+            this->isDeviceOpened = false;
+            this->timer.setInterval(30*SEC);
         }// if // if(QtUsb::deviceOK  != this->usb->openDevice(dev, fltr, conf))
+*/
+
+        if(this->openDev()) {
+            QString msg("Подключение к сканеру установлено.");
+            ui->wgLog->add(msg, Qt::green); INF(msg);
+
+            this->isDeviceOpened = true;
+            this->timer.setInterval(500);
+        } else {
+            QString msg("Не удалось подключиться к сканеру.");
+            ui->wgLog->add(msg, Qt::red); ERR(msg);
+
+            this->isDeviceOpened = false;
+            this->timer.setInterval(30*SEC);
+        }// if // if(QtUsb::deviceOK  != this->usb->openDevice(dev, fltr, conf))
+
     }// else // if(this->isDeviceOpened)
 
     if(arr.length()) {
@@ -247,7 +272,7 @@ void FMain::CONNECT(void) {
 // Инициализировать сканер. ----------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::DEV_INIT(void) {
-    this->usb = new QUsbManager(this);
+//    this->usb = new QUsbManager(this);
     this->dev = new QUsbDevice();
 
 //    this->dev->setDebug(true);
@@ -268,30 +293,18 @@ void FMain::on_aTest_triggered() {
     FNC << R"(/ bgn)";
 
 
-
     FNC << R"(\ end)";
 }// on_aTest_triggered
 
 // Начать/прекратить слежение за USB. ------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btNotifyUSB_clicked() {
-    if(this->usb) {
-        FNC << "stop";
-        ui->wgLog->add("ntf: end");
 
-        delete this->usb; this->usb = nullptr;
-    } else {
-        FNC << "start";
-        ui->wgLog->add("ntf: bgn");
+    if(this->timer.isActive()) { this->timer.stop(); this->closeDev(); }
+    else                       { this->timer.start(); }
 
-        this->usb = new QUsbManager(this);
-        connect(
-            this->usb, &QUsbManager::deviceInserted
-          , this, &FMain::on_DevInsert );
-        connect(
-            this->usb, &QUsbManager::deviceRemoved
-          , this, &FMain::on_DevRemove );
-    }// else // if(this->mgr)
+    static_cast<QPushButton*>(sender())->setText(STR("%1 прослушивание USB")
+        .arg(this->timer.isActive() ? "Остановить" : "Запустить") );
 
 }// on_btNotifyUSB_clicked
 
@@ -303,12 +316,7 @@ void FMain::on_DevInsert(QtUsb::FilterList lst) {
     ui->wgLog->add("ins: ok");
 
     for(QtUsb::DeviceFilter &flt: lst) {
-        qDebug("VID_%04x / PID_%04x", flt.vid, flt.pid);
         FNC << STR("V: %1 / P: %2").arg(flt.vid).arg(flt.pid);
-        FNC << STR("A: %1 / C: %2 / I: %3 / R: %4 / W: %5")
-               .arg(flt.cfg.alternate).arg(flt.cfg.config)
-               .arg(flt.cfg.interface)
-               .arg(flt.cfg.readEp).arg(flt.cfg.writeEp);
         ui->wgLog->add(STR("dev: V: %1 / P: %2").arg(flt.vid).arg(flt.pid));
     }// flt
 
@@ -325,35 +333,43 @@ void FMain::on_DevRemove(QtUsb::FilterList lst) {
 
 }// on_DevRemove
 
+
 // Инициализация устройства. ---------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::initDev() {
-    FNC << "ok";
+void FMain::testInitDev() {
+    FNC << "bgn";
 
     // fltr
-    fltr.vid = 0x1eab;
-    fltr.pid = 0x0d10;
+    fltr.vid = 0x0c2e/*1eab*/;
+    fltr.pid = 0x0200/*0d10*/;
 
     // conf
-    conf.alternate = 0;
-    conf.config = 2;
-    conf.interface = 0;
-    conf.readEp = 0x84;
-    conf.writeEp = 0x05;
+    conf.alternate = 0x0;
+    conf.config = 0x1/*0*/;
+    conf.interface = 0x0/*1*/;
+    conf.readEp = 0x81/*84*/;
+    conf.writeEp = 0x00/*05*/;
 
 }// initDev
+
 
 // Открыть устройство. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 bool FMain::openDev() {
-    QtUsb::DeviceStatus ds = usb->openDevice(dev, fltr, conf);
-    return (ds == QtUsb::deviceOK ? true : false);
+
+    if(this->dev) {
+        this->dev->setConfig(this->conf);
+        this->dev->setFilter(this->fltr);
+        if(this->dev->open() == 0) { return true; }
+    }// if(this->dev)
+
+    return false;
 }// openDev
 
 // Закрыть устройство. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 bool FMain::closeDev() {
-    usb->closeDevice(dev);
+    this->dev->close();
     return false;
 }// closeDev
 
@@ -366,28 +382,19 @@ void FMain::read(QByteArray *buf) { dev->read(buf, BUFSIZE); }
 void FMain::write(QByteArray *buf)
     { dev->write(buf, static_cast<quint32>(buf->size())); }
 
-// Записать. -------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::on_btWrite_clicked() {
-/*
-    QByteArray send;
-
-    send.append(static_cast<char>(0xAB));
-
-    this->write(&send);
-    ui->wgLog->add(STR("write:  %1").arg(QString::fromLatin1(send)));
-*/
-}// on_btWrite_clicked
-
 // Открыть. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btOpen_clicked() {
-    this->initDev();
-    bool open = this->openDev();
-
-    FNC << open;
-    ui->wgLog->add((open ? "open: ok" : "open: no"));
+    this->isDeviceOpened = this->openDev();
+    ui->wgLog->add((this->isDeviceOpened ? "opened: ok" : "opened: no"));
 }// on_btOpen_clicked
+
+// Закрыть. --------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btClose_clicked() {
+    this->isDeviceOpened = this->closeDev();
+    ui->wgLog->add((this->isDeviceOpened ? "opened: ok" : "opened: no"));
+}// on_btClose_clicked
 
 // Считать. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -395,21 +402,58 @@ void FMain::on_btRead_clicked() {
     QByteArray recv;
     this->read(&recv);
 
-    ui->wgLog->add(STR("read:  %1").arg(QString::fromUtf8(SEW(recv))));
+    ui->wgLog->add(STR("read:[%1]").arg(QString::fromUtf8(SEW(recv))));
 }// on_btRead_clicked
 
 // Список USB устройств. -------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btListDev_clicked() {
+    QtUsb::FilterList flt_l = this->dev->getAvailableDevices();
 
-    QtUsb::FilterList lst = this->usb->getPresentDevices();
+    ui->wgLog->add(STR("------------------------(%1)").arg(flt_l.size()));
+    for(QtUsb::DeviceFilter &flt: flt_l) {
 
-    FNC << "list size:" << lst.size();
+        QStringList str_l;
+        QtUsb::ConfigList cfg_l = this->dev->getAvailableConfigs(flt);
+        for(QtUsb::DeviceConfig &cfg: cfg_l) {
+            str_l.append(STR("cfg:%3 alt:%4 itf:%5 inp:%6 out:%7")
+                .arg(cfg.config).arg(cfg.alternate).arg(cfg.interface)
+                .arg(cfg.readEp).arg(cfg.writeEp) );
+        }// cfg
 
-    for(QtUsb::DeviceFilter &flt: lst)
-        { FNC << STR("V: %1 / P: %2").arg(flt.vid).arg(flt.pid); }
+        ui->wgLog->add(STR("vid:%1 pid:%2 cfg:[%3]")
+            .arg(flt.vid).arg(flt.pid).arg(str_l.join("  ")) );
+
+    }// flt
+    ui->wgLog->add(STR("------------------------"));
 
 }// on_btListDev_clicked
+
+// Задать конфигурацию. --------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btConfig_clicked() {
+
+    QString text = QInputDialog::getMultiLineText(
+        this, "Введите конфигурацию.", "Конфигурация:");
+    if(text.isEmpty()) { return; }
+
+    ui->wgLog->spc();
+    SET_PRM(text.split(" "));
+
+}// on_btConfig_clicked
+
+// Инструменты -> Скрыть. ------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aHide_triggered() { this->hide(); }
+
+// Отладка -> Тестовая инициализация. ------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aTestInit_triggered() { this->testInitDev(); }
+
+// Отладка -> Режим отладки. ---------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aDemugMode_triggered() { this->dev->setDebug(true); }
+
 
 //------------------------------------------------------------------------------
 

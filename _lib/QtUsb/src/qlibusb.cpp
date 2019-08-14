@@ -15,37 +15,122 @@ QUsbDevice::~QUsbDevice() {
   libusb_exit(mCtx);
 }
 
-QtUsb::FilterList QUsbDevice::getAvailableDevices() {
-  QtUsb::FilterList list;
-  ssize_t cnt;  // holding number of devices in list
-  libusb_device** devs;
-  libusb_context* ctx;
+// Вернуть список доступных конфигураций. --------------------------------------
+//------------------------------------------------------------------------------
+QtUsb::ConfigList QUsbDevice::getAvailableConfigs(
+    const QtUsb::DeviceFilter &fltr)
+{
+    QtUsb::ConfigList list;
 
-  libusb_init(&ctx);
-  cnt = libusb_get_device_list(ctx, &devs);  // get the list of devices
-  if (cnt < 0) {
-    qCritical("libusb_get_device_list Error");
+    ssize_t cnt;  // holding number of devices in list
+    libusb_device** devs;
+    libusb_context* ctx;
+
+    libusb_init(&ctx);
+    cnt = libusb_get_device_list(ctx, &devs);  // get the list of devices
+    if(cnt < 0) {
+        qCritical("libusb_get_device_list Error");
+        libusb_free_device_list(devs, 1);
+        return list;
+    }// if(cnt < 0)
+
+    for(int i = 0; i < cnt; i++) {
+        libusb_device* dev = devs[i];
+        libusb_device_descriptor desc_dev;
+
+        if(libusb_get_device_descriptor(dev, &desc_dev) == 0
+        && desc_dev.idProduct == fltr.pid && desc_dev.idVendor == fltr.vid )
+        {
+            QtUsb::DeviceConfig cfg;
+            libusb_config_descriptor *desc_cfg = nullptr;
+
+            if(libusb_get_active_config_descriptor(dev, &desc_cfg) == 0) {
+                cfg.config = desc_cfg->bConfigurationValue;
+
+                if(desc_cfg->bNumInterfaces == 1
+                && desc_cfg->interface->num_altsetting == 1)
+                {
+                    const libusb_interface_descriptor *alt = desc_cfg
+                        ->interface->altsetting;
+
+                    cfg.alternate = alt->bAlternateSetting;
+                    cfg.interface = alt->bInterfaceNumber;
+
+                    cfg.readEp = 0;
+                    for(int i=0; i<alt->bNumEndpoints; i++) {
+                        if(alt->endpoint[i].bEndpointAddress & (1<<7)) {
+                            cfg.readEp = alt->endpoint[i].bEndpointAddress;
+                            break;
+                        }// if(alt->endpoint[i].bEndpointAddress & 0x80)
+                    }// i
+
+                    cfg.writeEp = 0;
+                    for(int i=0; i<alt->bNumEndpoints; i++) {
+                        if(!(alt->endpoint[i].bEndpointAddress & (1<<7))) {
+                            cfg.writeEp = alt->endpoint[i].bEndpointAddress;
+                            break;
+                        }// if(alt->endpoint[i].bEndpointAddress & 0x80)
+                    }// i
+
+                } else {
+                    qCritical("libusb_get_active_config_descriptor Error");
+                    cfg.alternate = 0; cfg.interface = 0;
+                    cfg.readEp = 0; cfg.writeEp = 0;
+                }// else // if(conf->bNumInterfaces == 1 ...
+
+                libusb_free_config_descriptor(desc_cfg);
+            }// if(libusb_get_active_config_descriptor(dev, &conf) == 0)
+
+
+            list.append(cfg);
+        }// if(libusb_get_device_descriptor(dev, &desc) == 0)
+
+    }// i
+
     libusb_free_device_list(devs, 1);
-    return list;
-  }
+    libusb_exit(ctx);
 
-  for (int i = 0; i < cnt; i++) {
-    libusb_device* dev = devs[i];
-    libusb_device_descriptor desc;
-
-    if (libusb_get_device_descriptor(dev, &desc) == 0) {
-      QtUsb::DeviceFilter filter;
-      filter.pid = desc.idProduct;
-      filter.vid = desc.idVendor;
-      list.append(filter);
-    }
-  }
-
-  libusb_free_device_list(devs, 1);
-  libusb_exit(ctx);
   return list;
-}
 
+}// getAvailableConfigs
+
+// Вернуть список доступных устройств (только фильтры). ------------------------
+//------------------------------------------------------------------------------
+QtUsb::FilterList QUsbDevice::getAvailableDevices() {
+    QtUsb::FilterList list;
+
+    ssize_t cnt;  // holding number of devices in list
+    libusb_device** devs;
+    libusb_context* ctx;
+
+    libusb_init(&ctx);
+    cnt = libusb_get_device_list(ctx, &devs);  // get the list of devices
+    if(cnt < 0) {
+        qCritical("libusb_get_device_list Error");
+        libusb_free_device_list(devs, 1);
+        return list;
+    }// if(cnt < 0)
+
+    for(int i = 0; i < cnt; i++) {
+        libusb_device* dev = devs[i];
+        libusb_device_descriptor desc;
+
+        if(libusb_get_device_descriptor(dev, &desc) == 0) {
+            QtUsb::DeviceFilter filter;
+            filter.pid = desc.idProduct;
+            filter.vid = desc.idVendor;
+            list.append(filter);
+        }// if(libusb_get_device_descriptor(dev, &desc) == 0)
+
+    }// i
+
+    libusb_free_device_list(devs, 1);
+    libusb_exit(ctx);
+
+  return list;
+}// getAvailableDevices
+
+//------------------------------------------------------------------------------
 qint32 QUsbDevice::open() {
   UsbPrintFuncName();
 

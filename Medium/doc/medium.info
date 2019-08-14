@@ -14,13 +14,8 @@
 -V (--vid) {NUM}      : Идентификатор производителя.
 -p (--pid) {NUM}      : Идентификатор продукта.
 
--a (--alternate){NUM} : Номер набора данных.
--c (--config)   {NUM} : Номер конфигурации.
--i (--intergace){NUM} : Номер интерфейса.
--r (--read_ep)  {NUM} : Адрес конечной точки чтения.
--w (--write_ep) {NUM} : Адрес конечной точки записи.
-
-/* ВАЖНО */
-Логирование ведётся в два файла:
-    medium_cur.log (текущий)
-    medium_old.log (предыдущий).
+-a (--alternate){NUM} : Номер набора данных.            bAlternateSetting
+-c (--config)   {NUM} : Номер конфигурации.             bConfigurationValue
+-i (--interface){NUM} : Номер интерфейса.               bInterfaceNumber
+-r (--read_ep)  {NUM} : Адрес конечной точки чтения.    bEndpointAddress IN
+-w (--write_ep) {NUM} : Адрес конечной точки записи.    bEndpointAddress OUT

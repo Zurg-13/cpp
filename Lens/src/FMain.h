@@ -41,7 +41,15 @@ class FMain : public QMainWindow {
     void on_aExit_triggered();
     void on_aTest_triggered();
 
- private:
+    void on_btSend_clicked();
+
+    void on_aFileDest_triggered();
+
+    void on_aYandexDest_triggered();
+
+    void on_aGoogleDest_triggered();
+
+private:
     Ui::FMain *ui;
 
     QRubberBand *rubb_band;

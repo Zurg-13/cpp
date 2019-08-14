@@ -22,8 +22,10 @@ public:
     ANSWER_TYPE answer_type = ANSWER_TYPE::TEXT;
 
     explicit WHandler(QWidget *parent = nullptr);
-             WHandler(QString type, QString path, QColor color, QString text
-               , QWidget *parent = nullptr );
+             WHandler(
+                QString type, QString path, QColor color, QString text
+              , QWidget *parent = nullptr );
+
             ~WHandler();
 
     QByteArray answer(void);
@@ -57,6 +59,7 @@ private slots:
     void on_aQuit_triggered();
 
     void on_aAddHeader_triggered();
+
 };// WHandler
 
 //------------------------------------------------------------------------------

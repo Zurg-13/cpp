@@ -93,13 +93,13 @@
        <widget class="QPushButton" name="btSendMnu">
         <property name="minimumSize">
          <size>
-          <width>24</width>
+          <width>21</width>
           <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>24</width>
+          <width>21</width>
           <height>30</height>
          </size>
         </property>

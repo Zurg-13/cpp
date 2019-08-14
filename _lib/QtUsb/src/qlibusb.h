@@ -35,6 +35,7 @@ public:
    * @return QtUsb::FilterList
    */
   static QtUsb::FilterList getAvailableDevices(void);
+  static QtUsb::ConfigList getAvailableConfigs(const QtUsb::DeviceFilter &fltr);
 
 public slots:
   /**
@@ -93,4 +94,5 @@ private:
   QByteArray mReadBuffer;
   quint32 mReadBufferSize;
 };
+
 #endif // QLIBUSB_H
