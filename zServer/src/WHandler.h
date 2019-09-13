@@ -57,8 +57,8 @@ private slots:
     void on_aAsFile_triggered();
     void on_aAsQuery_triggered();
     void on_aQuit_triggered();
-
     void on_aAddHeader_triggered();
+    void on_aRequest_triggered();
 
 };// WHandler
 

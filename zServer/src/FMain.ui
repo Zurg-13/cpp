@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1002</width>
+    <width>943</width>
     <height>390</height>
    </rect>
   </property>
@@ -14,9 +14,8 @@
    <string>zServer</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QSplitter::handle { border: 2px solid gray; }
-QFrame { border: 1px solid black; }
-QTextBrowser {	border: 0px; }
+   <string notr="true">QSplitter::handle { border: 1px solid gray; }
+QTextBrowser {	border: 1px; }
 QTextEdit {	border: 1px solid gray; }
 QSplitter { border: 0px; }</string>
   </property>
@@ -56,7 +55,7 @@ QSplitter { border: 0px; }</string>
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="btSave">
+        <widget class="QPushButton" name="btFile">
          <property name="minimumSize">
           <size>
            <width>96</width>
@@ -77,52 +76,7 @@ QSplitter { border: 0px; }</string>
           </font>
          </property>
          <property name="text">
-          <string>Сохранить</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="minimumSize">
-          <size>
-           <width>96</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>96</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Имя</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btLoad">
-         <property name="minimumSize">
-          <size>
-           <width>96</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>96</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Загрузить</string>
+          <string>Файл</string>
          </property>
         </widget>
        </item>
@@ -185,7 +139,7 @@ QSplitter { border: 0px; }</string>
           </font>
          </property>
          <property name="text">
-          <string>314</string>
+          <string/>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -229,6 +183,9 @@ QSplitter { border: 0px; }</string>
     </item>
     <item>
      <widget class="QSplitter" name="splitter">
+      <property name="styleSheet">
+       <string notr="true">QFrame { border: 1px solid gray; }</string>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -249,7 +206,7 @@ QSplitter { border: 0px; }</string>
         <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Sunken</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
@@ -365,13 +322,48 @@ QSplitter { border: 0px; }</string>
          <number>0</number>
         </property>
         <item>
-         <widget class="QTextBrowser" name="tbLog"/>
+         <widget class="QTextBrowser" name="tbLog">
+          <property name="font">
+           <font>
+            <family>Courier New</family>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QFrame { border: 0px; }</string>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="lyRgtBtm">
           <property name="spacing">
            <number>2</number>
           </property>
+          <item>
+           <widget class="QPushButton" name="btDebug">
+            <property name="minimumSize">
+             <size>
+              <width>96</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>96</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Отладка</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <spacer name="spcrLog">
             <property name="orientation">
@@ -422,6 +414,30 @@ QSplitter { border: 0px; }</string>
   <action name="aClearHdl">
    <property name="text">
     <string>Очистить список обработчиков</string>
+   </property>
+  </action>
+  <action name="aConfSave">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+   <property name="toolTip">
+    <string>Сохранить конфигурацию</string>
+   </property>
+  </action>
+  <action name="aConfLoad">
+   <property name="text">
+    <string>Загрузить</string>
+   </property>
+   <property name="toolTip">
+    <string>Загрузить конфигурацию</string>
+   </property>
+  </action>
+  <action name="aExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+   <property name="toolTip">
+    <string>Выход</string>
    </property>
   </action>
  </widget>

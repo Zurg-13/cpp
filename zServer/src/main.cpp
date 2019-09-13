@@ -1,26 +1,34 @@
 #include <QApplication>
-#include <QMimeDatabase>
+#include <QTextCodec>
+#include <QTranslator>
 
-#include "FMain.h"
-#include "DHeader.h"
+#include "env.h" // Глобальная среда приложения.
 
-// Глобальные переменные. ------------------------------------------------------
+// Инициализация статических переменных среды. ---------------------------------
 //------------------------------------------------------------------------------
-QMimeDatabase *mime;
+unsigned int E::port = E::PORT;
+QMimeDatabase* E::mime;
 
-FMain *fmMain;
-DHeader *dgHeader;
-
+FMain* E::Main;
+DHeader* E::Header;
 
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    QMimeDatabase _mime; mime = &_mime;
+    QMimeDatabase _mime; E::mime = &_mime;
 
-    DHeader _dgHeader; dgHeader = &_dgHeader;
-    FMain _fmMain; fmMain = &_fmMain;
-    fmMain->show();
+    // Установить кодек текста.
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+    // Создать класс приложения.
+    QTranslator *translator = new QTranslator;
+    translator->load(QString(":/tr/qtbase_ru.qm"));
+    app.installTranslator(translator);
+
+    DHeader _dgHeader; E::Header = &_dgHeader;
+    FMain _fmMain; E::Main = &_fmMain;
+    E::Main->show();
 
     return app.exec();
 }// main

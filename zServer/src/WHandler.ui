@@ -177,6 +177,14 @@
     <string>Удалить заголовок</string>
    </property>
   </action>
+  <action name="aRequest">
+   <property name="text">
+    <string>Вызвать</string>
+   </property>
+   <property name="toolTip">
+    <string>Вызвать в браузере</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>btMenu</tabstop>

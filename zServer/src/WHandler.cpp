@@ -4,16 +4,15 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QMimeDatabase>
+#include <QDesktopServices>
+#include <QNetworkInterface>
+
+#include "env.h" // Глобальная среда приложения.
 
 #include "ui_WHandler.h"
 #include "WHandler.h"
 #include "DHeader.h"
 
-
-// Глобальные переменные. ------------------------------------------------------
-//------------------------------------------------------------------------------
-extern QMimeDatabase *mime;
-extern DHeader *dgHeader;
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -29,6 +28,8 @@ WHandler::WHandler(QWidget *parent) : QWidget(parent), ui(new Ui::WHandler) {
     // Меню (основное).
     QActionGroup *grTypeAnswer = new QActionGroup(this);
     QMenu *menu = new QMenu(this);
+    menu->addAction(ui->aRequest);
+    menu->addSeparator(); //----------------
     menu->addMenu(header);
     menu->addSeparator(); //----------------
     menu->addAction(ui->aAsText); grTypeAnswer->addAction(ui->aAsText);
@@ -147,7 +148,7 @@ QByteArray WHandler::answer_file(void) {
 
     if(!file.open(QIODevice::ReadOnly)) { return QByteArray(); }
 
-    buff.replace("{MIME}", mime->mimeTypeForFile(file).name().toUtf8());
+    buff.replace("{MIME}", E::mime->mimeTypeForFile(file).name().toUtf8());
     while(!file.atEnd()) {
         line = file.read(1024);
         buff.append(line);
@@ -198,15 +199,15 @@ void WHandler::setColor(QColor color) {
 // Добавить заголовок. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 void WHandler::on_aAddHeader_triggered() {
-    if(dgHeader->exec() == QDialog::Rejected) return;
+    if(E::Header->exec() == QDialog::Rejected) return;
 
     static QAction *separator = header->insertSeparator(ui->aAddHeader);
-    QMenu *menu = new QMenu(dgHeader->title(), this);
+    QMenu *menu = new QMenu(E::Header->title(), this);
     QAction *action = new QAction("Удалить", menu);
 
     connect(action, &QAction::triggered, this, &WHandler::on_DelHeader );
     menu->addAction(action); hdr[menu] =
-        qMakePair(dgHeader->type(), dgHeader->value());
+        qMakePair(E::Header->type(), E::Header->value());
 
     header->insertMenu(separator, menu);
 }// on_aAddHeader_triggered
@@ -229,5 +230,14 @@ QList<QString> WHandler::header_lst(void) {
     return ret;
 }// header_lst
 
+// Вызвать в браузере. ---------------------------------------------------------
 //------------------------------------------------------------------------------
+void WHandler::on_aRequest_triggered() {
+    static QString URL("http://{ADR}:{PRT}/{PTH}");
+    QDesktopServices::openUrl(QUrl(URL
+        .replace("{ADR}", QNetworkInterface::allAddresses().first().toString())
+        .replace("{PRT}", QString::number(E::port))
+        .replace("{PTH}", this->path) ));
+}// on_aRequest_triggered
 
+//------------------------------------------------------------------------------

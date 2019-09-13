@@ -27,7 +27,9 @@ private:
     QTcpServer *tcp = nullptr;
     QList<WHandler*> hdl;
 
+    void log(const QString &msg, const QString &stl);
     void log(const QString &msg, const QColor &clr = QColor());
+    void log_html(const QString &html);
     void spc(void);
 
     void addHandler(QString type, QString path, QColor color, QString text);
@@ -43,11 +45,13 @@ private slots:
 
     void on_btStart_clicked();
     void on_btClearLog_clicked();
-    void on_btSave_clicked();
-    void on_btLoad_clicked();
     void on_aClearHdl_triggered();
     void on_btUp_clicked();
 
+    void on_aConfSave_triggered();
+    void on_aConfLoad_triggered();
+    void on_aExit_triggered();
+    void on_btDebug_clicked();
 };// FMain
 
 //------------------------------------------------------------------------------

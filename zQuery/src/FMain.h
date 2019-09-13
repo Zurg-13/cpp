@@ -18,7 +18,7 @@ class FMain : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit FMain(QWidget *parent = 0);
+    explicit FMain(QWidget *parent = nullptr);
             ~FMain();
 
 private slots:
