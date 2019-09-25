@@ -173,7 +173,7 @@ QString("<div style='margin-bottom:5px'>")
 /**/
         QString tme = "[" + QTime::currentTime().toString() + "]";
         QString msg =
-            "<div style='margin-bottom:5px; color:" + clr.name() + "'>"
+            "<div style='margin-bottom:0px; color:" + clr.name() + "'>"
             "  <span>" + tme + OU + log + "</span>" + "<br>"
             "  <span>" + tme + TO + type + ", path:" + path + "</span>" + "<br>"
             "</div>";
@@ -356,27 +356,29 @@ void FMain::on_btDebug_clicked() {
 */
 
     text.append(
-QString("<div style='margin-bottom:5px'>")
+QString("<div style='margin-bottom:0px'>")
       + "  <span>" + QString::number(cnt+0) + msg + "</span>" + "<br>"
       + "  <span>" + QString::number(cnt+0) + msg + "</span>"
       + "</div>"
     );
 
+//    text.append("<div style='border-top: 1px solid black; width: 100%; margin: 0px;'>&nbsp;</div>");
 //    text.append(R"(<hr size="1" style='margin-top:1; margin-bottom:1'>)");
 //    text.append("<hr>");
 
     text.append(
-QString("<div style='margin-bottom:5px'>")
+QString("<div style='margin-bottom:0px'>")
       + "  <span>" + QString::number(cnt+1) + msg + "</span>" + "<br>"
       + "  <span>" + QString::number(cnt+1) + msg + "</span>"
       + "</div>"
     );
 
+//    text.append("<div style='border-top: 1px solid black; width: 100%; margin: 0px;'>&nbsp;</div>");
 //    text.append(R"(<hr size="1" style='margin-top:1; margin-bottom:1'>)");
 //    text.append("<hr>");
 
     text.append(
-QString("<div style='margin-bottom:5px'>")
+QString("<div style='margin-bottom:0px'>")
       + "  <span>" + QString::number(cnt+2) + msg + "</span>" + "<br>"
       + "  <span>" + QString::number(cnt+2) + msg + "</span>"
       + "</div>"
