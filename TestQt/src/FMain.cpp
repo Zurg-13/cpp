@@ -27,7 +27,6 @@ extern WAttention *wgAttention;
 extern WActive *wgActive;
 
 
-
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
@@ -57,13 +56,7 @@ void FMain::on_aExit_triggered() {
 void FMain::on_aTest_triggered() {
     FNC << R"(/ bgn)";
 
-    uint8_t x = (1<<2) | (0<<4) | (1<<6);
 
-
-
-    if(x & (1<<2)) { FNC << "2"; }
-    if(x & (1<<4)) { FNC << "4"; }
-    if(x & (1<<6)) { FNC << "6"; }
 
     FNC << R"(\ end)";
 }// on_aTest_triggered
@@ -237,4 +230,17 @@ void FMain::on_btActiveX_clicked() {
     wgActive->show();
 }// on_btActiveX_clicked
 
+// Очистка списка указателей. --------------------------------------------------
 //------------------------------------------------------------------------------
+#include <QPointer>
+void FMain::on_btListClear_clicked() {
+    FNC << R"(/bgn)";
+
+    QList<One*> lst;
+    for(int i=0; i<3; i++) {
+        lst.append(new One());
+    }// i
+    lst.clear();
+
+    FNC << R"(\end)";
+}// on_btListClear_clicked

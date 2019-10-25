@@ -36,6 +36,8 @@ class FMain : public QMainWindow {
 
     void on_bt_clicked();
 
+    void on_btListClear_clicked();
+
 private:
     Ui::FMain *ui;
 };// FMain
