@@ -5,6 +5,7 @@
 
 #include "_srv/Srv/dbg.h"
 #include "_srv/Srv/std.h"
+#include "_srv/Srv/lst.h"
 
 #include "ZLogger.h"
 
@@ -51,11 +52,33 @@ void FMain::on_aExit_triggered() {
     { QApplication::quit(); }
 }// on_aExit_triggered
 
+
+//template <typename T>
+//QString TST(QLiast<T>)
+
 // Отладка -> проба. -----------------------------------------------------------
 //------------------------------------------------------------------------------
+typedef QPair<QString, QString> tst_pair;
 void FMain::on_aTest_triggered() {
     FNC << R"(/ bgn)";
 
+
+    QMap<QString, QString> map = {{"1", "one"}, {"2", "two"}, {"3", "thr"}};
+    QList<QString> lst = {"one", "two", "thr"};
+
+    FNC << "map:" << map;
+    FNC << "lst:" << LST(map);
+
+    FNC << "str:" << BLD(lst);
+    FNC << "bld:" << BLD(LST(map));
+
+    FNC << "l_s:" << BLD(
+        lst, [](const QString &val){ return "{LBD:" + val + ":LBD}"; }
+      , QString("{SEP}") );
+
+    FNC << "tst:" << BLD(
+        lst, [](const QString &val){ return "{LBD:" + val + ":LBD}"; }
+      , QString("{SEP}") );
 
 
     FNC << R"(\ end)";
@@ -190,14 +213,14 @@ void FMain::on_btCast_clicked() {
 }// on_btCast_clicked
 
 
-#include "windows.h"
+//#include "windows.h"
 
 // Разное. ---------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_bt_clicked() {
     DBG << R"(/bgn)";
 
-
+/*
     APPBARDATA pabd;
     pabd.hWnd = reinterpret_cast<HWND>(this->winId());
     pabd.uCallbackMessage = 40032;
@@ -220,6 +243,7 @@ void FMain::on_bt_clicked() {
     }
 
     this->setGeometry(0, 0, 800, 50);
+*/
 
     DBG << R"(\end)";
 }// on_bt_clicked

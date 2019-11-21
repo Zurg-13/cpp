@@ -28,5 +28,6 @@ msvc {
   HEADERS += $$PWD/libusb-1.0/libusb.h
   LIBS += -L$$PWD/ libusb-1.0.lib
 }
+
 else:LIBS += -lusb-1.0
 

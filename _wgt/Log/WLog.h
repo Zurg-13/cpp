@@ -4,15 +4,19 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QWidget>
+#include <QMenu>
 
+//------------------------------------------------------------------------------
 namespace Ui { class WLog; }
 
-// Логирование. ----------------------------------------------------------------
-//------------------------------------------------------------------------------
+/* Логирование. ***************************************************************/
+/******************************************************************************/
 class WLog : public QWidget {
     Q_OBJECT
 
-public:
+ public:
+    enum class Plc { top, btm, lft, rgt, ovr };
+
     explicit WLog(QWidget *parent = nullptr);
             ~WLog();
 
@@ -26,11 +30,19 @@ public:
     void setUpToDown(void) { normal = true; }
     void setDownToUp(void) { normal = false; }
 
-private:
+    void place(const QWidget *wgt, Plc loc = Plc::btm);
+
+ private slots:
+    void on_context_menu(const QPoint &pos);
+
+    void on_aClear_triggered();
+
+ private:
     Ui::WLog *ui;
+    QMenu *extMenu;
     bool normal = false;
 
-};
+};// WLog
 
 //------------------------------------------------------------------------------
 #endif // WLOG_H

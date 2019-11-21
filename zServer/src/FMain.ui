@@ -365,6 +365,44 @@ QSplitter { border: 0px; }</string>
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="btDebugGrab">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>g</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btDebugFree">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>f</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="spcrLog">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

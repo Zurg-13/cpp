@@ -22,18 +22,24 @@ HEADERS += \
     env.h           \
     FMain.h         \
     WHandler.h      \
-    DHeader.h
+    DHeader.h \
+    WLogEntry.h \
+    WLogBoard.h
 
 SOURCES += \
     main.cpp        \
     FMain.cpp       \
     WHandler.cpp    \
-    DHeader.cpp
+    DHeader.cpp \
+    WLogEntry.cpp \
+    WLogBoard.cpp
 
 FORMS += \
     FMain.ui        \
     WHandler.ui     \
-    DHeader.ui
+    DHeader.ui \
+    WLogEntry.ui \
+    WLogBoard.ui
 
 RESOURCES += \
     res.qrc

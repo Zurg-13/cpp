@@ -1,6 +1,9 @@
 #ifndef FMAIN_H
 #define FMAIN_H
 
+
+// INCLUDE. --------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #include <QList>
 #include <QMainWindow>
 #include <QTcpServer>
@@ -15,14 +18,14 @@ namespace Ui { class FMain; }
 class FMain : public QMainWindow {
     Q_OBJECT
 
-public:
+ public:
     explicit FMain(QWidget *parent = nullptr);
             ~FMain();
 
-private slots:
+ private slots:
     void on_btAdd_clicked();
 
-private:
+ private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
     QList<WHandler*> hdl;
@@ -35,7 +38,7 @@ private:
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);
 
-private slots:
+ private slots:
     void remove_handler(WHandler*);
 
     void new_connect(void);
@@ -52,6 +55,8 @@ private slots:
     void on_aConfLoad_triggered();
     void on_aExit_triggered();
     void on_btDebug_clicked();
+    void on_btDebugGrab_clicked();
+    void on_btDebugFree_clicked();
 };// FMain
 
 //------------------------------------------------------------------------------

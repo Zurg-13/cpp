@@ -44,6 +44,28 @@
       <number>1</number>
      </property>
      <item>
+      <widget class="QPushButton" name="btRsp">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>O</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="edPath">
        <property name="minimumSize">
         <size>
@@ -183,6 +205,16 @@
    </property>
    <property name="toolTip">
     <string>Вызвать в браузере</string>
+   </property>
+  </action>
+  <action name="aWaitNot">
+   <property name="text">
+    <string>Мгновенный</string>
+   </property>
+  </action>
+  <action name="aWaitBtn">
+   <property name="text">
+    <string>По команде</string>
    </property>
   </action>
  </widget>

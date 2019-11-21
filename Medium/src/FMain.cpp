@@ -16,7 +16,6 @@
 #include "FMain.h"
 
 
-
 // Макросы. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #define PR(n, v) qMakePair(QString(n), QString(v))
@@ -87,7 +86,7 @@ QByteArray SEW(const QByteArray& arr) {
     }// while(cnt < end)
 
     return ret;
-}// sew
+}// SEW
 
 /* FMain. *********************************************************************/
 /******************************************************************************/
@@ -184,22 +183,6 @@ void FMain::on_poll(void) {
         dev->read(&arr, BUFSIZE);
     } else {
 
-/*
-        if(QtUsb::deviceOK == this->usb->openDevice(dev, fltr, conf)) {
-            QString msg("Подключение к сканеру установлено.");
-            ui->wgLog->add(msg, Qt::green); INF(msg);
-
-            this->isDeviceOpened = true;
-            this->timer.setInterval(500);
-        } else {
-            QString msg("Не удалось подключиться к сканеру.");
-            ui->wgLog->add(msg, Qt::red); ERR(msg);
-
-            this->isDeviceOpened = false;
-            this->timer.setInterval(30*SEC);
-        }// if // if(QtUsb::deviceOK  != this->usb->openDevice(dev, fltr, conf))
-*/
-
         if(this->openDev()) {
             QString msg("Подключение к сканеру установлено.");
             ui->wgLog->add(msg, Qt::green); INF(msg);
@@ -212,7 +195,7 @@ void FMain::on_poll(void) {
 
             this->isDeviceOpened = false;
             this->timer.setInterval(30*SEC);
-        }// if // if(QtUsb::deviceOK  != this->usb->openDevice(dev, fltr, conf))
+        }// if(this->openDev())
 
     }// else // if(this->isDeviceOpened)
 

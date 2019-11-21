@@ -22,6 +22,7 @@
 #define DTE_DOT_FMT QString("dd.MM.yyyy")
 #define TME_DOT_FMT QString("dd.MM.yyyy hh:mm")
 
+const unsigned int MSC = 1;
 const unsigned int SEC = 1000;
 const unsigned int MIN = 60 * SEC;
 const unsigned int HRS = 60 * MIN;

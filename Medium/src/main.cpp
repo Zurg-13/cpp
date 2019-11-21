@@ -4,9 +4,10 @@
 
 #include "FMain.h"
 
+
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
-static FMain *fmMain = nullptr;
+static FMain *fmMain;
 
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     QCoreApplication::setApplicationName("medium");
-    QCoreApplication::setApplicationVersion("0.01");
+    QCoreApplication::setApplicationVersion("1.01");
 
     FMain _fmMain; fmMain = &_fmMain;
 

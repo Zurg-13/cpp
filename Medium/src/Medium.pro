@@ -7,7 +7,7 @@ SRV = ../../_srv
 UNT = ../../_unt
 LIB = ../../_lib
 
-QT += core gui network widgets
+QT += core gui widgets network
 CONFIG += c++14
 
 TARGET = medium

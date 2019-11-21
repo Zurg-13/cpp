@@ -1,3 +1,5 @@
+// INCLUDE. --------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #include <functional>
 
 #include <QMenu>
@@ -154,7 +156,7 @@ void FMain::read_socket(void) {
     QString path = addr.left(addr.indexOf('?')).mid(1).trimmed();
 
     auto SND = [&](const QString &log, const QByteArray &ans, const QColor &clr)
-    -> void {
+     -> void {
 /*
         this->log(TO + type + ", path:" + path, clr);
         this->log(OU + log, clr);
@@ -166,7 +168,6 @@ QString("<div style='margin-bottom:5px'>")
       + "  <span>" + QString::number(cnt+0) + msg + "</span>" + "<br>"
       + "  <span>" + QString::number(cnt+0) + msg + "</span>"
       + "</div>"
-
 */
 
 
@@ -174,11 +175,15 @@ QString("<div style='margin-bottom:5px'>")
         QString tme = "[" + QTime::currentTime().toString() + "]";
         QString msg =
             "<div style='margin-bottom:0px; color:" + clr.name() + "'>"
-            "  <span>" + tme + OU + log + "</span>" + "<br>"
+            "  <span>" + tme + OU + ESCPG(log) + "</span>" + "<br>"
             "  <span>" + tme + TO + type + ", path:" + path + "</span>" + "<br>"
             "</div>";
         this->log_html(msg);
-        out << ans; socket->close();
+
+        out << ans;
+        socket->waitForBytesWritten();
+        socket->close();
+//        socket->disconnectFromHost();
 /**/
 
     };// SEND
@@ -333,77 +338,24 @@ void FMain::on_aExit_triggered() {
 
 // Отладка. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+static int cnt(0); ;
 void FMain::on_btDebug_clicked() {
-    const QString msg = ": НЕКОЕ ДОСТАТОЧНО ДЛИННОЕ СООБЩЕНИЕ";
-    static int cnt = 0; cnt++;
+    const QString msg = ": НЕКОЕ ДОСТАТОЧНО ДЛИННОЕ СООБЩЕНИЕ :";
 
-/**/
-    QTextBrowser *browser = ui->tbLog;
-    QString text;
+    E::Log->post("INP" + msg + STR(cnt++) , "OUT" + msg);
 
-/*
-    text.append("<html><body>");
-    text.append(
-        "<style type='text/css'>"
-//        "div { margin-bottom:" + QString::number(cnt) + "px; }"
-        "hr { "
-        "margin-bottom:" + QString::number(cnt) + "px; "
-        "margin-top:" + QString::number(cnt) + "px; "
-        "size:" + QString::number(cnt) + "px; "
-        "}"
+    E::Log->show();
+}// on_btDebug_clicked
 
-        "</style>" );
-*/
+// Отладка захват записи. ------------------------------------------------------
+//------------------------------------------------------------------------------
+WLogEntry *entry;
+void FMain::on_btDebugGrab_clicked()
+    { entry = E::Log->grab(); entry->inp("INP GRAB:" + STR(cnt++)); }
 
-    text.append(
-QString("<div style='margin-bottom:0px'>")
-      + "  <span>" + QString::number(cnt+0) + msg + "</span>" + "<br>"
-      + "  <span>" + QString::number(cnt+0) + msg + "</span>"
-      + "</div>"
-    );
+// Отладка освобождение записи. ------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btDebugFree_clicked()
+    { entry->out("OUT FREE"); E::Log->free(entry); }
 
-//    text.append("<div style='border-top: 1px solid black; width: 100%; margin: 0px;'>&nbsp;</div>");
-//    text.append(R"(<hr size="1" style='margin-top:1; margin-bottom:1'>)");
-//    text.append("<hr>");
-
-    text.append(
-QString("<div style='margin-bottom:0px'>")
-      + "  <span>" + QString::number(cnt+1) + msg + "</span>" + "<br>"
-      + "  <span>" + QString::number(cnt+1) + msg + "</span>"
-      + "</div>"
-    );
-
-//    text.append("<div style='border-top: 1px solid black; width: 100%; margin: 0px;'>&nbsp;</div>");
-//    text.append(R"(<hr size="1" style='margin-top:1; margin-bottom:1'>)");
-//    text.append("<hr>");
-
-    text.append(
-QString("<div style='margin-bottom:0px'>")
-      + "  <span>" + QString::number(cnt+2) + msg + "</span>" + "<br>"
-      + "  <span>" + QString::number(cnt+2) + msg + "</span>"
-      + "</div>"
-    );
-
-    text.append("</body></html>");
-    browser->setHtml(text);
-/**/
-
-
-// style='padding-top:10px;'
-
-/*
-    if(FIRST_RUN) {
-        ui->tbLog->append(
-            "<style type='text/css'>p { margin-bottom:0px; }</style>"
-        );
-    }
-
-    ui->tbLog->append(
-QString("<p>") //+ QString::number(cnt) + msg
-      + "  <span>" + QString::number(cnt) + msg + "</span>" + "<br>"
-      + "  <span>" + QString::number(cnt) + msg + "</span>" + "<br>"
-      + "</p>"
-    );
-*/
-
-}
+//------------------------------------------------------------------------------

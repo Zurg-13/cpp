@@ -1,53 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WLog</class>
- <widget class="QWidget" name="WLog">
+ <class>WLogBoard</class>
+ <widget class="QWidget" name="WLogBoard">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>578</width>
-    <height>209</height>
+    <width>611</width>
+    <height>570</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>192</width>
-    <height>60</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>Log</string>
+   <string>WLogBoard</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>2</number>
+    <number>0</number>
    </property>
    <item>
-    <widget class="QPlainTextEdit" name="pt">
-     <property name="readOnly">
+    <widget class="QScrollArea" name="sa">
+     <property name="widgetResizable">
       <bool>true</bool>
      </property>
+     <widget class="QWidget" name="content">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>609</width>
+        <height>568</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
-  <action name="aClear">
-   <property name="text">
-    <string>Очистить</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

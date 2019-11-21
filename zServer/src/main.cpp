@@ -11,6 +11,7 @@ QMimeDatabase* E::mime;
 
 FMain* E::Main;
 DHeader* E::Header;
+WLogBoard* E::Log;
 
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -26,8 +27,9 @@ int main(int argc, char *argv[]) {
     translator->load(QString(":/tr/qtbase_ru.qm"));
     app.installTranslator(translator);
 
-    DHeader _dgHeader; E::Header = &_dgHeader;
-    FMain _fmMain; E::Main = &_fmMain;
+    DHeader dgHeader; E::Header = &dgHeader;
+    WLogBoard wgLog; E::Log = &wgLog;
+    FMain fmMain; E::Main = &fmMain;
     E::Main->show();
 
     return app.exec();

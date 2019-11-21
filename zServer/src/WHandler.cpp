@@ -8,11 +8,22 @@
 #include <QNetworkInterface>
 
 #include "env.h" // Глобальная среда приложения.
+#include "dbg.h"
 
 #include "ui_WHandler.h"
 #include "WHandler.h"
 #include "DHeader.h"
 
+// Задать режим ожидания ответа. -----------------------------------------------
+//------------------------------------------------------------------------------
+void WHandler::setWait(WAIT_TYPE type) {
+    this->wait_type = type;
+
+    switch(this->wait_type) {
+     case WAIT_TYPE::NOT : ui->btRsp->setEnabled(false); break;
+     case WAIT_TYPE::BTN : ui->btRsp->setEnabled(true); break;
+    }// switch(type)
+}// setWait
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -25,12 +36,18 @@ WHandler::WHandler(QWidget *parent) : QWidget(parent), ui(new Ui::WHandler) {
     header = new QMenu("Заголовки", this);
     header->addAction(ui->aAddHeader);
 
+    // Меню (тип ожидания).
+    QMenu *wait = new QMenu("Ожидание", this);
+    wait->addAction(ui->aWaitNot);
+    wait->addAction(ui->aWaitBtn);
+
     // Меню (основное).
     QActionGroup *grTypeAnswer = new QActionGroup(this);
     QMenu *menu = new QMenu(this);
     menu->addAction(ui->aRequest);
+    menu->addMenu(wait);  // >>>
     menu->addSeparator(); //----------------
-    menu->addMenu(header);
+    menu->addMenu(header);// >>>
     menu->addSeparator(); //----------------
     menu->addAction(ui->aAsText); grTypeAnswer->addAction(ui->aAsText);
     menu->addAction(ui->aAsFile); grTypeAnswer->addAction(ui->aAsFile);
@@ -114,9 +131,24 @@ void WHandler::on_edPath_textChanged(const QString &text) { this->path = text; }
 // Получить ответ. -------------------------------------------------------------
 //------------------------------------------------------------------------------
 QByteArray WHandler::answer(void) {
-    switch (answer_type) {
-      case ANSWER_TYPE::TEXT: return answer_text();
-      case ANSWER_TYPE::FILE: return answer_file();
+    FNC << "bgn";
+
+    if(this->wait_type == WAIT_TYPE::BTN) {
+
+        FNC << "entr loop";
+
+        QEventLoop loop;
+        connect(ui->btRsp, &QPushButton::clicked, &loop, &QEventLoop::quit);
+        loop.exec();
+
+        FNC << "quit loop";
+
+    }// if(this->wait_type == WAIT_TYPE::BTN)
+
+
+    switch(answer_type) {
+      case ANSWER_TYPE::TEXT : return answer_text();
+      case ANSWER_TYPE::FILE : return answer_file();
       case ANSWER_TYPE::QUERY: return answer_query();
     }// switch (answer_type)
 
@@ -240,4 +272,13 @@ void WHandler::on_aRequest_triggered() {
         .replace("{PTH}", this->path) ));
 }// on_aRequest_triggered
 
+// Включить режим мгновенного ответа на запрос. --------------------------------
 //------------------------------------------------------------------------------
+void WHandler::on_aWaitNot_triggered() { this->setWait(WAIT_TYPE::NOT); }
+
+// Включить режим ответа на запрос по нажатию кнопки. --------------------------
+//------------------------------------------------------------------------------
+void WHandler::on_aWaitBtn_triggered() { this->setWait(WAIT_TYPE::BTN); }
+
+//------------------------------------------------------------------------------
+
