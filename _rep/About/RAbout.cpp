@@ -7,8 +7,9 @@
 
 #include "ver.h"
 
-#include "_srv/Srv/drw.h"
-#include "_srv/Srv/std.h"
+#include "drw.h"
+#include "std.h"
+#include "wgt.h"
 
 
 //Глобальные переменные.--------------------------------------------------------
