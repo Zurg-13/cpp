@@ -1,7 +1,6 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <functional>
-
 #include "WLog.h"
 #include "ui_WLog.h"
 
@@ -32,8 +31,31 @@ void WLog::add(QString msg, QColor clr) {
     auto MSG = [&]() -> QString {
         return "<h style='color:" + clr.name() + ";'>" + msg + "</h>"; };
 
-    if(normal) { ui->pt->appendHtml(MSG()); }
-    else       { ui->pt->cursorForPosition(QPoint(0, 0)).insertHtml(MSG()+BR); }
+/*
+    auto RMV = [&](const QTextBlock &block) -> void {
+
+        if(ui->pt->blockCount() > this->size) {
+
+            FNC << "cnt:" << ui->pt->blockCount();
+
+            QTextCursor cursor(block);
+            cursor.select(QTextCursor::BlockUnderCursor);
+            cursor.removeSelectedText();
+        }// while(ui->pt->blockCount() >= this->size)
+    };// RMV
+*/
+
+/*
+    if(normal) {
+        ui->pt->appendHtml(MSG());
+        RMV(ui->pt->document()->firstBlock());
+    } else {
+        ui->pt->cursorForPosition(QPoint(0, 0)).insertHtml(MSG()+BR);
+        RMV(ui->pt->document()->lastBlock());
+    }// else // if(normal)
+*/
+
+    ui->pt->appendHtml(MSG());
 }// add
 
 // Добавить как текст. ---------------------------------------------------------
@@ -42,8 +64,12 @@ void WLog::addPlainText(QString msg) {
     static const QString NS = "\n";
     auto MSG = [&]() -> QString { return msg; };
 
+/*
     if(normal) { ui->pt->appendPlainText(MSG());
     } else     { ui->pt->cursorForPosition(QPoint(0, 0)).insertText(MSG()+NS); }
+*/
+
+    ui->pt->appendPlainText(MSG());
 }// addPlainText
 
 // Конструктор. ----------------------------------------------------------------
@@ -54,14 +80,13 @@ WLog::WLog(QWidget *parent) : QWidget(parent), ui(new Ui::WLog) {
     ui->setupUi(this);
 
     // Контекстное меню.
-    this->extMenu = new QMenu("Дополнительно", this);
-    this->extMenu->addAction(ui->aClear);
-
     ui->pt->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->pt, &QPlainTextEdit::customContextMenuRequested
           , this, &WLog::on_context_menu );
-
 }// WLog
+
+WLog::WLog(int size, QWidget *parent) : WLog(parent)
+    { ui->pt->setMaximumBlockCount(size); }
 
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -105,7 +130,7 @@ void WLog::on_context_menu(const QPoint &pos) {
     QMenu* menu = ui->pt->createStandardContextMenu();
 
     menu->addSeparator();
-    menu->addMenu(this->extMenu);
+    menu->addAction(ui->aClear);
     menu->exec(ui->pt->mapToGlobal(pos));
 
     delete menu;

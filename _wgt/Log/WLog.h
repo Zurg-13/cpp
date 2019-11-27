@@ -13,11 +13,13 @@ namespace Ui { class WLog; }
 /******************************************************************************/
 class WLog : public QWidget {
     Q_OBJECT
+    const int SIZE_DFT = 1000;
 
  public:
     enum class Plc { top, btm, lft, rgt, ovr };
 
     explicit WLog(QWidget *parent = nullptr);
+             WLog(int size, QWidget *parent = nullptr);
             ~WLog();
 
     void addPlainText(QString msg);
@@ -27,20 +29,21 @@ class WLog : public QWidget {
     void spc(void) { add("<br>"); }
     void clr(void);
 
+/*
     void setUpToDown(void) { normal = true; }
     void setDownToUp(void) { normal = false; }
+*/
 
     void place(const QWidget *wgt, Plc loc = Plc::btm);
 
  private slots:
     void on_context_menu(const QPoint &pos);
-
     void on_aClear_triggered();
 
  private:
     Ui::WLog *ui;
-    QMenu *extMenu;
-    bool normal = false;
+//    bool normal = false;
+    int size = SIZE_DFT;
 
 };// WLog
 
