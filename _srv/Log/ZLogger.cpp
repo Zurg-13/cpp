@@ -25,7 +25,7 @@ const QString PRX("*.*.*T*-*-*");
 //------------------------------------------------------------------------------
 QString ZLogger::giveFileName(void) {
     static QStringList flt = (QStringList() << PRX + LFLE.arg(this->name));
-    static auto NME = [this]() -> QString { return TME + LFLE.arg(name); };
+    auto NME = [this]() -> QString { return TME + LFLE.arg(name); };
     QStringList all = this->dir.entryList(flt, QDir::Files);
 
     all.sort();
