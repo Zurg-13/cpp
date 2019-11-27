@@ -53,7 +53,7 @@ void WBox::select_cng(WClr *clr) {
 // Проверка на содержание цвета в контейнере. ----------------------------------
 //------------------------------------------------------------------------------
 bool WBox::contain(const QColor &clr) {
-    static auto CONTAIN = [](QLayout *l, const QColor &c) -> bool {
+    auto CONTAIN = [](QLayout *l, const QColor &c) -> bool {
         for(int i=0; i < l->count(); i++) {
             if(static_cast<WClr*>(l->itemAt(i)->widget())->color() == c)
                 { return true; }
