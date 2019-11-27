@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/xml.h \
     $$PWD/tme.h \
     $$PWD/lst.h \
+    $$PWD/wgt.h \
 
 SOURCES += \
     $$PWD/dbg.cpp \
@@ -14,3 +15,4 @@ SOURCES += \
     $$PWD/xml.cpp \
     $$PWD/tme.cpp \
     $$PWD/lst.cpp \
+    $$PWD/wgt.cpp \

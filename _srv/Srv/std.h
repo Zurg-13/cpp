@@ -26,12 +26,6 @@ const QString EMPTY_STR("");
 #define asTXT text().trimmed()
 
 #define FCS(c) do { c->selectAll(); c->setFocus(); } while(false)
-#define SELECT_ROW(v, r) do { v->selectRow(r); v->scrollTo(v->currentIndex()); } while(false)
-#define TO_CENTER(r) this->move(r.center() - this->rect().center())
-#define DESKTOP qApp->desktop()->availableGeometry(this)
-
-#define ACCEPT QDialog::Accepted
-#define REJECT QDialog::Rejected
 
 #define FIRST_RUN ([] {                     \
     static bool is_first_time = true;       \
