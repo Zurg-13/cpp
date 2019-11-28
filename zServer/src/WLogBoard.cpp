@@ -1,13 +1,22 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <functional>
+
 #include <QScrollArea>
+#include <QLabel>
 
 #include "dbg.h"
 #include "std.h"
+#include "wgt.h"
 
 #include "WLogBoard.h"
 #include "ui_WLogBoard.h"
 
+/* Дополнительные функции. ****************************************************/
+/******************************************************************************/
+
+/* WLogBoard. *****************************************************************/
+/******************************************************************************/
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -32,31 +41,67 @@ WLogBoard::~WLogBoard() {
     delete ui;
 }//~WLogBoard
 
+// Добавить разделитель. -------------------------------------------------------
+//------------------------------------------------------------------------------
+void WLogBoard::rift(void) {
+    QFrame *frm = new QFrame();
+        frm->setFrameShape(QFrame::HLine);
+        frm->setFrameShadow(QFrame::Plain);
+    static_cast<QBoxLayout*>(this->box->layout())
+        ->insertWidget(this->inset_pos, frm);
+}// rift
+
+// Добавить ОДИНОЧНУЮ запись. --------------------------------------------------
+//------------------------------------------------------------------------------
+void WLogBoard::post(const QString &msg, const QColor &clr) {
+    QLabel* lbl = new QLabel(msg);
+        lbl->setStyleSheet(STR("background-color: %1;").arg(clr.name()));
+    static_cast<QBoxLayout*>(this->box->layout())
+        ->insertWidget(this->inset_pos, lbl);
+}// post
+
 // Добавить запись. ------------------------------------------------------------
 //------------------------------------------------------------------------------
+WLogEntry* WLogBoard::post(WLogEntry *entry) {
+    static_cast<QBoxLayout*>(this->box->layout())
+        ->insertWidget(this->inset_pos, entry);
+    return entry;
+}// post
+
 void WLogBoard::post(const QString &inp, const QString &out)
     { post(new WLogEntry(inp, out)); }
 
-void WLogBoard::post(WLogEntry *entry) {
-    static_cast<QBoxLayout*>(this->box->layout())
-        ->insertWidget(this->inset_pos, entry);
-}// post
+void WLogBoard::post(const QString &inp, const QString &out, const QColor &clr)
+    { post(new WLogEntry(inp, out))->clr(clr); }
 
 // Захватить виджет. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 WLogEntry* WLogBoard::grab(void) {
-    WLogEntry *entry = new WLogEntry(EMPTY_STR, EMPTY_STR);
-        entry->highlight(Qt::red);
-    post(entry); this->inset_pos++;
+    WLogEntry *entry = post(new WLogEntry(EMPTY_STR, EMPTY_STR));
+        entry->grab()->hgl(Qt::red);
+    this->inset_pos++;
     return entry;
 }// grab
 
 // Освободить виджет. ----------------------------------------------------------
 //------------------------------------------------------------------------------
-void WLogBoard::free(WLogEntry *entry) {
-    this->inset_pos--;
-    entry->highlight(Qt::green);
-}// free
+WLogEntry* WLogBoard::free(WLogEntry *entry)
+    { this->inset_pos--; entry->hgl(Qt::green); return entry->free(); }
+
+// Очистить лог. ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+void  WLogBoard::clear(void) {
+    int pos = 0;
+    while(QLayoutItem* itm = this->box->layout()->takeAt(pos)) {
+        if(QWidget *wgt = itm->widget()) {
+            QVariant is_grab = wgt->property("is_grab");
+            if(is_grab.isValid() && is_grab.toBool()) { pos++; continue; }
+            wgt->setParent(nullptr);
+        }// if(QWidget *wgt = itm->widget())
+        if(QLayout *lay = itm->layout()) { pos++; continue; }
+        delete itm;
+    }// while(QLayoutItem* itm = ly->layout()->takeAt(0))
+}// clear
 
 //------------------------------------------------------------------------------
 

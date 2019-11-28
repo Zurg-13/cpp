@@ -265,7 +265,7 @@ QList<QString> WHandler::header_lst(void) {
 // Вызвать в браузере. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 void WHandler::on_aRequest_triggered() {
-    static QString URL("http://{ADR}:{PRT}/{PTH}");
+    QString URL("http://{ADR}:{PRT}/{PTH}");
     QDesktopServices::openUrl(QUrl(URL
         .replace("{ADR}", QNetworkInterface::allAddresses().first().toString())
         .replace("{PRT}", QString::number(E::port))

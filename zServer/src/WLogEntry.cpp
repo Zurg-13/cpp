@@ -1,4 +1,5 @@
 #include "dbg.h"
+#include "std.h"
 
 #include "WLogEntry.h"
 #include "ui_WLogEntry.h"
@@ -26,7 +27,7 @@ WLogEntry::~WLogEntry() {
 
 // Выделить запись цветом. -----------------------------------------------------
 //------------------------------------------------------------------------------
-void WLogEntry::highlight(const QColor &clr) {
+void WLogEntry::hgl(const QColor &clr) {
     static QString STYLE_BTM(
         "border-top: 0px;"
         "border-left: 2px solid %1;"
@@ -41,6 +42,13 @@ void WLogEntry::highlight(const QColor &clr) {
     ui->edOut->setStyleSheet(STYLE_TOP.arg(clr.name()));
     ui->edInp->setStyleSheet(STYLE_BTM.arg(clr.name()));
 }// highlight
+
+// Задать цвет записи. ---------------------------------------------------------
+//------------------------------------------------------------------------------
+void WLogEntry::clr(const QColor &clr) {
+    if(clr == Qt::black || clr == Qt::white) { return; }
+    this->setStyleSheet(STR("background-color: %1;").arg(clr.name()));
+}// clr
 
 // Записать ввод. --------------------------------------------------------------
 //------------------------------------------------------------------------------

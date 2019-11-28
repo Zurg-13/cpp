@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QColor>
 
 #include "WLogEntry.h"
 
@@ -21,10 +22,15 @@ class WLogBoard : public QWidget {
     explicit WLogBoard(QWidget *parent = nullptr);
             ~WLogBoard();
 
-    void        post(const QString &inp, const QString &out);
-    void        post(WLogEntry *entry);
-    WLogEntry*  grab(void);
-    void        free(WLogEntry *entry);
+    void       post(const QString &msg, const QColor &clr = QColor());
+    void       post(const QString &inp, const QString &out, const QColor &clr);
+    void       post(const QString &inp, const QString &out);
+    WLogEntry* post(WLogEntry *entry);
+    WLogEntry* grab(void);
+    WLogEntry* free(WLogEntry *entry);
+    void       rift(void);
+
+    void       clear(void);
 
  private:
     Ui::WLogBoard *ui;

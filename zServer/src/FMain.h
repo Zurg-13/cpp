@@ -10,6 +10,7 @@
 #include <QTcpSocket>
 
 #include "WHandler.h"
+#include "WLogEntry.h"
 
 namespace Ui { class FMain; }
 
@@ -30,10 +31,17 @@ class FMain : public QMainWindow {
     QTcpServer *tcp = nullptr;
     QList<WHandler*> hdl;
 
-    void log(const QString &msg, const QString &stl);
-    void log(const QString &msg, const QColor &clr = QColor());
-    void log_html(const QString &html);
-    void spc(void);
+    Q_DECL_DEPRECATED void log(const QString &msg, const QString &stl);
+    Q_DECL_DEPRECATED void log(const QString &msg, const QColor &clr = QColor());
+    Q_DECL_DEPRECATED void log_html(const QString &html);
+    Q_DECL_DEPRECATED void spc(void);
+
+    void       post(const QString &msg, const QColor &clr = QColor());
+    void       post(
+        const QString &inp, const QString &out, const QColor &clr = QColor() );
+    WLogEntry* grab(void);
+    void       free(WLogEntry *entry);
+    void       rift(void);
 
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);

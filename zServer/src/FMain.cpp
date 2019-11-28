@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QDataStream>
 #include <QtConcurrentMap>
+#include <QTimer>
 
 #include "env.h" // Глобальная среда приложения.
 
@@ -97,20 +98,32 @@ void FMain::on_btStart_clicked() {
 
     if(tcp->isListening()) {
         tcp->close();
+
         log(tr("Прослушиватель остановлен"), Qt::lightGray);
+        post(tr("Прослушиватель остановлен"), Qt::lightGray);
+
         SET_BTN("Пуск", "color: limegreen;");
     } else {
 
         bool ok;
         unsigned short port = ui->edPort->text().toUShort(&ok);
-        if(!ok) { log(tr("Введите корректный порт"), Qt::red); return; }
+        if(!ok) {
+            log(tr("Введите корректный порт"), Qt::red);
+            post(tr("Введите корректный порт"), Qt::red);
+            return;
+        }
 
         if(tcp->listen(QHostAddress::Any, port)) {
             spc();
+            rift();
+
             log(tr("Прослушиватель запущен"), Qt::lightGray);
+            post(tr("Прослушиватель запущен"), Qt::lightGray);
+
             SET_BTN("Стоп", "color: crimson;");
         } else {
             log(tr("Ошибка прослушивателя: ") + tcp->errorString(), Qt::red);
+            post(tr("Ошибка прослушивателя: ") + tcp->errorString(), Qt::red);
         }// else // if(!tcp->listen(QHostAddress::Any, ui->edPort->text.toInt()))
     }// else // if(tcp->isListening())
 
@@ -138,15 +151,10 @@ void FMain::new_connect(void) {
 // Чтение сокета. --------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::read_socket(void) {
-//    static QByteArray OU(" <<< "), TO(" >>> "), OK("<ok> DEFAULT </ok>");
-    static QByteArray OU(R"( / )"), TO(R"( \ )"), OK("<ok> DEFAULT </ok>");
+    static QByteArray OK("<ok> DEFAULT </ok>");
 
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
-
-//    QDataStream out(socket);
-/**/
-    QTextStream out(socket); out.setAutoDetectUnicode(true);
-/**/
+//    QTextStream out(socket); out.setAutoDetectUnicode(true);
 
     QString read = QString::fromUtf8(socket->readAll());
     int pos = read.indexOf('/');
@@ -155,47 +163,45 @@ void FMain::read_socket(void) {
     QString addr = read.mid(pos, read.indexOf("HTTP/") - pos).trimmed();
     QString path = addr.left(addr.indexOf('?')).mid(1).trimmed();
 
-    auto SND = [&](const QString &log, const QByteArray &ans, const QColor &clr)
+
+    auto SEND = [=](const QString &log, const QByteArray &ans, const QColor &clr)
      -> void {
-/*
-        this->log(TO + type + ", path:" + path, clr);
-        this->log(OU + log, clr);
-        out << ans; socket->waitForBytesWritten(); socket->disconnectFromHost();
-*/
+        QTextStream out(socket); out.setAutoDetectUnicode(true);
 
-/*
-QString("<div style='margin-bottom:5px'>")
-      + "  <span>" + QString::number(cnt+0) + msg + "</span>" + "<br>"
-      + "  <span>" + QString::number(cnt+0) + msg + "</span>"
-      + "</div>"
-*/
+        this->log(">>> " + type + ", path:" + path, clr);
+        this->log("<<< " + log, clr);
 
-
-/**/
-        QString tme = "[" + QTime::currentTime().toString() + "]";
-        QString msg =
-            "<div style='margin-bottom:0px; color:" + clr.name() + "'>"
-            "  <span>" + tme + OU + ESCPG(log) + "</span>" + "<br>"
-            "  <span>" + tme + TO + type + ", path:" + path + "</span>" + "<br>"
-            "</div>";
-        this->log_html(msg);
-
-        out << ans;
-        socket->waitForBytesWritten();
-        socket->close();
-//        socket->disconnectFromHost();
-/**/
-
+        out << ans; socket->waitForBytesWritten(); socket->close();
     };// SEND
 
+
     for(WHandler *handler: hdl) {
-        if(0 == QString::compare(path, handler->path, Qt::CaseInsensitive)) {
-            SND(handler->plane_text(), handler->answer(), handler->color);
+//        if(0 == QString::compare(path, handler->path, Qt::CaseInsensitive)) {
+        if(path == handler->path) {
+
+            FNC << "send bgn";
+            WLogEntry *entry = ui->wgLog->grab();
+                entry->inp(type + ", path:" + path);
+                entry->clr(handler->color);
+
+            QTimer::singleShot(0, [=]{
+                QTextStream out(socket); out.setAutoDetectUnicode(true);
+
+                out << handler->answer();
+                entry->out(handler->plane_text());
+                ui->wgLog->free(entry);
+                socket->waitForBytesWritten(); socket->close();
+
+                FNC << "send end";
+            });// singleShot
+
+
+//            SEND(handler->plane_text(), handler->answer(), handler->color);
             return;
         }// if(0 == QString::compare(path, handler->path, Qt::CaseInsensitive))
     }// handler
 
-    SND(OK, OK, Qt::darkRed);
+    SEND(OK, OK, Qt::darkRed);
 }// read_socket
 
 // Закрытие сокета. ------------------------------------------------------------
@@ -216,6 +222,11 @@ void FMain::error_socket(QAbstractSocket::SocketError) {
     log(tr("Ошибка сокета: ")
       +(qobject_cast<QTcpSocket*>(sender()))->errorString()
       , Qt::red );
+
+    post(tr("Ошибка сокета: ")
+      +(qobject_cast<QTcpSocket*>(sender()))->errorString()
+      , Qt::red );
+
 }// error_socket
 
 // Логирование. ----------------------------------------------------------------
@@ -237,6 +248,7 @@ void FMain::log(const QString &msg, const QString &stl) {
       + "</h>" + "<br>" );
 
 }// FMain::log
+
 void FMain::log_html(const QString &html)
     { if(ui){ ui->tbLog->cursorForPosition(QPoint(0, 0)).insertHtml(html); }}
 
@@ -247,9 +259,31 @@ void FMain::spc(void) {
     ui->tbLog->cursorForPosition(QPoint(0, 0)).insertHtml("<br>");
 }// spc
 
+// Опубликовать запись в логе. -------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::post(const QString &msg, const QColor &clr)
+    { ui->wgLog->post(msg, clr); }
+void FMain::post(const QString &inp, const QString &out, const QColor &clr)
+    { ui->wgLog->post(new WLogEntry(inp, out))->clr(clr); }
+
+// Захватить записб в логе. ----------------------------------------------------
+//------------------------------------------------------------------------------
+WLogEntry* FMain::grab(void) { return ui->wgLog->grab(); }
+
+// Освободить запись в логе. ---------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::free(WLogEntry *entry) { ui->wgLog->free(entry); }
+
+// Вставить промежуток в лог. --------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::rift(void) { ui->wgLog->rift(); }
+
 // Очистить лог. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_btClearLog_clicked() { ui->tbLog->clear(); }
+void FMain::on_btClearLog_clicked() {
+    ui->tbLog->clear();
+    ui->wgLog->clear();
+}
 
 // Добавить сервер. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -342,20 +376,20 @@ static int cnt(0); ;
 void FMain::on_btDebug_clicked() {
     const QString msg = ": НЕКОЕ ДОСТАТОЧНО ДЛИННОЕ СООБЩЕНИЕ :";
 
-    E::Log->post("INP" + msg + STR(cnt++) , "OUT" + msg);
+    ui->wgLog->post("INP" + msg + STR(cnt++) , "OUT" + msg);
 
-    E::Log->show();
+    ui->wgLog->show();
 }// on_btDebug_clicked
 
 // Отладка захват записи. ------------------------------------------------------
 //------------------------------------------------------------------------------
 WLogEntry *entry;
 void FMain::on_btDebugGrab_clicked()
-    { entry = E::Log->grab(); entry->inp("INP GRAB:" + STR(cnt++)); }
+    { entry = ui->wgLog->grab(); entry->inp("INP GRAB:" + STR(cnt++)); }
 
 // Отладка освобождение записи. ------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btDebugFree_clicked()
-    { entry->out("OUT FREE"); E::Log->free(entry); }
+    { entry->out("OUT FREE"); ui->wgLog->free(entry); }
 
 //------------------------------------------------------------------------------

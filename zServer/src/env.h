@@ -21,7 +21,6 @@ class E {
 
     static FMain *Main;
     static DHeader *Header;
-    static WLogBoard *Log;
 
 };// E
 

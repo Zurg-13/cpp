@@ -322,6 +322,16 @@ QSplitter { border: 0px; }</string>
          <number>0</number>
         </property>
         <item>
+         <widget class="WLogBoard" name="wgLog" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>150</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QTextBrowser" name="tbLog">
           <property name="font">
            <font>
@@ -480,6 +490,14 @@ QSplitter { border: 0px; }</string>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>WLogBoard</class>
+   <extends>QWidget</extends>
+   <header>WLogBoard.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
