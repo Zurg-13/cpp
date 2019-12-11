@@ -6,6 +6,8 @@
 #include <QMenu>
 #include <QMap>
 #include <QPair>
+#include <QHttpServerResponse>
+#include <QHttpServerRequest>
 
 namespace Ui { class WHandler; }
 typedef QPair<QString, QString> Header;
@@ -14,8 +16,8 @@ typedef QPair<QString, QString> Header;
 //------------------------------------------------------------------------------
 class WHandler : public QWidget {
     Q_OBJECT
-    enum class ANSWER_TYPE { TEXT, FILE, QUERY };
     enum class WAIT_TYPE { NOT, BTN };
+    enum class ANSWER_TYPE { TEXT, FILE, QUERY };
 
 public:
     QColor color;
@@ -30,10 +32,12 @@ public:
 
             ~WHandler();
 
-    QByteArray answer(void);
+    QHttpServerResponse answer(void);
+
     QString plane_text(void);
     QString answer_type_name(void);
-    QList<QString> header_lst(void);
+
+    void interrupt(void);
 
 signals:
     void remove(WHandler *);
@@ -42,14 +46,15 @@ private:
     Ui::WHandler *ui;
     QMenu *header = nullptr;
     QMap<QMenu*, Header> hdr;
+    bool is_interrupted = false;
 
-    void setColor(QColor color);
+    void setColor(QColor clor);
     void setType(QString type_name);
     void setWait(WAIT_TYPE type);
 
-    QByteArray answer_text(void);
-    QByteArray answer_file(void);
-    QByteArray answer_query(void);
+    QHttpServerResponse answer_text(void);
+    QHttpServerResponse answer_file(void);
+    QHttpServerResponse answer_query(void);
 
 private slots:
     void on_edPath_textChanged(const QString&);

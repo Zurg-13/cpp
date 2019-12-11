@@ -13,6 +13,7 @@
 #include <QDataStream>
 #include <QtConcurrentMap>
 #include <QTimer>
+#include <QStringBuilder>
 
 #include "env.h" // Глобальная среда приложения.
 
@@ -21,8 +22,8 @@
 #include "xml.h"
 #include "tme.h"
 
-#include "ui_FMain.h"
 #include "FMain.h"
+#include "ui_FMain.h"
 
 // Дополнительные функции. ****************************************************/
 /******************************************************************************/
@@ -30,6 +31,35 @@
 
 /* FMain **********************************************************************/
 /******************************************************************************/
+
+// Обработка запроса. ----------------------------------------------------------
+//------------------------------------------------------------------------------
+QHttpServerResponse FMain::proc(const QUrl &url, const QHttpServerRequest &req){
+    static int cnt = 0; cnt++;
+    static QString  DFT("<ok> DEFAULT: %1 </ok>");
+
+    QString path = url.path();
+    QString type = QVariant::fromValue(req.method()).toString();
+
+    for(WHandler *handler: this->hdl) {
+
+        if(path == handler->path) {
+            WLogEntry *entry = ui->wgLog->grab();
+                entry->inp(type % ", path:" % path % ", cont:" % req.body());
+                entry->clr(handler->color);
+            QHttpServerResponse rsp(handler->answer()); // WAIT
+                entry->out(handler->plane_text());
+            ui->wgLog->free(entry);
+            return rsp;
+        }// if(path == handler->path)
+
+    }// handler
+
+    ui->wgLog->post(
+        type % ", path:" % path + ", cont:" % req.body()
+      , DFT.arg(cnt), Qt::darkYellow );
+    return QHttpServerResponse(DFT.arg(cnt));
+}// proc
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -43,9 +73,12 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
 
     // Инициализация.
     QNetworkProxyFactory::setUseSystemConfiguration(false);
-    tcp = new QTcpServer(this);
-    connect(tcp, &QTcpServer::newConnection, this, &FMain::new_connect);
     E::port = E::PORT; ui->edPort->setText(QString::number(E::port));
+
+    tcp = new QTcpServer(this);
+    srv.bind(this->tcp);
+    srv.route("/<arg>", [this](const QUrl &url, const QHttpServerRequest &req)
+        { return this->proc(url, req); });
 
     // Меню серверов.
     QMenu *mServer = new QMenu(this);
@@ -69,23 +102,19 @@ FMain::~FMain() {
     delete ui;
 }// ~FMain
 
-// Добавить. -------------------------------------------------------------------
+// Добавить обработчик. --------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btAdd_clicked() {
-    WHandler *handler = new WHandler(this);
-
-    connect(handler, &WHandler::remove, this, &FMain::remove_handler);
-    hdl.push_back(handler);
-
-    ui->lyHdl->addWidget(handler);
+    addHandler(
+        "TEXT", EMPTY_STR, this->palette().color(QPalette::Window), EMPTY_STR );
 }// on_btAdd_clicked
 
-// Удалить прослушиватель. -----------------------------------------------------
+// Удалить обработчик. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::remove_handler(WHandler *handler) {
 
-    for(QList<WHandler*>::iterator it = hdl.begin(); it != hdl.end(); it++){
-        if((*it) ==  handler) { hdl.erase(it); handler->deleteLater(); return; }
+    for(QList<WHandler*>::iterator it = hdl.begin(); it != hdl.end(); it++) {
+        if((*it) == handler) { hdl.erase(it); handler->deleteLater(); return; }
     }// it
 
 }// on_btAdd_clicked
@@ -98,166 +127,30 @@ void FMain::on_btStart_clicked() {
 
     if(tcp->isListening()) {
         tcp->close();
+        for(WHandler *handler: this->hdl)
+            { handler->interrupt(); }
+        for(QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>())
+            { socket->disconnectFromHost(); }
 
-        log(tr("Прослушиватель остановлен"), Qt::lightGray);
-        post(tr("Прослушиватель остановлен"), Qt::lightGray);
-
+        post(tr("Прослушивание остановлено"), Qt::lightGray);
         SET_BTN("Пуск", "color: limegreen;");
-    } else {
 
+    } else {
         bool ok;
         unsigned short port = ui->edPort->text().toUShort(&ok);
-        if(!ok) {
-            log(tr("Введите корректный порт"), Qt::red);
-            post(tr("Введите корректный порт"), Qt::red);
-            return;
-        }
+        if(!ok)
+            { post(tr("Введите корректный порт"), Qt::red); return; }
 
         if(tcp->listen(QHostAddress::Any, port)) {
-            spc();
             rift();
-
-            log(tr("Прослушиватель запущен"), Qt::lightGray);
-            post(tr("Прослушиватель запущен"), Qt::lightGray);
-
+            post(tr("Прослушивание запущено"), Qt::lightGray);
             SET_BTN("Стоп", "color: crimson;");
         } else {
-            log(tr("Ошибка прослушивателя: ") + tcp->errorString(), Qt::red);
             post(tr("Ошибка прослушивателя: ") + tcp->errorString(), Qt::red);
-        }// else // if(!tcp->listen(QHostAddress::Any, ui->edPort->text.toInt()))
+        }// else // if(tcp->listen(QHostAddress::Any, port))
     }// else // if(tcp->isListening())
 
 }// on_btStart_clicked
-
-// Новое подключение. ----------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::new_connect(void) {
-    QTcpSocket *socket = tcp->nextPendingConnection();
-
-/*
-    spc();
-    log(tr("Новое подключение: ")
-       + QString::number(reinterpret_cast<ulong>(socket))
-       + " (" + socket->peerAddress().toString() + ")", Qt::lightGray);
-*/
-    connect(socket, &QTcpSocket::readyRead, this, &FMain::read_socket);
-    connect(socket, &QTcpSocket::disconnected, this, &FMain::close_socket);
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(error_socket(QAbstractSocket::SocketError)) );
-
-//    sct.push_back(socket);
-}// new_connect
-
-// Чтение сокета. --------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::read_socket(void) {
-    static QByteArray OK("<ok> DEFAULT </ok>");
-
-    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
-//    QTextStream out(socket); out.setAutoDetectUnicode(true);
-
-    QString read = QString::fromUtf8(socket->readAll());
-    int pos = read.indexOf('/');
-
-    QString type = read.left(pos).trimmed();
-    QString addr = read.mid(pos, read.indexOf("HTTP/") - pos).trimmed();
-    QString path = addr.left(addr.indexOf('?')).mid(1).trimmed();
-
-
-    auto SEND = [=](const QString &log, const QByteArray &ans, const QColor &clr)
-     -> void {
-        QTextStream out(socket); out.setAutoDetectUnicode(true);
-
-        this->log(">>> " + type + ", path:" + path, clr);
-        this->log("<<< " + log, clr);
-
-        out << ans; socket->waitForBytesWritten(); socket->close();
-    };// SEND
-
-
-    for(WHandler *handler: hdl) {
-//        if(0 == QString::compare(path, handler->path, Qt::CaseInsensitive)) {
-        if(path == handler->path) {
-
-            FNC << "send bgn";
-            WLogEntry *entry = ui->wgLog->grab();
-                entry->inp(type + ", path:" + path);
-                entry->clr(handler->color);
-
-            QTimer::singleShot(0, [=]{
-                QTextStream out(socket); out.setAutoDetectUnicode(true);
-
-                out << handler->answer();
-                entry->out(handler->plane_text());
-                ui->wgLog->free(entry);
-                socket->waitForBytesWritten(); socket->close();
-
-                FNC << "send end";
-            });// singleShot
-
-
-//            SEND(handler->plane_text(), handler->answer(), handler->color);
-            return;
-        }// if(0 == QString::compare(path, handler->path, Qt::CaseInsensitive))
-    }// handler
-
-    SEND(OK, OK, Qt::darkRed);
-}// read_socket
-
-// Закрытие сокета. ------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::close_socket(void) {
-/*
-    QTcpSocket *socket = (qobject_cast<QTcpSocket*>(sender()));
-
-    log(tr("Сокет закрыт.")
-      + QString::number(reinterpret_cast<ulong>(socket))
-      + " (" + socket->peerAddress().toString() + ")", Qt::lightGray);
-*/
-}// close_socket
-
-// Ошибка сокета. --------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::error_socket(QAbstractSocket::SocketError) {
-    log(tr("Ошибка сокета: ")
-      +(qobject_cast<QTcpSocket*>(sender()))->errorString()
-      , Qt::red );
-
-    post(tr("Ошибка сокета: ")
-      +(qobject_cast<QTcpSocket*>(sender()))->errorString()
-      , Qt::red );
-
-}// error_socket
-
-// Логирование. ----------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::log(const QString &msg, const QColor &clr)
-    { this->log(msg, "color:" + clr.name() + ";"); }
-void FMain::log(const QString &msg, const QString &stl) {
-/*
-    if(!ui) { return; }
-
-    ui->tbLog->cursorForPosition(QPoint(0, 0)).insertHtml(
-        "<h style='" + stl + "'>"
-      + "[" + QTime::currentTime().toString() + "] "
-      + ESCPG(msg) + "</h>" + "<br>" );
-*/
-    this->log_html(
-        "<h style='" + stl + "'>"
-        "[" + QTime::currentTime().toString() + "] " + ESCPG(msg)
-      + "</h>" + "<br>" );
-
-}// FMain::log
-
-void FMain::log_html(const QString &html)
-    { if(ui){ ui->tbLog->cursorForPosition(QPoint(0, 0)).insertHtml(html); }}
-
-// Разделитель. ----------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::spc(void) {
-    if(!ui) { return; }
-    ui->tbLog->cursorForPosition(QPoint(0, 0)).insertHtml("<br>");
-}// spc
 
 // Опубликовать запись в логе. -------------------------------------------------
 //------------------------------------------------------------------------------
@@ -280,12 +173,9 @@ void FMain::rift(void) { ui->wgLog->rift(); }
 
 // Очистить лог. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_btClearLog_clicked() {
-    ui->tbLog->clear();
-    ui->wgLog->clear();
-}
+void FMain::on_btClearLog_clicked() { ui->wgLog->clear(); }
 
-// Добавить сервер. ------------------------------------------------------------
+// Добавить обработчик. --------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::addHandler(QString type, QString path, QColor color, QString text) {
     WHandler *handler = new WHandler(type, path, color, text, this);
@@ -296,7 +186,7 @@ void FMain::addHandler(QString type, QString path, QColor color, QString text) {
     ui->lyHdl->addWidget(handler);
 }// addHandler
 
-// Очистить список серверов. ---------------------------------------------------
+// Очистить список обработчиков. -----------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_aClearHdl_triggered() { clearHdl(); }
 void FMain::clearHdl(void) {
@@ -372,24 +262,43 @@ void FMain::on_aExit_triggered() {
 
 // Отладка. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
-static int cnt(0); ;
+#include <QInputDialog>
 void FMain::on_btDebug_clicked() {
+    FNC << R"(/ bgn)";
+
+/*
+    static int cnt(0);
     const QString msg = ": НЕКОЕ ДОСТАТОЧНО ДЛИННОЕ СООБЩЕНИЕ :";
-
     ui->wgLog->post("INP" + msg + STR(cnt++) , "OUT" + msg);
-
     ui->wgLog->show();
+*/
+
+/*
+    QString str(
+        "POST /poll HTTP/1.1\r\nHost: 10.0.1.98:314\r\n"
+        "Content-Type: text/xml\r\n"
+        "Content-Length: 83\r\n"
+        "Connection: Keep-Alive\r\nAccept-Encoding: gzip, deflate\r\n"
+        "Accept-Language: ru-RU,en,*\r\nUser-Agent: Mozilla/5.0\r\n\r\n"
+        "<conn><sgn>zrg-test</sgn><ver>1.0</ver><bld>1.1.0</bld><ref>test-start</ref></conn>");
+
+    static QString prv(R"(Content-Length:(.*)\r\n)");
+    QString cur = QInputDialog::getText(
+        this, STR("QRegExp"), STR("reg:"), QLineEdit::Normal, prv);
+    QRegExp reg(cur);
+        reg.setMinimal(true);
+
+    reg.indexIn(str);
+    FNC << "cap:" << reg.cap(1);
+
+    prv = cur;
+*/
+
+    for(const QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>()) {
+        FNC << "| obj:" << socket->metaObject()->className();
+    }// socket
+
+    FNC << R"(\ end)";
 }// on_btDebug_clicked
-
-// Отладка захват записи. ------------------------------------------------------
-//------------------------------------------------------------------------------
-WLogEntry *entry;
-void FMain::on_btDebugGrab_clicked()
-    { entry = ui->wgLog->grab(); entry->inp("INP GRAB:" + STR(cnt++)); }
-
-// Отладка освобождение записи. ------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::on_btDebugFree_clicked()
-    { entry->out("OUT FREE"); ui->wgLog->free(entry); }
 
 //------------------------------------------------------------------------------

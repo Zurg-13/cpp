@@ -92,15 +92,15 @@ WLogEntry* WLogBoard::free(WLogEntry *entry)
 //------------------------------------------------------------------------------
 void  WLogBoard::clear(void) {
     int pos = 0;
-    while(QLayoutItem* itm = this->box->layout()->takeAt(pos)) {
+    while(QLayoutItem* itm = this->box->layout()->itemAt(pos)) {
         if(QWidget *wgt = itm->widget()) {
             QVariant is_grab = wgt->property("is_grab");
-            if(is_grab.isValid() && is_grab.toBool()) { pos++; continue; }
-            wgt->setParent(nullptr);
+            if(is_grab.isValid() && is_grab.toBool())
+                { pos++; continue; }
+            else
+                { delete wgt; delete itm; }
         }// if(QWidget *wgt = itm->widget())
-        if(QLayout *lay = itm->layout()) { pos++; continue; }
-        delete itm;
-    }// while(QLayoutItem* itm = ly->layout()->takeAt(0))
+    }// while(QLayoutItem* itm = this->box->layout()->takeAt(pos))
 }// clear
 
 //------------------------------------------------------------------------------

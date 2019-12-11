@@ -323,23 +323,17 @@ QSplitter { border: 0px; }</string>
         </property>
         <item>
          <widget class="WLogBoard" name="wgLog" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
             <height>150</height>
            </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTextBrowser" name="tbLog">
-          <property name="font">
-           <font>
-            <family>Courier New</family>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QFrame { border: 0px; }</string>
           </property>
          </widget>
         </item>
@@ -371,44 +365,6 @@ QSplitter { border: 0px; }</string>
             </property>
             <property name="text">
              <string>Отладка</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btDebugGrab">
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>g</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btDebugFree">
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>f</string>
             </property>
            </widget>
           </item>

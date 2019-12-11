@@ -1,0 +1,1 @@
+C:\Qt\5.13.2\mingw73_32\bin\windeployqt.exe zServer.exe --dir bin --compiler-runtime --no-translations

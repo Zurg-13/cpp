@@ -9,6 +9,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+/**/
+#include <QtHttpServer>
+/**/
+
 #include "WHandler.h"
 #include "WLogEntry.h"
 
@@ -29,12 +33,8 @@ class FMain : public QMainWindow {
  private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
+    QHttpServer srv;
     QList<WHandler*> hdl;
-
-    Q_DECL_DEPRECATED void log(const QString &msg, const QString &stl);
-    Q_DECL_DEPRECATED void log(const QString &msg, const QColor &clr = QColor());
-    Q_DECL_DEPRECATED void log_html(const QString &html);
-    Q_DECL_DEPRECATED void spc(void);
 
     void       post(const QString &msg, const QColor &clr = QColor());
     void       post(
@@ -46,13 +46,10 @@ class FMain : public QMainWindow {
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);
 
+    QHttpServerResponse proc(const QUrl &url, const QHttpServerRequest &req);
+
  private slots:
     void remove_handler(WHandler*);
-
-    void new_connect(void);
-    void read_socket(void);
-    void close_socket(void);
-    void error_socket(QAbstractSocket::SocketError);
 
     void on_btStart_clicked();
     void on_btClearLog_clicked();
@@ -63,8 +60,6 @@ class FMain : public QMainWindow {
     void on_aConfLoad_triggered();
     void on_aExit_triggered();
     void on_btDebug_clicked();
-    void on_btDebugGrab_clicked();
-    void on_btDebugFree_clicked();
 };// FMain
 
 //------------------------------------------------------------------------------

@@ -44,28 +44,6 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="QPushButton" name="btRsp">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>30</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>30</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>O</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLineEdit" name="edPath">
        <property name="minimumSize">
         <size>
@@ -86,6 +64,28 @@
        </property>
        <property name="placeholderText">
         <string>Путь</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btRsp">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -219,7 +219,6 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>btMenu</tabstop>
   <tabstop>edPath</tabstop>
   <tabstop>teAnswer</tabstop>
  </tabstops>

@@ -7,7 +7,7 @@ WGT = ../../_wgt
 SRV = ../../_srv
 UNT = ../../_unt
 
-QT += core gui widgets network concurrent
+QT += core gui widgets network concurrent httpserver
 CONFIG += c++14
 
 TARGET = zServer

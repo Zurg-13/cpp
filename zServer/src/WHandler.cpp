@@ -20,8 +20,8 @@ void WHandler::setWait(WAIT_TYPE type) {
     this->wait_type = type;
 
     switch(this->wait_type) {
-     case WAIT_TYPE::NOT : ui->btRsp->setEnabled(false); break;
-     case WAIT_TYPE::BTN : ui->btRsp->setEnabled(true); break;
+     case WAIT_TYPE::NOT : ui->btRsp->setVisible(false); break;
+     case WAIT_TYPE::BTN : ui->btRsp->setVisible(true); break;
     }// switch(type)
 }// setWait
 
@@ -31,6 +31,7 @@ WHandler::WHandler(QWidget *parent) : QWidget(parent), ui(new Ui::WHandler) {
 
     // Внешний вид.
     ui->setupUi(this);
+    ui->btRsp->setIcon(QIcon(":/img/run.png")); ui->btRsp->setVisible(false);
 
     // Меню (заголовки).
     header = new QMenu("Заголовки", this);
@@ -44,6 +45,7 @@ WHandler::WHandler(QWidget *parent) : QWidget(parent), ui(new Ui::WHandler) {
     // Меню (основное).
     QActionGroup *grTypeAnswer = new QActionGroup(this);
     QMenu *menu = new QMenu(this);
+    menu->setStyleSheet("color: black;");
     menu->addAction(ui->aRequest);
     menu->addMenu(wait);  // >>>
     menu->addSeparator(); //----------------
@@ -80,13 +82,15 @@ WHandler::WHandler(
 //------------------------------------------------------------------------------
 WHandler::~WHandler() {
     delete ui;
+
+    FNC << "end";
 }// ~WHandler
 
 // Остановка. ------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WHandler::on_aQuit_triggered() {
     if(QMessageBox::Yes == QMessageBox::question(
-        this, "Подтверждение", "Действительно закрыть ?") )
+        this, "Подтверждение", "Действительно закрыть ?" ))
     { emit remove(this); }
 }// terminate
 
@@ -118,7 +122,7 @@ void WHandler::on_aAsFile_triggered(){
 // Отвечать запросом. ----------------------------------------------------------
 //------------------------------------------------------------------------------
 void WHandler::on_aAsQuery_triggered() {
-    QMessageBox::warning(this, "Сообщение", "Не реализоапно.");
+    QMessageBox::warning(this, "Сообщение", "Не реализовано.");
 
 //    ui->aAsQuery->setChecked(true);
 //    answer_type = ANSWER_TYPE::QUERY;
@@ -130,21 +134,23 @@ void WHandler::on_edPath_textChanged(const QString &text) { this->path = text; }
 
 // Получить ответ. -------------------------------------------------------------
 //------------------------------------------------------------------------------
-QByteArray WHandler::answer(void) {
-    FNC << "bgn";
+QHttpServerResponse WHandler::answer(void) {
 
     if(this->wait_type == WAIT_TYPE::BTN) {
+        this->is_interrupted = false;
 
-        FNC << "entr loop";
-
+        ui->btRsp->setEnabled(true);
         QEventLoop loop;
         connect(ui->btRsp, &QPushButton::clicked, &loop, &QEventLoop::quit);
         loop.exec();
+        ui->btRsp->setEnabled(false);
 
-        FNC << "quit loop";
+        if(this->is_interrupted) {
+            return QHttpServerResponse(
+                QHttpServerResponse::StatusCode::InternalServerError );
+        }// if(this->is_interrupted)
 
     }// if(this->wait_type == WAIT_TYPE::BTN)
-
 
     switch(answer_type) {
       case ANSWER_TYPE::TEXT : return answer_text();
@@ -157,43 +163,30 @@ QByteArray WHandler::answer(void) {
 
 // Получить ответ в виде текста. -----------------------------------------------
 //------------------------------------------------------------------------------
-QByteArray WHandler::answer_text(void) {
-    const QString NS("\r\n");
-    QString HEADER(
-        "HTTP/1.0 200 Ok\r\n"
-        "{HDR}"
-        "Content-Type: text/html; charset=\"utf-8\"\r\n\r\n" );
+QHttpServerResponse WHandler::answer_text(void) {
+    QHttpServerResponse rsp(ui->teAnswer->toPlainText().toUtf8());
 
-    return (
-        HEADER.replace("{HDR}", hdr.size() ? header_lst().join(NS): "")
-      + ui->teAnswer->toPlainText() ).toUtf8();
+    if(this->hdr.isEmpty()) {
+        rsp.setHeader("Content-Type", "text/html; charset=utf-8");
+    } else {
+        rsp.clearHeaders();
+        for(const Header &header : this->hdr)
+            { rsp.addHeader(header.first.toUtf8(), header.second.toUtf8()); }
+    }// else // if(this->hdr.isEmpty())
 
+    return rsp;
 }// answer_text
 
 // Получить ответ в виде файла. ------------------------------------------------
 //------------------------------------------------------------------------------
-QByteArray WHandler::answer_file(void) {
-    QByteArray line, buff(
-        "HTTP/1.0 200 Ok\r\n"
-        "Content-Type: {MIME};\r\n\r\n" );
-    QFile file(ui->teAnswer->toPlainText());
-
-    if(!file.open(QIODevice::ReadOnly)) { return QByteArray(); }
-
-    buff.replace("{MIME}", E::mime->mimeTypeForFile(file).name().toUtf8());
-    while(!file.atEnd()) {
-        line = file.read(1024);
-        buff.append(line);
-    }// while(!file.atEnd())
-
-    return buff;
-}// answer_file
+QHttpServerResponse WHandler::answer_file(void)
+    { return QHttpServerResponse::fromFile(ui->teAnswer->toPlainText()); }
 
 // Получить ответ в виде запроса. ----------------------------------------------
 //------------------------------------------------------------------------------
-QByteArray WHandler::answer_query(void) {
-    qDebug() << "[answer_query]";
-    return QString("error answer query").toUtf8();
+QHttpServerResponse WHandler::answer_query(void) {
+    qDebug() << "Не реализовано [answer_query]";
+    return QHttpServerResponse("error answer query");
 }// answer_query
 
 // Текст в окне ответа. --------------------------------------------------------
@@ -205,8 +198,14 @@ QString WHandler::plane_text(void) { return ui->teAnswer->toPlainText(); }
 QString WHandler::answer_type_name(void) {
     return answer_type == ANSWER_TYPE::TEXT  ? "TEXT"
          : answer_type == ANSWER_TYPE::FILE  ? "FILE"
-         : answer_type == ANSWER_TYPE::QUERY ? "QUERY" : "UNDEF";
+                                             : answer_type == ANSWER_TYPE::QUERY ? "QUERY" : "UNDEF";
 }// answer_type_name
+
+
+// Прервать обработку запроса. -------------------------------------------------
+//------------------------------------------------------------------------------
+void WHandler::interrupt()
+    { this->is_interrupted = true; ui->btRsp->click(); }
 
 // Выставить тип запроса по имени типа. ----------------------------------------
 //------------------------------------------------------------------------------
@@ -223,9 +222,11 @@ void WHandler::setType(QString type_name) {
 // Выставить цвет. -------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WHandler::setColor(QColor color) {
-    static QString BKG_C = "background-color: %1;", EMPTY = "";
+    static QString NOT = "", CLR =
+        "QLineEdit { background-color: %1; }"
+        "QTextEdit { background-color: %1; }";
     this->color = color;
-    this->setStyleSheet(color == Qt::black ? EMPTY : BKG_C.arg(color.name()));
+    this->setStyleSheet(color == Qt::black ? NOT : CLR.arg(color.name()));
 }// answer_type_name
 
 // Добавить заголовок. ---------------------------------------------------------
@@ -252,15 +253,6 @@ void WHandler::on_DelHeader() {
     hdr.remove(menu);
     menu->deleteLater();
 }// on_aDelHeader_triggered
-
-// Сформировать список заголовков. ---------------------------------------------
-//------------------------------------------------------------------------------
-QList<QString> WHandler::header_lst(void) {
-    QList<QString> ret;
-    for(Header header: hdr.values())
-        { ret.push_back(header.first + ": " + header.second); }
-    return ret;
-}// header_lst
 
 // Вызвать в браузере. ---------------------------------------------------------
 //------------------------------------------------------------------------------
