@@ -1,6 +1,7 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <functional>
+
 #include "WLog.h"
 #include "ui_WLog.h"
 
@@ -82,7 +83,7 @@ WLog::WLog(QWidget *parent) : QWidget(parent), ui(new Ui::WLog) {
     // Контекстное меню.
     ui->pt->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->pt, &QPlainTextEdit::customContextMenuRequested
-          , this, &WLog::on_context_menu );
+          , this, &WLog::ctx_menu );
 }// WLog
 
 WLog::WLog(int size, QWidget *parent) : WLog(parent)
@@ -126,7 +127,7 @@ void WLog::place(const QWidget *wgt, Plc plc) {
 
 // Перехват вызова контекстного меню. ------------------------------------------
 //------------------------------------------------------------------------------
-void WLog::on_context_menu(const QPoint &pos) {
+void WLog::ctx_menu(const QPoint &pos) {
     QMenu* menu = ui->pt->createStandardContextMenu();
 
     menu->addSeparator();

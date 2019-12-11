@@ -37,7 +37,7 @@ class WLog : public QWidget {
     void place(const QWidget *wgt, Plc loc = Plc::btm);
 
  private slots:
-    void on_context_menu(const QPoint &pos);
+    void ctx_menu(const QPoint &pos);
     void on_aClear_triggered();
 
  private:

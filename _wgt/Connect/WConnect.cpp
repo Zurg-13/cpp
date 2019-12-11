@@ -6,13 +6,12 @@
 #include <QSqlDatabase>
 #include <functional>
 
-#include "ui_WConnect.h"
+#include "std.h"
+#include "dbg.h"
+#include "xml.h"
+
 #include "WConnect.h"
-
-#include "_srv/std.h"
-#include "_srv/dbg.h"
-#include "_srv/xml.h"
-
+#include "ui_WConnect.h"
 
 // Инициализация. --------------------------------------------------------------
 //------------------------------------------------------------------------------
