@@ -21,7 +21,7 @@ QString VAL(const QString &tag, const QString &xml) {
 // Собрать XML-тег. ------------------------------------------------------------
 //------------------------------------------------------------------------------
 QString TAG(const QString &tag)
-    { return "<" % tag % "/"; }
+    { return "<" % tag % "/" % ">"; }
 QString TAG(const QString &tag, const QString &val)
     { return "<" % tag % ">" % val % "</" % tag % ">"; }
 QString TAG(const QString &tag, const QString &attr, const QString &val)
