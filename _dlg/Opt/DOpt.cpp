@@ -6,8 +6,8 @@
 
 #include "_srv/std.h"
 
-#include "ui_DOpt.h"
 #include "DOpt.h"
+#include "ui_DOpt.h"
 
 
 // Выбрать ключ из запроса. ----------------------------------------------------
