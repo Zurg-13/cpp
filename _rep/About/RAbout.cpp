@@ -2,14 +2,15 @@
 //------------------------------------------------------------------------------
 #include <functional>
 
-#include "ui_RAbout.h"
-#include "RAbout.h"
 
 #include "ver.h"
 
 #include "drw.h"
 #include "std.h"
 #include "wgt.h"
+
+#include "RAbout.h"
+#include "ui_RAbout.h"
 
 
 //Глобальные переменные.--------------------------------------------------------
