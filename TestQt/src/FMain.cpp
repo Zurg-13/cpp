@@ -1,5 +1,7 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <functional>
+
 #include <QMessageBox>
 #include <QTime>
 
@@ -9,14 +11,15 @@
 
 #include "ZLogger.h"
 
-#include "ui_FMain.h"
-#include "FMain.h"
 #include "WAnimation.h"
 #include "WSound.h"
 #include "FProc.h"
 #include "WTextBrowzer.h"
 #include "WAttention.h"
 #include "WActive.h"
+
+#include "FMain.h"
+#include "ui_FMain.h"
 
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -245,6 +248,13 @@ void FMain::on_bt_clicked() {
     this->setGeometry(0, 0, 800, 50);
 */
 
+    this->test_var_val = "123";
+    DBG << "val:" << this->test_var;
+
+    this->test_var_val = "456";
+    DBG << "val:" << this->test_var;
+
+
     DBG << R"(\end)";
 }// on_bt_clicked
 
@@ -268,3 +278,66 @@ void FMain::on_btListClear_clicked() {
 
     FNC << R"(\end)";
 }// on_btListClear_clicked
+
+// WLog. -----------------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include "WLog.h"
+void FMain::on_btWLog_clicked() {
+//    static QSharedPointer<WLog> tst_log(new WLog(5));
+    static WLog* tst_log(new WLog(5));
+    static int cnt = 0;
+
+    if(!tst_log->isVisible()) { tst_log->show(); }
+
+    tst_log->add(QString("%1: msg").arg(cnt++));
+}// on_btWLog_clicked
+
+// QSharedPointer. -------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include <QSharedPointer>
+QSharedPointer<One> tst_shared_func(void)
+    { return QSharedPointer<One>(new One); }
+void FMain::on_btSharedPtr_clicked() {
+    static bool first = true;
+    static QMap<bool, QSharedPointer<One>> map;
+
+    FNC << "first:" << first;
+
+    map[first] = tst_shared_func();
+
+    first = !first;
+}// on_btSharedPtr_clicked
+
+// QtConcurrent. ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include <QtConcurrent/QtConcurrent>
+#include <QThread>
+void FMain::on_btQtConcurrent_clicked() {
+    FNC << R"(/ bgn)";
+
+
+    unsigned long sec = 5;
+    QFuture<unsigned long> ftr = QtConcurrent::run([sec]() -> unsigned long {
+        QThread::sleep(sec); FNC << "run:" << sec; return sec; });
+
+
+
+/*
+    QList<unsigned long> lst({1, 2, 3});
+    std::function<void(unsigned long&)> fn = [](unsigned long &elm) {
+        QThread::sleep(elm); FNC << "map:" << elm; };
+    QtConcurrent::map(lst, fn);
+*/
+
+/*
+    QVector<QString> words = {"one", "two", "three", "four"};
+    std::function<QString(const QString &word)> func = [](const QString &word) {
+        return word + word; };
+    QFuture<QString> result = QtConcurrent::mapped(words, func);
+*/
+
+    FNC << R"(\ end)";
+}// on_btQtConcurrent_clicked
+
+//------------------------------------------------------------------------------
+

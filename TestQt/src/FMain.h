@@ -14,9 +14,12 @@ namespace Ui { class FMain; }
 class FMain : public QMainWindow {
     Q_OBJECT
 
+    QString test_var_val;
   public:
+    const QString &test_var = test_var_val;
+
     explicit FMain(QWidget *parent = nullptr);
-    ~FMain();
+            ~FMain();
 
   private slots:
     void on_aTest_triggered();
@@ -37,6 +40,9 @@ class FMain : public QMainWindow {
     void on_bt_clicked();
 
     void on_btListClear_clicked();
+    void on_btWLog_clicked();
+    void on_btSharedPtr_clicked();
+    void on_btQtConcurrent_clicked();
 
 private:
     Ui::FMain *ui;
