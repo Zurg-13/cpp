@@ -21,7 +21,8 @@ HEADERS +=  \
     qlibusb.h
 
 linux-g++* {
-    !packagesExist(libusb-1.0):error("Could not find libusb-1.0 using PKGCONFIG")
+# todo: Это вообще-то произвол.
+#    !packagesExist(libusb-1.0):error("Could not find libusb-1.0 using PKGCONFIG")
 }
 
 msvc {
