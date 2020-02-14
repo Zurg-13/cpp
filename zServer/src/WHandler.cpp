@@ -9,6 +9,7 @@
 
 #include "env.h" // Глобальная среда приложения.
 #include "dbg.h"
+#include "drw.h"
 
 #include "ui_WHandler.h"
 #include "WHandler.h"
@@ -198,9 +199,8 @@ QString WHandler::plane_text(void) { return ui->teAnswer->toPlainText(); }
 QString WHandler::answer_type_name(void) {
     return answer_type == ANSWER_TYPE::TEXT  ? "TEXT"
          : answer_type == ANSWER_TYPE::FILE  ? "FILE"
-                                             : answer_type == ANSWER_TYPE::QUERY ? "QUERY" : "UNDEF";
+         : answer_type == ANSWER_TYPE::QUERY ? "QUERY" : "UNDEF";
 }// answer_type_name
-
 
 // Прервать обработку запроса. -------------------------------------------------
 //------------------------------------------------------------------------------
@@ -223,10 +223,10 @@ void WHandler::setType(QString type_name) {
 //------------------------------------------------------------------------------
 void WHandler::setColor(QColor color) {
     static QString NOT = "", CLR =
-        "QLineEdit { background-color: %1; }"
-        "QTextEdit { background-color: %1; }";
+        "QLineEdit { background-color: %1; color: %2 }"
+        "QTextEdit { background-color: %1; color: %2 }";
     this->color = color;
-    this->setStyleSheet(color == Qt::black ? NOT : CLR.arg(color.name()));
+    this->setStyleSheet(CLR.arg(color.name()).arg(contrast_bw(color).name()));
 }// answer_type_name
 
 // Добавить заголовок. ---------------------------------------------------------
@@ -258,10 +258,18 @@ void WHandler::on_DelHeader() {
 //------------------------------------------------------------------------------
 void WHandler::on_aRequest_triggered() {
     QString URL("http://{ADR}:{PRT}/{PTH}");
-    QDesktopServices::openUrl(QUrl(URL
-        .replace("{ADR}", QNetworkInterface::allAddresses().first().toString())
-        .replace("{PRT}", QString::number(E::port))
-        .replace("{PTH}", this->path) ));
+
+    const QHostAddress &local = QHostAddress(QHostAddress::LocalHost);
+    for(const QHostAddress &addr: QNetworkInterface::allAddresses()) {
+        if(addr.protocol() == QAbstractSocket::IPv4Protocol && addr != local) {
+            QDesktopServices::openUrl(QUrl(URL
+                .replace("{ADR}", addr.toString())
+                .replace("{PRT}", QString::number(E::port))
+                .replace("{PTH}", this->path) ));
+
+            break;
+        }//if(addr.protocol() == QAbstractSocket::IPv4Protocol && addr != local)
+    }// addr
 }// on_aRequest_triggered
 
 // Включить режим мгновенного ответа на запрос. --------------------------------

@@ -46,7 +46,7 @@ class FMain : public QMainWindow {
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);
 
-    QHttpServerResponse proc(const QUrl &url, const QHttpServerRequest &req);
+    QHttpServerResponse proc(const QString &path, const QHttpServerRequest &req);
 
  private slots:
     void remove_handler(WHandler*);

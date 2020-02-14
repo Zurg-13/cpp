@@ -34,18 +34,22 @@
 
 // Обработка запроса. ----------------------------------------------------------
 //------------------------------------------------------------------------------
-QHttpServerResponse FMain::proc(const QUrl &url, const QHttpServerRequest &req){
+QHttpServerResponse FMain::proc(
+    const QString &path, const QHttpServerRequest &req )
+{
     static int cnt = 0; cnt++;
     static QString  DFT("<ok> DEFAULT: %1 </ok>");
 
-    QString path = url.path();
+    qDebug() << "path:" << req.url().path();
+
     QString type = QVariant::fromValue(req.method()).toString();
+    QString body = req.body(); // req вызывать ДО входа в ожидание.
 
     for(WHandler *handler: this->hdl) {
 
         if(path == handler->path) {
             WLogEntry *entry = ui->wgLog->grab();
-                entry->inp(type % ", path:" % path % ", cont:" % req.body());
+                entry->inp(type % ", path:" % path % ", cont:" % body);
                 entry->clr(handler->color);
             QHttpServerResponse rsp(handler->answer()); // WAIT
                 entry->out(handler->plane_text());
@@ -56,7 +60,7 @@ QHttpServerResponse FMain::proc(const QUrl &url, const QHttpServerRequest &req){
     }// handler
 
     ui->wgLog->post(
-        type % ", path:" % path + ", cont:" % req.body()
+        type % ", path:" % path + ", body:" % body
       , DFT.arg(cnt), Qt::darkYellow );
     return QHttpServerResponse(DFT.arg(cnt));
 }// proc
@@ -75,10 +79,21 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     QNetworkProxyFactory::setUseSystemConfiguration(false);
     E::port = E::PORT; ui->edPort->setText(QString::number(E::port));
 
-    tcp = new QTcpServer(this);
+    this->tcp = new QTcpServer(this);
     srv.bind(this->tcp);
-    srv.route("/<arg>", [this](const QUrl &url, const QHttpServerRequest &req)
-        { return this->proc(url, req); });
+    srv.route("/<arg>",
+    [this](
+        const QUrl &url,
+        const QHttpServerRequest &req, QHttpServerResponder &&rpdr )
+    {
+        QTimer::singleShot(
+            0, [this, rpdr = std::move(rpdr), path = url.path(), &req = req]()
+        mutable {
+            QHttpServerResponse rsp = this->proc(path, req);
+            if(rpdr.socket() && rpdr.socket()->isValid())
+                { rsp.write(std::move(rpdr)); }
+        });// singleShot
+    });// route
 
     // Меню серверов.
     QMenu *mServer = new QMenu(this);
@@ -254,15 +269,11 @@ void FMain::on_aConfLoad_triggered() {
 void FMain::on_aExit_triggered() {
     if(QMessageBox::Yes == QMessageBox::question(
         this, "Подтверждение.", "Действительно выйти ?"
-      , QMessageBox::Yes | QMessageBox::No ))
-    {
-        QApplication::quit();
-    }// if(QMessageBox::Yes == QMessageBox::question ...
+      , QMessageBox::Yes | QMessageBox::No )) { QApplication::quit(); }
 }// FMain::on_aExit_triggered()
 
 // Отладка. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
-#include <QInputDialog>
 void FMain::on_btDebug_clicked() {
     FNC << R"(/ bgn)";
 
@@ -274,29 +285,10 @@ void FMain::on_btDebug_clicked() {
 */
 
 /*
-    QString str(
-        "POST /poll HTTP/1.1\r\nHost: 10.0.1.98:314\r\n"
-        "Content-Type: text/xml\r\n"
-        "Content-Length: 83\r\n"
-        "Connection: Keep-Alive\r\nAccept-Encoding: gzip, deflate\r\n"
-        "Accept-Language: ru-RU,en,*\r\nUser-Agent: Mozilla/5.0\r\n\r\n"
-        "<conn><sgn>zrg-test</sgn><ver>1.0</ver><bld>1.1.0</bld><ref>test-start</ref></conn>");
-
-    static QString prv(R"(Content-Length:(.*)\r\n)");
-    QString cur = QInputDialog::getText(
-        this, STR("QRegExp"), STR("reg:"), QLineEdit::Normal, prv);
-    QRegExp reg(cur);
-        reg.setMinimal(true);
-
-    reg.indexIn(str);
-    FNC << "cap:" << reg.cap(1);
-
-    prv = cur;
-*/
-
     for(const QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>()) {
         FNC << "| obj:" << socket->metaObject()->className();
     }// socket
+*/
 
     FNC << R"(\ end)";
 }// on_btDebug_clicked

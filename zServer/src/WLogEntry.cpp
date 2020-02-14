@@ -1,5 +1,6 @@
 #include "dbg.h"
 #include "std.h"
+#include "drw.h"
 
 #include "WLogEntry.h"
 #include "ui_WLogEntry.h"
@@ -46,8 +47,8 @@ void WLogEntry::hgl(const QColor &clr) {
 // Задать цвет записи. ---------------------------------------------------------
 //------------------------------------------------------------------------------
 void WLogEntry::clr(const QColor &clr) {
-    if(clr == Qt::black || clr == Qt::white) { return; }
-    this->setStyleSheet(STR("background-color: %1;").arg(clr.name()));
+    const static QString CLR = "background-color: %1; color: %2";
+    this->setStyleSheet(CLR.arg(clr.name()).arg(contrast_bw(clr).name()));
 }// clr
 
 // Записать ввод. --------------------------------------------------------------

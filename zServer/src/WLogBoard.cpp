@@ -8,6 +8,7 @@
 #include "dbg.h"
 #include "std.h"
 #include "wgt.h"
+#include "drw.h"
 
 #include "WLogBoard.h"
 #include "ui_WLogBoard.h"
@@ -22,7 +23,7 @@
 //------------------------------------------------------------------------------
 WLogBoard::WLogBoard(QWidget *parent) : QWidget(parent), ui(new Ui::WLogBoard) {
 
-    // Внешний вмид.
+    // Внешний вид.
     ui->setupUi(this);
 
     // Скроллинг.
@@ -54,8 +55,9 @@ void WLogBoard::rift(void) {
 // Добавить ОДИНОЧНУЮ запись. --------------------------------------------------
 //------------------------------------------------------------------------------
 void WLogBoard::post(const QString &msg, const QColor &clr) {
+    const static QString CLR = "background-color: %1; color: %2";
     QLabel* lbl = new QLabel(msg);
-        lbl->setStyleSheet(STR("background-color: %1;").arg(clr.name()));
+        lbl->setStyleSheet(CLR.arg(clr.name()).arg(contrast_bw(clr).name()));
     static_cast<QBoxLayout*>(this->box->layout())
         ->insertWidget(this->inset_pos, lbl);
 }// post
@@ -98,9 +100,9 @@ void  WLogBoard::clear(void) {
             if(is_grab.isValid() && is_grab.toBool())
                 { pos++; continue; }
             else
-                { delete wgt; delete itm; }
+                { delete wgt; delete this->box->layout()->takeAt(pos); }
         }// if(QWidget *wgt = itm->widget())
-    }// while(QLayoutItem* itm = this->box->layout()->takeAt(pos))
+    }// while(QLayoutItem* itm = this->box->layout()->itemAt(pos))
 }// clear
 
 //------------------------------------------------------------------------------
