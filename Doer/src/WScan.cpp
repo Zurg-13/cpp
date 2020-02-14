@@ -59,6 +59,8 @@ void WScan::on_btClose_clicked() { this->close(); }
 // Список USB-устройств. -------------------------------------------------------
 //-----------------------------------------------------------------------------
 void WScan::on_btListDev_clicked() {
+
+/* todo: отключено
     QtUsb::FilterList flt_l = this->scan->usb->getAvailableDevices();
 
     E::Log->add(STR("----------- USB -----------(%1)").arg(flt_l.size()));
@@ -77,6 +79,8 @@ void WScan::on_btListDev_clicked() {
 
     }// flt
     E::Log->add(STR("---------------------------"));
+*/
+
 }// on_btListDev_clicked
 
 //-----------------------------------------------------------------------------

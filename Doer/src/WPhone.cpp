@@ -8,6 +8,7 @@
 #include "std.h"
 #include "dbg.h"
 #include "tme.h"
+#include "xml.h"
 
 #include "WPhone.h"
 #include "ui_WPhone.h"
@@ -22,6 +23,7 @@ WPhone::WPhone(QWidget *parent) : QWidget(parent), ui(new Ui::WPhone) {
 
     // Внешний вид.
     ui->setupUi(this);
+    ui->frExt->setVisible(false);
 
     // Инициализация.
     this->phone = new MPhone(ui->te->toPlainText(), nullptr);
@@ -47,7 +49,9 @@ void WPhone::loadConf(const QString& fnme) {
 // Загрузить конфигурацию. -----------------------------------------------------
 //------------------------------------------------------------------------------
 void WPhone::on_btConfLoad_clicked() {
-    loadConf(QFileDialog::getOpenFileName(
+    [this](const QString& fnme)
+        { if(fnme.isEmpty()) { return; } ui->te->setPlainText(FLE(fnme)); }
+    (QFileDialog::getOpenFileName(
         this, "Открыть конфигурацию", APP_DIR, "*.xml" ));
 }// on_btConfLoad_clicked
 
@@ -87,17 +91,41 @@ void WPhone::on_btStop_clicked() { this->phone->stop(); }
 void WPhone::on_btCall_clicked() {
     E::Log->add(STR(SYSDATE) + " call bgn", Qt::gray);
 
-    MPhone::Status stt = this->phone->call(ui->edNum->text());
+    QMap<QString, QString> map;
+        map["target"] = ui->edNum->text();
+    this->phone->call(Command("tst-call", "call_init", "call", map) );
 
-    E::Log->add(
-        STR(SYSDATE) + " call end: "
-          +( stt == MPhone::Status::ERR ? "error"
-            :stt == MPhone::Status::BSY ? "call out"
-            :stt == MPhone::Status::RDY ? "ready"
-            :stt == MPhone::Status::RNG ? "ringing" : "???")
-      , Qt::gray );
-}
+    E::Log->add(STR(SYSDATE) + " call end", Qt::gray);
+}// on_btCall_clicked
+
+// Дополнительно. --------------------------------------------------------------
+//------------------------------------------------------------------------------
+void WPhone::on_btExe_clicked() {
+
+    if(ui->frExt->isVisible()) {
+        ui->frExt->setVisible(false);
+        ui->btExe->setStyleSheet("");
+        ui->btExe->setText("exe");
+    } else {
+        ui->frExt->setVisible(true);
+        ui->btExe->setText("exe [скрыть]");
+        ui->btExe->setStyleSheet("color:red;");
+    }// else // if(ui->frExt->isVisible())
+
+}// on_pushButton_clicked
+
+// Выполнить команду. ----------------------------------------------------------
+//------------------------------------------------------------------------------
+void WPhone::on_btExtExe_clicked() {
+
+    this->phone->EXE([](const QString &pfx, const QString &xml) {
+        QList<Cmd> ret;
+        for(const QString &command : LST("cmd", xml))
+            { ret.append(Cmd(pfx, command)); }
+        return ret;
+    }(VAL("pfx", ui->te->toPlainText()), ui->teExt->toPlainText()));
+
+}// on_btExtExe_clicked
 
 //------------------------------------------------------------------------------
-
 

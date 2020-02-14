@@ -7,19 +7,20 @@
 
 #include "Result.h"
 
+
 // Сформировать XML-ответ. -----------------------------------------------------
 //------------------------------------------------------------------------------
-QByteArray Result::xml(const QString &sgn) {
-    return
+QSharedPointer<QByteArray> Result::xml(const QString &sgn, const QString &pid) {
+    return QSharedPointer<QByteArray>(new QByteArray(
         TAG("result",
-            TAG("sgn", sgn)
+            TAG("sgn", sgn) + TAG("pid", pid)
           + TAG("ref", this->ref)
           + TAG("status", this->status)
           + TAG("desc", this->desc)
           + (this->p_list.isEmpty()
               ? TAG("p_list")
               : TAG("p_list", TAG("p", "key", this->p_list)) )
-    ).toUtf8();
+    ).toUtf8() ));
 }// xml
 
 // Приведение к строке. --------------------------------------------------------

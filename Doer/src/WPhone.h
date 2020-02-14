@@ -5,7 +5,7 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QWidget>
-#include "unt/MPhone.h"
+#include "mdl/MPhone.h"
 
 namespace Ui { class WPhone; }
 
@@ -32,6 +32,9 @@ class WPhone : public QWidget {
     void on_btInfo_clicked();
     void on_btStop_clicked();
     void on_btCall_clicked();
+
+    void on_btExe_clicked();
+    void on_btExtExe_clicked();
 
 private:
     Ui::WPhone *ui;

@@ -12,10 +12,17 @@
 class Command {
 
  public:
+    QString ref, action, module;
     QMap<QString, QString> p_list;
-    QString ref, name;
 
-    explicit Command(const QString& xml);
+    explicit Command(const QString &xml);
+             Command(
+                const QString &ref, const QString &action, const QString &module
+             ) : Command(ref, action, module, {}) {}
+             Command(
+                const QString &ref, const QString &action, const QString &module
+              , const QMap<QString, QString> &p_list
+             ) : ref(ref), action(action), module(module), p_list(p_list) {}
 
     QString toString(void);
 };// Command
@@ -26,18 +33,20 @@ element cmd {
     ## связка команды с ответом. Для event не указывается
     element ref { text }
 
-  , ## действие
-    element name { text }
+  , ## модуль, которуму предназначена команда
+    element module { text }
 
-  , element p_list {
+  , ## действие
+    element action { text }
+
+  , element p_map {
         element p {
             attribute key {text}
 
           , ## значение параметра
             text
-        }
     }
-}
+}}
 */
 
 //------------------------------------------------------------------------------

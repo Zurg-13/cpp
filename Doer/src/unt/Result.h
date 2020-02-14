@@ -6,6 +6,10 @@
 //------------------------------------------------------------------------------
 #include <QString>
 #include <QMap>
+#include <QSharedPointer>
+
+#include "Event.h"
+#include "Command.h"
 
 /* Формирование результата команды. *******************************************/
 /******************************************************************************/
@@ -13,6 +17,8 @@ class Result {
 
  public:
     Result(void): has_result(false) {}
+    Result(const Command &cmd, const QString &status, const QString &desc)
+        : Result(cmd.ref, status, desc) {}
     Result(const QString &ref, const QString &status, const QString &desc)
         : has_result(true), ref(ref), status(status), desc(desc) {}
     Result(
@@ -22,8 +28,9 @@ class Result {
 
 
     bool hasResult(void) { return has_result; }
-    QByteArray xml(const QString &sgn);
+    QSharedPointer<QByteArray> xml(const QString &sgn, const QString &pid);
     QString toString(void);
+    Event toEVT(const QString &name) { return Event(name, p_list); }
 
  private:
     bool has_result;
