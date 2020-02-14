@@ -20,17 +20,15 @@ QList<QString> DCR(
 
 // Собрать строку из списка элементов. -----------------------------------------
 //------------------------------------------------------------------------------
-QString BLD(const QList<QString> &lst) {
-    static QString SEP(", ");
+QString BLD(const QList<QString> &lst, QString sep) {
     auto CST = [](const QString &val) { return QString(val); };
-    return BLD<QString, decltype(CST)>(lst, CST, SEP );
+    return BLD<QString, decltype(CST)>(lst, CST, sep);
 }// BLD
 
-QString BLD(const QList<QPair<QString, QString>> &lst) {
-    static QString SEP(", ");
+QString BLD(const QList<QPair<QString, QString>> &lst, QString sep) {
     auto CST = [](const QPair<QString, QString> &pr)
         -> QString { return  pr.first + "=" + pr.second; };
-    return BLD<QPair<QString, QString>, decltype(CST)>(lst, CST, SEP);
+    return BLD<QPair<QString, QString>, decltype(CST)>(lst, CST, sep);
 }// BLD
 
 //------------------------------------------------------------------------------

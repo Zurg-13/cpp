@@ -29,8 +29,8 @@ QList<QPair<K, V>> LST(QMap<K, V> map) {
 
 // Собрать строку из списка элементов. -----------------------------------------
 //------------------------------------------------------------------------------
-QString BLD(const QList<QString> &lst);
-QString BLD(const QList<QPair<QString, QString>> &lst);
+QString BLD(const QList<QString> &lst, QString sep = ", ");
+QString BLD(const QList<QPair<QString, QString>> &lst, QString sep = ", ");
 
 template <typename T, typename F>
 QString BLD(const QList<T> &lst, F cst, const QString &sep) {

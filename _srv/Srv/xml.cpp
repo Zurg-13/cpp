@@ -1,10 +1,24 @@
 // INCLUDE ---------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QXmlStreamReader>
+#include <QRegularExpression>
 #include <QStringBuilder>
 
 #include "xml.h"
 #include "std.h"
+
+#include "dbg.h"
+
+
+// Проверить наличие тега. -----------------------------------------------------
+//------------------------------------------------------------------------------
+bool EXIST(const QString &tag, const QString &xml) {
+    QRegularExpression TAG(
+        STR("<[\\s\\r\\n\\t]*") % tag
+      % STR("([\\s\\r\\n\\t]+.*?|[\\s\\r\\n\\t]*)/?>"));
+    return xml.indexOf(TAG, 0) >= 0;
+}// EXIST
+
 
 // Извлечь значение тега. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -82,19 +96,30 @@ QMap<QString, QString> MAP(
 
 // Подмена символов: & == &amp; < == &lt; > == &gt; ----------------------------
 //------------------------------------------------------------------------------
-QString ESCPG(QString val) {
-    return val
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
+QString  ESCPG(const QString &xml) {
+    const static QRegularExpression FND("<|>|&|\"|'");
+    const static QHash<QChar, QString> enc = {
+        {'<', "&lt;"}, {'>', "&gt;"}
+      , {'&', "&amp;"}, {'"', "&quot;"}, {'\'', "&apos;"} };
+    QStringList bld;
+
+    for(int bgn = 0, end = xml.indexOf(FND, bgn)
+      ; end >=0; end = xml.indexOf(FND, bgn))
+    {
+        bld.append(xml.mid(bgn, end - bgn));
+        bld.append(enc.value(xml[end]));
+        bgn = end + 1;
+    }// end
+
+    return bld.join(QString());
 }// ESCPG
 
 QString UNESC(const QString &txt) {
-    QStringList bld;
-    static QChar AMP = '&', SCL = ';';
-    static QMap<QString, QString> dec = {
+    const static QChar AMP = '&', SCL = ';';
+    const static QHash<QString, QString> dec = {
         {"&lt;", "<"}, {"&gt;", ">"}
-      , {"&amp;", "&"}, {"&quot;", R"(")"}, {"&#039;", "'"} };
+      , {"&amp;", "&"}, {"&quot;", "\""}, {"&apos;", "'"} };
+    QStringList bld;
 
     if(NOT(txt.contains(AMP))) { return txt; }
 

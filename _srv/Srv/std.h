@@ -3,7 +3,9 @@
 
 // INCLUDE ---------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <QFile>
 #include <QString>
+#include <QTextStream>
 #include <QApplication>
 #include <QDesktopWidget>
 
@@ -64,6 +66,23 @@ QString DFT(QString val, QString dft);
 // Чтение файла. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 QString FLE(QString fnme);
+
+// Сохранить файл. { SVE(fnme) << txt; } ---------------------------------------
+//------------------------------------------------------------------------------
+class SVE {
+
+ public:
+    explicit SVE(const QString &fnme) : file(fnme), strm(&file)
+        { file.open(QIODevice::WriteOnly | QIODevice::Text); }
+    QTextStream& operator << (const QString &str)
+        { strm << str; return strm; }
+
+ private:
+    QFile file;
+    QTextStream strm;
+
+};// SVE
+
 
 //------------------------------------------------------------------------------
 #endif // STD_H

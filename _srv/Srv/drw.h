@@ -74,21 +74,21 @@
 //----------------------------------------------
 
 //Отрисовка текста в прямоугольнике.
-#define RCT_TXT(r, c, t) do{ \
+#define RCT_TXT(r, c, t) do { \
     painter->fillRect(r, c);                    \
     painter->drawText(r, Qt::AlignCenter, t);   \
     painter->setPen(Qt::white);                 \
     painter->drawRect(r);                       \
-}while(false)
+} while(false)
 
 //Отрисовка цветного текста в прямоугольнике.
-#define RCT_TXT_CLR(r, rc, t, tc) do{ \
+#define RCT_TXT_CLR(r, rc, t, tc) do { \
     painter->fillRect(r, rc);                   \
     painter->setPen(tc);                        \
     painter->drawText(r, Qt::AlignCenter, t);   \
     painter->setPen(Qt::white);                 \
     painter->drawRect(r);                       \
-}while(false)
+} while(false)
 
 //Общие макросы.--------------------------------
 //----------------------------------------------
@@ -100,7 +100,7 @@
 
 //Общие функции.--------------------------------
 //----------------------------------------------
-
+QColor contrast_bw(const QColor &clr);
 
 //---------------------------------------------------------------------------
 #endif // DRW_H
