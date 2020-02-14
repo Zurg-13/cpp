@@ -29,7 +29,7 @@ extern FProc *fmProc;
 extern WTextBrowzer *wgTextBrowzer;
 extern WAttention *wgAttention;
 extern WActive *wgActive;
-
+extern FMain *fmMain;
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -338,6 +338,18 @@ void FMain::on_btQtConcurrent_clicked() {
 
     FNC << R"(\ end)";
 }// on_btQtConcurrent_clicked
+
+// WLogAdv. --------------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include "WBrd.h"
+void FMain::on_btLogAdv_clicked() {
+    FNC << R"(/ bgn)";
+    static WBrd board(nullptr);
+
+    board.show();
+
+    FNC << R"(\ end)";
+}// on_btLogAdv_clicked
 
 //------------------------------------------------------------------------------
 

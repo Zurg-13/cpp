@@ -40,9 +40,10 @@ class FMain : public QMainWindow {
     void on_bt_clicked();
 
     void on_btListClear_clicked();
-    void on_btWLog_clicked();
     void on_btSharedPtr_clicked();
     void on_btQtConcurrent_clicked();
+    void on_btWLog_clicked();
+    void on_btLogAdv_clicked();
 
 private:
     Ui::FMain *ui;

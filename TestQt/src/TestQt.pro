@@ -16,6 +16,7 @@ TEMPLATE = app
 include($$SRV/Srv/Srv.pri)
 include($$SRV/Log/Log.pri)
 include($$WGT/Log/WLog.pri)
+include($$WGT/Brd/WBrd.pri)
 
 INCLUDEPATH += ../../
 DEPENDPATH  += ../../
