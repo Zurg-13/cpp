@@ -19,18 +19,38 @@ bool EXIST(const QString &tag, const QString &xml) {
     return xml.indexOf(TAG, 0) >= 0;
 }// EXIST
 
+// Удалить комментарии. --------------------------------------------------------
+//------------------------------------------------------------------------------
+QString CDEL(const QString &xml)
+    { return QString(xml).remove(QRegularExpression("<!--+([^-]|-[^-])*--+>"));}
 
 // Извлечь значение тега. ------------------------------------------------------
 //------------------------------------------------------------------------------
-QString VAL(const QString &tag, const QString &xml) {
+QString VAL(const QString &tag, const QString &xml)
+    { return VAL(tag, &xml, 0).asSTR; }
+QStringRef VAL(const QString &tag, const QString *xml, int start) {
     QString opn = "<" % tag % ">", cls = "</" % tag % ">";
-    int bgn = xml.indexOf(opn) + opn.length();
-    int end = xml.lastIndexOf(cls);
+    int bgn = xml->indexOf(opn, start) + opn.length();
+    int end = xml->indexOf(cls, bgn);
 
-    return bgn >= 0 && end > 0 && bgn < end
-        ? xml.mid(bgn, end - bgn)
-        : EMPTY_STR;
+    return bgn >= opn.length() && end > bgn
+        ? QStringRef(xml, bgn, end - bgn)
+        : QStringRef();
 }// VAL
+
+// Извлечь тег вместе с содержимым. --------------------------------------------
+//------------------------------------------------------------------------------
+QString    CUT(const QString &tag, const QString &xml)
+    { return CUT(tag, &xml, 0).asSTR; }
+QStringRef CUT(const QString &tag, const QString *xml, int start) {
+    QString opn = "<" % tag % ">", cls = "</" % tag % ">";
+    int bgn = xml->indexOf(opn, start);
+    int end = xml->indexOf(cls, bgn + opn.length());
+
+    return bgn >= 0 && end > bgn
+        ? QStringRef(xml, bgn, (end + cls.length()) - bgn)
+        : QStringRef();
+}// CUT
 
 // Собрать XML-тег. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -87,7 +107,7 @@ QMap<QString, QString> MAP(
         QXmlStreamReader::TokenType token = doc.readNext();
         if(token == QXmlStreamReader::StartElement && doc.name() == tag) {
             QXmlStreamAttributes attr = doc.attributes();
-            ret[attr.value(key).toString()] = doc.readElementText();
+            ret[attr.value(key).asSTR] = doc.readElementText();
         }// if(token == QXmlStreamReader::StartElement && doc.name() == tag)
     }// while(reader.atEnd() == false || reader.hasError() == false)
 

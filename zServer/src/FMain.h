@@ -6,12 +6,7 @@
 //------------------------------------------------------------------------------
 #include <QList>
 #include <QMainWindow>
-#include <QTcpServer>
-#include <QTcpSocket>
-
-/**/
 #include <QtHttpServer>
-/**/
 
 #include "WHandler.h"
 #include "WLogEntry.h"

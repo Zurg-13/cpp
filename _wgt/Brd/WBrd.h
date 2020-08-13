@@ -12,18 +12,22 @@ namespace Ui { class WBrd; }
 class WBrd : public QWidget {
     Q_OBJECT
 
-public:
+ public:
     explicit WBrd(QWidget *parent = nullptr);
             ~WBrd();
 
-    WRec* post(const QString &msg, const QColor &clr = QColor());
-    WRec* post(const QString &msg, const QString &adv, const QColor &clr = QColor());
+    WRec* post(const QString &msg, const QString &adv = EMPTY_STR);
     WRec* post(WRec *rec);
     void  rift(void);
 
     WRec* grab(void);
     WRec* free(WRec *rec);
     void  clear(void);
+
+ private slots:
+    void ctx_menu(const QPoint &pos);
+    void on_aClear_triggered();
+    void on_aTest_triggered();
 
 private:
     Ui::WBrd *ui;

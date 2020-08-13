@@ -323,15 +323,15 @@ void FMain::testInitDev() {
     FNC << "bgn";
 
     // fltr
-    fltr.vid = 0x0c2e/*1eab*/;
-    fltr.pid = 0x0200/*0d10*/;
+    fltr.vid = /*0x0c2e*/ 0x1eab;
+    fltr.pid = /*0x0200*/ 0x1d10;
 
     // conf
     conf.alternate = 0x0;
-    conf.config = 0x1/*0*/;
-    conf.interface = 0x0/*1*/;
-    conf.readEp = 0x81/*84*/;
-    conf.writeEp = 0x00/*05*/;
+    conf.config = 0x1;
+    conf.interface = 0x0;
+    conf.readEp = 0x81;
+    conf.writeEp = 0x02;
 
 }// initDev
 

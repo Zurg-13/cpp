@@ -27,10 +27,12 @@ void WLog::inf(QString msg) { if(this->isVisible()) add(msg); }
 
 // Добавить запись в лог. ------------------------------------------------------
 //------------------------------------------------------------------------------
+#include "dbg.h"
 void WLog::add(QString msg, QColor clr) {
     static const QString BR = "<br>";
     auto MSG = [&]() -> QString {
-        return "<h style='color:" + clr.name() + ";'>" + msg + "</h>"; };
+        return "<h style='color:" + clr.name() + ";'>" + msg + "</h>";
+    };// MSG
 
 /*
     auto RMV = [&](const QTextBlock &block) -> void {

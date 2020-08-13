@@ -24,6 +24,7 @@ DEPENDPATH  += ../../
 HEADERS += \
     FMain.h         \
     WAnimation.h    \
+    WBall.h \
     WSound.h        \
     FProc.h         \
     WTextBrowzer.h \
@@ -31,6 +32,7 @@ HEADERS += \
     WActive.h
 
 SOURCES += \
+    WBall.cpp \
     main.cpp        \
     FMain.cpp       \
     WAnimation.cpp  \
@@ -43,6 +45,7 @@ SOURCES += \
 FORMS += \
     FMain.ui        \
     WAnimation.ui   \
+    WBall.ui \
     WSound.ui       \
     FProc.ui        \
     WTextBrowzer.ui \

@@ -53,7 +53,7 @@
     <widget class="QPushButton" name="btAdd">
      <property name="minimumSize">
       <size>
-       <width>96</width>
+       <width>128</width>
        <height>30</height>
       </size>
      </property>
@@ -79,7 +79,7 @@
     <widget class="QPushButton" name="btHide">
      <property name="minimumSize">
       <size>
-       <width>96</width>
+       <width>128</width>
        <height>30</height>
       </size>
      </property>

@@ -8,6 +8,7 @@
 #include "_srv/Srv/dbg.h"
 #include "_srv/Srv/std.h"
 #include "_srv/Srv/lst.h"
+#include "_srv/Srv/xml.h"
 
 #include "ZLogger.h"
 
@@ -17,6 +18,7 @@
 #include "WTextBrowzer.h"
 #include "WAttention.h"
 #include "WActive.h"
+#include "WBall.h"
 
 #include "FMain.h"
 #include "ui_FMain.h"
@@ -29,6 +31,8 @@ extern FProc *fmProc;
 extern WTextBrowzer *wgTextBrowzer;
 extern WAttention *wgAttention;
 extern WActive *wgActive;
+extern WBall *wgBall;
+
 extern FMain *fmMain;
 
 // Конструктор. ----------------------------------------------------------------
@@ -65,24 +69,18 @@ typedef QPair<QString, QString> tst_pair;
 void FMain::on_aTest_triggered() {
     FNC << R"(/ bgn)";
 
+    QString xml =
+        "<root>"
+            "<val_one>1</val_one>"
+            "<val_two>2</val_two>"
+            "<val_thr>3</val_thr>"
+        "</root>";
 
-    QMap<QString, QString> map = {{"1", "one"}, {"2", "two"}, {"3", "thr"}};
-    QList<QString> lst = {"one", "two", "thr"};
+    FNC << "val:";
+    FNC << "root:" << VAL("root", xml) << "val_two:" << VAL("val_two", xml);
 
-    FNC << "map:" << map;
-    FNC << "lst:" << LST(map);
-
-    FNC << "str:" << BLD(lst);
-    FNC << "bld:" << BLD(LST(map));
-
-    FNC << "l_s:" << BLD(
-        lst, [](const QString &val){ return "{LBD:" + val + ":LBD}"; }
-      , QString("{SEP}") );
-
-    FNC << "tst:" << BLD(
-        lst, [](const QString &val){ return "{LBD:" + val + ":LBD}"; }
-      , QString("{SEP}") );
-
+    FNC << "cut:";
+    FNC << "root:" << CUT("root", xml) << "val_two:" << CUT("val_two", xml);
 
     FNC << R"(\ end)";
 }// on_aTest_triggered
@@ -342,14 +340,34 @@ void FMain::on_btQtConcurrent_clicked() {
 // WLogAdv. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include "WBrd.h"
+#include <QList>
+#include <QPair>
 void FMain::on_btLogAdv_clicked() {
     FNC << R"(/ bgn)";
-    static WBrd board(nullptr);
 
-    board.show();
+
+    static WBrd board(nullptr); board.show();
+
+    QList<QPair<QString, QString>> lst {
+        {"one", "111"}
+      , {"two", ""}
+      , {"thr", "333"}};
+
+    board.rift();
+    for(const QPair<QString, QString> &pair: lst) {
+        board.post(pair.first, pair.second);
+    }// pair
+    board.rift();
+
 
     FNC << R"(\ end)";
 }// on_btLogAdv_clicked
+
+// WBall. ----------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btBall_clicked(){
+    wgBall->show();
+}
 
 //------------------------------------------------------------------------------
 

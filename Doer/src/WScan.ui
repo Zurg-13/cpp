@@ -177,14 +177,14 @@
     <widget class="QPlainTextEdit" name="te">
      <property name="plainText">
       <string>&lt;scaner&gt;
-    &lt;vid&gt;0x0c2e&lt;/vid&gt;
-    &lt;pid&gt;0x0200&lt;/pid&gt;
+    &lt;vid&gt;0x1eab&lt;/vid&gt;
+    &lt;pid&gt;0x1d10&lt;/pid&gt;
     
     &lt;alternate&gt;0x0&lt;/alternate&gt;
     &lt;config&gt;0x1&lt;/config&gt;
     &lt;interface&gt;0x0&lt;/interface&gt;
-    &lt;readEp&gt;0x81&lt;/readEp&gt;
-    &lt;writeEp&gt;0x00&lt;/writeEp&gt;
+    &lt;read_ep&gt;0x81&lt;/read_ep&gt;
+    &lt;write_ep&gt;0x02&lt;/write_ep&gt;
 &lt;/scaner&gt;</string>
      </property>
     </widget>

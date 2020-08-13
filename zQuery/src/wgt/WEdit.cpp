@@ -165,12 +165,12 @@ void WEdit::on_btCnn_clicked() {
     QMap<QVariant, QString> map;
     for(WConnect *conn : wgCnn->lst()) {
         map.insert(
-            QVariant((uint)conn)
+            QVariant::fromValue(conn)
           , FSN(conn->nme(), FSN(conn->usr(), conn->url(), " -> "), ": "));
     }// conn
 
     if(dgSel->sel(&map)) {
-        WConnect* conn = (WConnect*)dgSel->ret().toUInt();
+        WConnect* conn = dgSel->ret().value<WConnect*>();
         this->db.setDatabaseName(conn->url());
         this->db.setUserName(conn->usr());
         this->db.setPassword(conn->pwd());
@@ -206,7 +206,6 @@ void WEdit::write(QXmlStreamWriter &doc) {
 // Изменение позиции курсора. --------------------------------------------------
 //------------------------------------------------------------------------------
 void WEdit::on_edSql_cursorPositionChanged() {
-//    static QString sep(";\u2029");
     static QRegExp sep(R"(;$)");
     QList<QTextEdit::ExtraSelection> extraSelections;
     int pos = ui->edSql->textCursor().position();

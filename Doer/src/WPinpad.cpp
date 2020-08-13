@@ -18,13 +18,7 @@
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WPinpad::WPinpad(QWidget *parent) : QWidget(parent), ui(new Ui::WPinpad) {
-
-    // Внешний вид.
     ui->setupUi(this);
-
-    // Инициализация.
-    this->pinpad = new MPinpad(ui->te->toPlainText(), nullptr);
-
 }// WPinpad
 
 // Деструктор. -----------------------------------------------------------------
@@ -34,12 +28,12 @@ WPinpad::~WPinpad() {
     delete ui;
 }//~WPinpad
 
-// Загрузить конфигурацию. -----------------------------------------------------
+// Задать конфигурацию. --------------------------------------------------------
 //------------------------------------------------------------------------------
-void WPinpad::loadConf(const QString &fnme) {
-    if(fnme.isEmpty()) { return; }
-    ui->te->setPlainText(FLE(fnme));
-    this->pinpad->init(ui->te->toPlainText());
+void WPinpad::setConf(const QString &conf) {
+    ui->te->setPlainText(conf);
+    if(this->pinpad) { this->pinpad->init(conf); }
+    else             { this->pinpad = new MPinpad(conf, nullptr); }
 }// loadConf
 
 // Загрузить конфигурацию. -----------------------------------------------------
@@ -48,7 +42,7 @@ void WPinpad::on_btCfgLoad_clicked() {
     [this](const QString& fnme)
         { if(fnme.isEmpty()) { return; } ui->te->setPlainText(FLE(fnme)); }
     (QFileDialog::getOpenFileName(
-        this, "Открыть конфигурацию", APP_DIR, "*.xml" ));
+        this, "Открыть файл конфигурации", APP_DIR, "*.xml" ));
 }// on_btCfgLoad_clicked
 
 // Открыть устройство. ---------------------------------------------------------
@@ -64,7 +58,13 @@ void WPinpad::on_btDevClose_clicked() { this->pinpad->close(); }
 void WPinpad::on_btCfgSet_clicked()
     { this->pinpad->init(ui->te->toPlainText()); }
 
-// Напечатать ZREport. ---------------------------------------------------------
+// Напечатать ZReport. ---------------------------------------------------------
 //------------------------------------------------------------------------------
-void WPinpad::on_btZReport_clicked()
-    { this->pinpad->zreport(Command("test", "zreport", "pinpad")); }
+void WPinpad::on_btZReport_clicked() {
+    this->pinpad->zreport(
+        Command("test", "zreport", "pinpad")
+      , [](const Result &rslt) { E::Log->add("res:" + rslt.toString()); }
+    );
+}// on_btZReport_clicked
+
+//------------------------------------------------------------------------------

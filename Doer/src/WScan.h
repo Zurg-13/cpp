@@ -21,7 +21,7 @@ class WScan : public QWidget {
     explicit WScan(QWidget *parent = nullptr);
             ~WScan();
 
-    void loadConf(const QString& fnme);
+    void setConf(const QString& conf);
 
 private slots:
     void on_btSetConf_clicked();
@@ -29,6 +29,7 @@ private slots:
     void on_btOpen_clicked();
     void on_btClose_clicked();
     void on_btListDev_clicked();
+    void on_btScan_clicked();
 
 private:
     Ui::WScan *ui;

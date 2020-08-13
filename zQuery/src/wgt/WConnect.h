@@ -32,10 +32,19 @@ private slots:
     void on_aDelete_triggered();
     void on_aTest_triggered();
 
+    void on_aConnOCI_triggered();
+    void on_aConnODBC_triggered();
+    void on_aConnMYSQL_triggered();
+    void on_aConnPSQL_triggered();
+    void on_aConnSQLITE_triggered();
+
 private:
     Ui::WConnect *ui;
     static int global_count;   //Глобальный счётчик.
     int count = global_count++;
+    QString conn_type;
+
+    void SET(QObject *sender, const QString &type);
 
 };// WConnect
 

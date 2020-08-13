@@ -60,7 +60,7 @@ bool ExecSQL(QSqlQuery &q) {
     if(!q.exec()){
         QString msg(q.lastError().databaseText());
         ExtMsg(
-            SQL_ERR_MSG.arg(q.lastError().number())
+            SQL_ERR_MSG.arg(q.lastError().nativeErrorCode())
           , msg.left(FIND_END(msg)) + "\n" + q.lastError().driverText()
           , q.lastQuery() + BoundParams(q));
         return false;

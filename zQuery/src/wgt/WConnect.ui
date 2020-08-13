@@ -254,6 +254,31 @@
     <string>Проверить подключение</string>
    </property>
   </action>
+  <action name="aConnOCI">
+   <property name="text">
+    <string>Oracle (QOCI)</string>
+   </property>
+  </action>
+  <action name="aConnODBC">
+   <property name="text">
+    <string>MS ODBC (QODBC)</string>
+   </property>
+  </action>
+  <action name="aConnMYSQL">
+   <property name="text">
+    <string>MySql (QMYSQL)</string>
+   </property>
+  </action>
+  <action name="aConnPSQL">
+   <property name="text">
+    <string>PostgreSQL (QPSQL)</string>
+   </property>
+  </action>
+  <action name="aConnSQLITE">
+   <property name="text">
+    <string>SQLite v3 (QSQLITE)</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>edNme</tabstop>

@@ -24,6 +24,7 @@ class Command {
               , const QMap<QString, QString> &p_list
              ) : ref(ref), action(action), module(module), p_list(p_list) {}
 
+    const QString prm(const QString &key) { return this->p_list.value(key); }
     QString toString(void);
 };// Command
 

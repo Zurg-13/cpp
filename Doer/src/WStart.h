@@ -19,7 +19,7 @@ class WStart : public QWidget {
     explicit WStart(QWidget *parent = nullptr);
             ~WStart();
 
-    void loadConf(const QString& fnme);
+    void setConf(const QString& conf);
 
  private:
     Ui::WStart *ui;

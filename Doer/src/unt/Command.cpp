@@ -10,9 +10,9 @@
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 Command::Command(const QString& xml) {
-    this->ref = VAL("ref", xml);
+    this->ref    = VAL("ref", xml);
     this->action = VAL("action", xml); this->module = VAL("module", xml);
-    this->p_list = MAP("p", "key", TAG("p_list", VAL("p_list", xml)));
+    this->p_list = MAP("p", "key", CUT("p_list", &xml).toString());
 }// Command
 
 // Приведение к строке. --------------------------------------------------------

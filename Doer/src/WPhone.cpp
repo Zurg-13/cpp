@@ -25,9 +25,6 @@ WPhone::WPhone(QWidget *parent) : QWidget(parent), ui(new Ui::WPhone) {
     ui->setupUi(this);
     ui->frExt->setVisible(false);
 
-    // Инициализация.
-    this->phone = new MPhone(ui->te->toPlainText(), nullptr);
-
 }// WPhone
 
 // Деструктор. -----------------------------------------------------------------
@@ -37,13 +34,12 @@ WPhone::~WPhone() {
     delete ui;
 }//~WPhone
 
-// Загрузить конфигурацию. -----------------------------------------------------
+// Задать конфигурацию. --------------------------------------------------------
 //------------------------------------------------------------------------------
-void WPhone::loadConf(const QString& fnme) {
-    if(fnme.isEmpty()) { return; }
-    QString conf = FLE(fnme);
+void WPhone::setConf(const QString& conf) {
     ui->te->setPlainText(conf);
-    this->phone->init(conf);
+    if(this->phone){ this->phone->init(conf); }
+    else           { this->phone = new MPhone(conf, nullptr);}
 }// loadConf
 
 // Загрузить конфигурацию. -----------------------------------------------------
@@ -65,7 +61,8 @@ void WPhone::on_btDevClose_clicked() { this->phone->close(); }
 
 // Применить конфигурацию. -----------------------------------------------------
 //------------------------------------------------------------------------------
-void WPhone::on_btConfSet_clicked() { this->phone->init(ui->te->toPlainText());}
+void WPhone::on_btConfSet_clicked()
+    { this->phone->init(ui->te->toPlainText()); }
 
 // Запросить информацию. -------------------------------------------------------
 //------------------------------------------------------------------------------

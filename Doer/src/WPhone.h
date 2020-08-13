@@ -21,7 +21,7 @@ class WPhone : public QWidget {
     explicit WPhone(QWidget *parent = nullptr);
             ~WPhone();
 
-    void loadConf(const QString& fnme);
+    void setConf(const QString& fnme);
 
  private slots:
     void on_btDevOpen_clicked();

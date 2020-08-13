@@ -1,10 +1,12 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <functional>
+
 #include <QMenu>
 #include <QMessageBox>
 #include <QtSql/QtSql>
 #include <QSqlDatabase>
-#include <functional>
+#include <QActionGroup>
 
 #include "ui_WConnect.h"
 #include "WConnect.h"
@@ -24,14 +26,29 @@ WConnect::WConnect(QWidget *parent) : QWidget(parent), ui(new Ui::WConnect) {
 
     // Внешний вид.
     ui->setupUi(this);
-    ui->edNme->setText(QString("connect_") + STR(count));
+    ui->edNme->setText(QString("conn-") + STR(count));
+
+    // Типы подключений.
+    QActionGroup *group = new QActionGroup(this);
+    QMenu *type = new QMenu(this);
+    auto ADD = [type, group](QAction *action) {
+        group->addAction(action);
+        type->addAction(action); action->setParent(type); };
+
+    ADD(ui->aConnOCI); ADD(ui->aConnODBC); ADD(ui->aConnPSQL);
+    ADD(ui->aConnMYSQL); ADD(ui->aConnSQLITE);
+    ui->aConnOCI->triggered();  // По умолчанию.
 
     // Меню.
     QMenu *menu = new QMenu(this);
     menu->addAction(ui->aTest);
     menu->addSeparator(); //---------------------
+    menu->addMenu(type);  // >>>
+    menu->addSeparator(); //---------------------
     menu->addAction(ui->aDelete);
     ui->btMenu->setMenu(menu);
+
+    // Инициализация.
 
 }// WConnect
 
@@ -54,7 +71,7 @@ void WConnect::on_aDelete_triggered() {
 // Проверить подключение. ------------------------------------------------------
 //------------------------------------------------------------------------------
 void WConnect::on_aTest_triggered() {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    QSqlDatabase db = QSqlDatabase::addDatabase(this->conn_type);
     db.setDatabaseName(url()); db.setUserName(usr()); db.setPassword(pwd());
 
     QMessageBox::information(
@@ -108,5 +125,18 @@ void WConnect::state(const QString &xml) {
     ui->edCnn->setPlainText(VAL("url", xml));
 }// parse
 
-//------------------------------------------------------------------------------
 
+// Назначить тип БД. -----------------------------------------------------------
+//------------------------------------------------------------------------------
+void WConnect::SET(QObject *sender, const QString &type) {
+    this->conn_type = type;
+    qobject_cast<QMenu*>(sender->parent())->setTitle(
+        STR("Тип БД: %1").arg(qobject_cast<QAction*>(sender)->text()) );
+}// SET
+void WConnect::on_aConnOCI_triggered()   { SET(sender(), "QOCI"); }
+void WConnect::on_aConnODBC_triggered()  { SET(sender(), "QODBC"); }
+void WConnect::on_aConnMYSQL_triggered() { SET(sender(), "QMYSQL"); }
+void WConnect::on_aConnPSQL_triggered()  { SET(sender(), "QPSQL"); }
+void WConnect::on_aConnSQLITE_triggered(){ SET(sender(), "QSQLITE"); }
+
+//------------------------------------------------------------------------------

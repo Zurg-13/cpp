@@ -21,7 +21,7 @@ class WPinpad : public QWidget {
     explicit WPinpad(QWidget *parent = nullptr);
             ~WPinpad();
 
-    void loadConf(const QString& fnme);
+    void setConf(const QString& conf);
 
  private slots:
     void on_btCfgLoad_clicked();

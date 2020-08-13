@@ -32,6 +32,16 @@
     </widget>
    </item>
   </layout>
+  <action name="aClear">
+   <property name="text">
+    <string>Очистить</string>
+   </property>
+  </action>
+  <action name="aTest">
+   <property name="text">
+    <string>Проба</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

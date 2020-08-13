@@ -44,6 +44,7 @@ class FMain : public QMainWindow {
     void on_btQtConcurrent_clicked();
     void on_btWLog_clicked();
     void on_btLogAdv_clicked();
+    void on_btBall_clicked();
 
 private:
     Ui::FMain *ui;

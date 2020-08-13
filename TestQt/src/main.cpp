@@ -9,6 +9,7 @@
 #include "WTextBrowzer.h"
 #include "WAttention.h"
 #include "WActive.h"
+#include "WBall.h"
 
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -19,6 +20,7 @@ FProc *fmProc;
 WTextBrowzer *wgTextBrowzer;
 WAttention *wgAttention;
 WActive *wgActive;
+WBall *wgBall;
 
 
 // Главная функция. ------------------------------------------------------------
@@ -32,6 +34,7 @@ int main(int argc, char *argv[]) {
     WTextBrowzer _wgTextBrowzer; wgTextBrowzer = &_wgTextBrowzer;
     WAttention _wgAttention; wgAttention = &_wgAttention;
     WActive _wgActive; wgActive = &_wgActive;
+    WBall _wgBall; wgBall = &_wgBall;
 
     FMain _fmMain; fmMain = &_fmMain; fmMain->show();
     return app.exec();
