@@ -33,9 +33,16 @@ class Ball {
     }
 
     void drawCollision(QPainter &p, Ball &ball) {
-        qreal dst = dist(ball);
-        if(dst <= this->r + ball.r) {
-            qreal phi;
+        qreal phi;
+
+        p.setPen(Qt::green);
+        phi = qAtan2(dy, dx);
+        p.drawLine(
+            this->x              , this->y
+          , this->x + r*qCos(phi), this->y + r*qSin(phi));
+
+
+        if(dist(ball) <= this->r + ball.r) {
             qreal x1 = this->x, y1 = this->y;
             qreal x2 = ball.x, y2 = ball.y;
 
@@ -51,8 +58,8 @@ class Ball {
                 this->x               , this->y
               , this->x + 20*qCos(phi), this->y + 20*qSin(phi));
 
-
         }// if(dist(ball) < this->r + ball.r)
+
     }// drawCollision
 
     void calc(Ball &ball) {
@@ -85,7 +92,9 @@ class Ball {
         return qAtan((y2-y1)/(x2-x1)) + M_PI_2;
     }
 
-    qreal agl(void) { return qAtan(dx/dy); }
+//    qreal agl(void) { return qAtan(dx/dy); }
+    qreal agl(void) { return qAtan2(dy, dx); }
+
     qreal vel(void) { return qSqrt(dx*dx + dy*dy); }
     qreal mas(void) { return r*r; }
 
@@ -104,7 +113,6 @@ struct Pos { qreal x, y; };
 class Perturbation {
 
  public:
-    Pos pos;
     qreal x, y, dx, dy, r, speed;
     QString name;
     QColor color = Qt::black;
@@ -112,18 +120,16 @@ class Perturbation {
     Distortion *parent;
     Perturbation *next = nullptr, *prev = nullptr;
 
-    Perturbation(Pos pos, qreal r): pos(pos), r(r) {}
+    Perturbation(qreal x, qreal y, qreal dx, qreal dy, qreal r)
+    :   x(x), y(y), dx(dx), dy(dy), r(r) {}
 
     Perturbation* setPrev(Perturbation *prev){ this->prev = prev; return this; }
 
     bool isMove(void) { return speed; }
     void draw(QPainter &p);
-    bool isInside(const Pos &pos) { return isInside(pos, this->r); }
-    bool isInside(const Pos &pos, const qreal &R) {
-        return (pos.x-this->pos.x)*(pos.x-this->pos.x)
-             + (pos.y-this->pos.y)*(pos.y-this->pos.y) < R*R;
-    }// isInside
-
+    bool isInside(qreal x, qreal y) { return isInside(x, y, this->r); }
+    bool isInside(qreal x, qreal y, qreal r)
+        { return (x-this->x)*(x-this->x) + (y-this->y)*(y-this->y) < r*r; }
 
     void push(void) {
         const double SPEED = 1.0;
@@ -138,14 +144,14 @@ class Perturbation {
     void push(Perturbation *some) { speed = some->speed; }
     void stop() { speed = 0; }
 
-    void jamp(Perturbation &pbtn) { jamp(pbtn.pos.x, pbtn.pos.y); }
-    void jamp(qreal x, qreal y)   { this->pos.x = x, this->pos.y = y; }
+    void jamp(Perturbation &pbtn) { jamp(pbtn.x, pbtn.y); }
+    void jamp(qreal x, qreal y)   { this->x = x, this->y = y; }
 
     void calc(void) { x += dx; y += dy; }
 
     qreal dist(Perturbation *pbtn) {
-        return (qSqrt(qPow(this->pos.x - pbtn->pos.x, 2)
-                   +  qPow(this->pos.y - pbtn->pos.y, 2) ));
+        return (qSqrt(qPow(this->x - pbtn->x, 2)
+                   +  qPow(this->y - pbtn->y, 2) ));
     }// dist
 
     qreal sign(qreal val)
@@ -172,10 +178,12 @@ class Linear : Trajectory {
  public:
     Linear(qreal dx, qreal dy): dx(dx), dy(dy) {}
     virtual void calc(Perturbation *pbtn)
-        { pbtn->pos.x += dx*pbtn->speed; pbtn->pos.y += dy*pbtn->speed; }
+        { pbtn->x += dx*pbtn->speed; pbtn->y += dy*pbtn->speed; }
+/*
     virtual void post(Perturbation *ptbt, const Perturbation *stab) {
 
     }// post
+*/
 
 };// Linear
 
@@ -198,13 +206,9 @@ class Distortion {
         ptb.append(elem);
     }// add
 
-    Perturbation* get(qreal X, qreal Y) {
-
-/* todo: заглушка
+    Perturbation* get(qreal x, qreal y) {
         for(Perturbation *prtb: this->ptb)
-            { if(prtb->isInside(X, Y)) { return prtb; }}
-*/
-
+            { if(prtb->isInside(x, y)) { return prtb; }}
         return nullptr;
     }// get
 

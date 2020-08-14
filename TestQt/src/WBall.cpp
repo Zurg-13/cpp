@@ -15,15 +15,28 @@
 WBall::WBall(QWidget *parent) : QWidget(parent), ui(new Ui::WBall) {
     ui->setupUi(this);
 
-    this->timer.setInterval(100);
+    this->timer.setInterval(40);
     connect(&timer, &QTimer::timeout, this, &WBall::on_timer);
 
-/*
     int w = this->width()-50, h = this->height();
-    for(int i=0; i < 10; i++) {
-        bll.append(Ball(w*RND, h*RND, 4-RND*8, 4-RND*8, 20+30*RND));
+
+
+/*
+    qreal S = 0.05, R = 50;
+    for(int i=0; i < 13; i++) {
+        Ball ball(w*RND, h*RND, S-RND*2*S, S-RND*2*S, R+R*2*RND);
+        while([this](Ball &ball) -> bool {
+            for(Ball &b: this->bll)
+                { if(b.dist(ball) <= b.r + ball.r) { return true; }}
+            return false; }(ball))
+            { ball = Ball(w*RND, h*RND, S-RND*2*S, S-RND*2*R, R+R*2*RND); }
+        bll.append(ball);
     }// i
 */
+
+    bll.append(Ball(100, 100, 0.5, 0, 50));
+    bll.append(Ball(250, 100,-0.5, 0, 50));
+
 
 }// WBall
 
@@ -39,19 +52,19 @@ void WBall::paintEvent(QPaintEvent */*evt*/) {
     int w = this->width()-50, h = this->height();
     QPainter p(this);
 
-    anomaly.draw(p);
-
 /*
+    anomaly.draw(p);
+*/
+
     p.setPen(Qt::black);
     for(int i=0; i<this->bll.size(); i++) {
         Ball &ball = this->bll[i];
         for(int j=i+1; j<this->bll.size(); j++) {
             ball.calc(this->bll[j]);
             ball.drawCollision(p, this->bll[j]);
-        }
+        }// j
         ball.move(w, h); ball.draw(p);
     }// ball
-*/
 
 }// paintEvent
 
@@ -89,6 +102,7 @@ void WBall::on_timer(void) {
 // Создать аномалию. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 void WBall::on_pushButton_clicked() {
+
 /*
     Distortion *one = new Distortion();
         one->add(new Perturbation(100, 100, 50));
