@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QScrollArea>
 #include <QColor>
 
 #include "WLogEntry.h"
@@ -36,7 +35,7 @@ class WLogBoard : public QWidget {
     Ui::WLogBoard *ui;
     QWidget *box = nullptr;
 
-    int inset_pos = 0;
+    int insert_pos = 0;
 
 };// WLogBoard
 

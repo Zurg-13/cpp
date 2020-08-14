@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <QScrollArea>
+#include <QVBoxLayout>
 #include <QLabel>
 
 #include "dbg.h"
@@ -12,9 +13,6 @@
 
 #include "WLogBoard.h"
 #include "ui_WLogBoard.h"
-
-/* Дополнительные функции. ****************************************************/
-/******************************************************************************/
 
 /* WLogBoard. *****************************************************************/
 /******************************************************************************/
@@ -49,7 +47,7 @@ void WLogBoard::rift(void) {
         frm->setFrameShape(QFrame::HLine);
         frm->setFrameShadow(QFrame::Plain);
     static_cast<QBoxLayout*>(this->box->layout())
-        ->insertWidget(this->inset_pos, frm);
+        ->insertWidget(this->insert_pos, frm);
 }// rift
 
 // Добавить ОДИНОЧНУЮ запись. --------------------------------------------------
@@ -59,14 +57,14 @@ void WLogBoard::post(const QString &msg, const QColor &clr) {
     QLabel* lbl = new QLabel(msg);
         lbl->setStyleSheet(CLR.arg(clr.name()).arg(contrast_bw(clr).name()));
     static_cast<QBoxLayout*>(this->box->layout())
-        ->insertWidget(this->inset_pos, lbl);
+        ->insertWidget(this->insert_pos, lbl);
 }// post
 
 // Добавить запись. ------------------------------------------------------------
 //------------------------------------------------------------------------------
 WLogEntry* WLogBoard::post(WLogEntry *entry) {
     static_cast<QBoxLayout*>(this->box->layout())
-        ->insertWidget(this->inset_pos, entry);
+        ->insertWidget(this->insert_pos, entry);
     return entry;
 }// post
 
@@ -81,14 +79,14 @@ void WLogBoard::post(const QString &inp, const QString &out, const QColor &clr)
 WLogEntry* WLogBoard::grab(void) {
     WLogEntry *entry = post(new WLogEntry(EMPTY_STR, EMPTY_STR));
         entry->grab()->hgl(Qt::red);
-    this->inset_pos++;
+    this->insert_pos++;
     return entry;
 }// grab
 
 // Освободить виджет. ----------------------------------------------------------
 //------------------------------------------------------------------------------
 WLogEntry* WLogBoard::free(WLogEntry *entry)
-    { this->inset_pos--; entry->hgl(Qt::green); return entry->free(); }
+    { this->insert_pos--; entry->hgl(Qt::green); return entry->free(); }
 
 // Очистить лог. ---------------------------------------------------------------
 //------------------------------------------------------------------------------

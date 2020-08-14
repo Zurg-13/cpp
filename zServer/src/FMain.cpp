@@ -274,21 +274,16 @@ void FMain::on_aExit_triggered() {
 
 // Отладка. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include "WHdlBoard.h"
+WHdlBoard *brd = nullptr;
 void FMain::on_btDebug_clicked() {
     FNC << R"(/ bgn)";
 
-/*
-    static int cnt(0);
-    const QString msg = ": НЕКОЕ ДОСТАТОЧНО ДЛИННОЕ СООБЩЕНИЕ :";
-    ui->wgLog->post("INP" + msg + STR(cnt++) , "OUT" + msg);
-    ui->wgLog->show();
-*/
+//    static WHdlBoard *brd = nullptr;
+    if(brd == nullptr) { brd = new WHdlBoard(this); }
 
-/*
-    for(const QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>()) {
-        FNC << "| obj:" << socket->metaObject()->className();
-    }// socket
-*/
+
+    brd->show();
 
     FNC << R"(\ end)";
 }// on_btDebug_clicked
