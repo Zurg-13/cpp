@@ -1,7 +1,7 @@
 #include <QPropertyAnimation>
 
-#include "_srv/std.h"
-#include "_srv/dbg.h"
+#include "std.h"
+#include "dbg.h"
 
 #include "ui_WChain.h"
 #include "WChain.h"

@@ -4,6 +4,9 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QWidget>
+#include <QSplitter>
+
+#include "WHdlEntry.h"
 
 namespace Ui { class WHdlBoard; }
 
@@ -17,13 +20,14 @@ class WHdlBoard : public QWidget {
             ~WHdlBoard();
 
 
-    void       clear(void);
+    WHdlEntry* post(WHdlEntry * entry);
+    void clear(void);
 
  private:
     Ui::WHdlBoard *ui;
-    QWidget *box = nullptr;
+    QSplitter *box = nullptr;
 
-};// QWidget
+};// WHdlBoard
 
 //------------------------------------------------------------------------------
 #endif // WHDLBOARD_H

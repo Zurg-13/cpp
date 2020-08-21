@@ -27,8 +27,8 @@ QString U8(const char *str) { return QString::fromUtf8(str); }
 
 // Приведение к целому. --------------------------------------------------------
 //------------------------------------------------------------------------------
-int INT(QString val) { return val.toInt(); }
-int INT(double val) { return static_cast<int>(val); }
+int INT(const QString &val) { return val.toInt(); }
+int INT(const double &val)  { return static_cast<int>(val); }
 
 // Проверка на пустое значение. ------------------------------------------------
 //------------------------------------------------------------------------------

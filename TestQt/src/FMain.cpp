@@ -319,7 +319,6 @@ void FMain::on_btQtConcurrent_clicked() {
         QThread::sleep(sec); FNC << "run:" << sec; return sec; });
 
 
-
 /*
     QList<unsigned long> lst({1, 2, 3});
     std::function<void(unsigned long&)> fn = [](unsigned long &elm) {

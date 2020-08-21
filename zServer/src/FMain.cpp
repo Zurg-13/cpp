@@ -131,8 +131,17 @@ void FMain::remove_handler(WHandler *handler) {
     for(QList<WHandler*>::iterator it = hdl.begin(); it != hdl.end(); it++) {
         if((*it) == handler) { hdl.erase(it); handler->deleteLater(); return; }
     }// it
+}// remove_handler
 
-}// on_btAdd_clicked
+void FMain::remove_handler_entry(WHdlEntry *hdlr) {
+    for(QList<WHdlEntry*>::iterator it  = hdl_entry.begin()
+                                  ; it != hdl_entry.end()
+                                  ; it++)
+    {
+        if((*it) == hdlr) { hdl_entry.erase(it); hdlr->deleteLater(); return; }
+    }// it
+
+}// remove_handler
 
 // Пуск/Стоп. ------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -190,15 +199,31 @@ void FMain::rift(void) { ui->wgLog->rift(); }
 //------------------------------------------------------------------------------
 void FMain::on_btClearLog_clicked() { ui->wgLog->clear(); }
 
+
+/**/
+//todo: hdl_entry
+WHdlBoard *hdl_board = nullptr;
+/**/
+
 // Добавить обработчик. --------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::addHandler(QString type, QString path, QColor color, QString text) {
     WHandler *handler = new WHandler(type, path, color, text, this);
-
     connect(handler, &WHandler::remove, this, &FMain::remove_handler);
     hdl.push_back(handler);
-
     ui->lyHdl->addWidget(handler);
+
+    //todo: hdl_entry
+    if(hdl_board == nullptr) { hdl_board = new WHdlBoard(); }
+    WHdlEntry *entry = new WHdlEntry(type, path, color, text, this);
+    connect(entry, &WHdlEntry::remove, this, &FMain::remove_handler_entry);
+    hdl_entry.push_back(entry);
+
+    static int cnt = 0;
+    hdl_board->post(entry)->test(STR(cnt++));
+
+    hdl_board->show();
+
 }// addHandler
 
 // Очистить список обработчиков. -----------------------------------------------
@@ -207,6 +232,10 @@ void FMain::on_aClearHdl_triggered() { clearHdl(); }
 void FMain::clearHdl(void) {
     for(WHandler *handler : hdl){ delete handler;  }
     hdl.clear();
+
+    //todo: hdl_entry
+    if(hdl_board) { hdl_board->clear(); }
+    hdl_entry.clear();
 }// clearHdl
 
 // Поверх всех окон. -----------------------------------------------------------

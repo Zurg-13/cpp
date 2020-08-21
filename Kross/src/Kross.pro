@@ -16,7 +16,7 @@ LIB = ../../_lib
 INCLUDEPATH += ../../
 DEPENDPATH  += ../../
 
-include($$SRV/Srv.pri)
+include($$SRV/Srv/Srv.pri)
 include($$WGT/Log/WLog.pri)
 
 HEADERS += \

@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "_srv/std.h"
+#include "std.h"
 
 #include "WLine.h"
 #include "WChain.h"

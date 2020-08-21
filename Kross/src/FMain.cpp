@@ -5,8 +5,8 @@
 
 #include <qmath.h>
 
-#include "_srv/std.h"
-#include "_srv/tme.h"
+#include "std.h"
+#include "tme.h"
 
 #include "ui_FMain.h"
 #include "FMain.h"

@@ -19,6 +19,7 @@ INCLUDEPATH += ../../
 DEPENDPATH  += ../../
 
 HEADERS += \
+    WHdlEntry.h \
     env.h           \
     FMain.h         \
     WHandler.h      \
@@ -26,6 +27,7 @@ HEADERS += \
     WLogEntry.h     \
     WLogBoard.h     \
     WHdlBoard.h     \
+    WHdlEntry.h     \
 
 SOURCES += \
     main.cpp        \
@@ -35,14 +37,16 @@ SOURCES += \
     WLogEntry.cpp   \
     WLogBoard.cpp   \
     WHdlBoard.cpp   \
+    WHdlEntry.cpp   \
 
 FORMS += \
     FMain.ui        \
     WHandler.ui     \
     DHeader.ui      \
-    WLogEntry.ui    \
+    WHdlEntry.ui    \
     WLogBoard.ui    \
     WHdlBoard.ui    \
+    WLogEntry.ui    \
 
 RESOURCES += \
     res.qrc
