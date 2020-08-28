@@ -55,5 +55,15 @@ QPair<F, S> PR(F fst, S scd) { return QPair<F, S>(fst,scd ); }
 template <typename T>
 void DEL(QList<T> lst) { for(T val : lst) { delete val; }}
 
+// Интерпретировать список пар как словарь. ------------------------------------
+//------------------------------------------------------------------------------
+template <typename K, typename V>
+QMap<K, V> MAP(const QList<QPair<K, V>> &lst) {
+    QMap<K, V> map;
+    for(const QPair<K, V> pair: lst) { map[pair.first] = pair.second; }
+    return map;
+}// MAP
+
+
 //------------------------------------------------------------------------------
 #endif // LST_H
