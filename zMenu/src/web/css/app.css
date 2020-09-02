@@ -1,0 +1,69 @@
+ body {
+     background-color: #fafafa;
+     margin-top: 90px;
+ }
+
+  .card-item {
+     border: 1px solid #eeeeee;
+     padding: 0px;
+     background: #ffffff;
+     margin: 5px;
+  }
+
+  .card-item .card-content {
+      margin: 7px;
+  }
+
+  .card-item .card-content table {
+      width: 100%;
+  }
+
+  .disabled {
+     background: #d6d6d6;
+     color: #eeeeee;
+  }
+
+  .change-button-cell {
+      width: 25%;
+      padding: 10px;
+      vertical-align: middle;
+      text-align: center;
+  }
+
+  textarea.description {
+      resize: vertical;
+  }
+
+  .change-button-cell button {
+      font-size: 100%;
+  }
+
+  .control-panel {
+      margin-top :  0px ;
+      padding :  10px ;
+      position :  fixed ;
+      top :  0px ;
+      left :  0px ;
+      background :  #ffffff ;
+      height :  80px ;
+      width :  100% ;
+      border-bottom :  1px   solid   #eeeeee ;
+  }
+
+  .name {
+      font-weight: bold;
+      margin-bottom: 10px;
+  }
+
+  .description {
+
+  }
+
+  .price {
+      font-size: 140%;
+      text-align: right;
+  }
+
+  .sum {
+      font-size: 200%;
+  }

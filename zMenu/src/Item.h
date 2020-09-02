@@ -14,8 +14,11 @@ class Item : public QWidget {
     static int count;
 
  public:
-    explicit Item(QWidget *prnt = nullptr);
             ~Item();
+    explicit Item(QWidget *prnt = nullptr);
+             Item(
+                const QString &nme, const QString &nte, int prc
+              , QWidget *prnt = nullptr );
 
     void    set(const QString &xml);
     void    set(const QMap<QString, QString> &prm);
@@ -24,7 +27,7 @@ class Item : public QWidget {
     static QString ELM(const QString &nme, const QString &val);
 
 private slots:
-    void on_btSel_clicked();
+    void on_btSlct_clicked();
 
 private:
     Ui::Item *ui;

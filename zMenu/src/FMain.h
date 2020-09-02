@@ -26,7 +26,10 @@ private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
     QHttpServer srv;
+    QString path;
 
+    void SET_SQL(void);
+    void SET_PRM(const QStringList &args);
     QHttpServerResponse proc(const QString&, const QHttpServerRequest&);
 };
 

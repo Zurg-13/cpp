@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>372</width>
+    <width>424</width>
     <height>98</height>
    </rect>
   </property>
@@ -21,9 +21,9 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
    <item>
-    <layout class="QVBoxLayout" name="lySel" stretch="1,0">
+    <layout class="QVBoxLayout" name="lySlct" stretch="1,0">
      <item>
-      <widget class="QPushButton" name="btSel">
+      <widget class="QPushButton" name="btSlct">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -53,7 +53,7 @@
         <string notr="true">background-color:  white;</string>
        </property>
        <property name="text">
-        <string>+</string>
+        <string>-</string>
        </property>
       </widget>
      </item>
@@ -72,7 +72,7 @@
         </size>
        </property>
        <property name="text">
-        <string>выбрать</string>
+        <string>видно</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -82,9 +82,9 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="lyNote" stretch="1,0">
+    <layout class="QVBoxLayout" name="lyNote" stretch="0,0">
      <item>
-      <widget class="QLabel" name="lbNote">
+      <widget class="QLineEdit" name="edName">
        <property name="minimumSize">
         <size>
          <width>192</width>
@@ -102,16 +102,16 @@
          <pointsize>22</pointsize>
         </font>
        </property>
-       <property name="text">
+       <property name="placeholderText">
         <string>Название</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="lbNoteNote">
+      <widget class="QLineEdit" name="edNote">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>192</width>
          <height>24</height>
         </size>
        </property>
@@ -121,8 +121,8 @@
          <height>24</height>
         </size>
        </property>
-       <property name="text">
-        <string>подробное описание</string>
+       <property name="placeholderText">
+        <string>Подробное описание</string>
        </property>
       </widget>
      </item>
@@ -131,7 +131,7 @@
    <item>
     <layout class="QVBoxLayout" name="lyPrice">
      <item>
-      <widget class="QLabel" name="lbPrice">
+      <widget class="QLineEdit" name="edPrice">
        <property name="minimumSize">
         <size>
          <width>96</width>
@@ -152,8 +152,8 @@
        <property name="text">
         <string>999.99</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
+       <property name="placeholderText">
+        <string>Название</string>
        </property>
       </widget>
      </item>

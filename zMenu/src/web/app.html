@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru" ng-app="app"><head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  
+    <link type="text/css" rel="stylesheet" href="css/lib/bootstrap.css"/>
+    <link type="text/css" rel="stylesheet" href="css/app.css"/>
+    <script src="js/lib/angular.min.js"></script>
+    <script src="js/lib/angular-resource.min.js"></script>
+    <script src="js/app.js"></script>
+    
+<!--    
+    <link type="text/css" rel="stylesheet" href="./css/app.css">
+    <script src="js/lib/angular.min.js"></script>
+    <script src="js/lib/angular-resource.min.js"></script>
+    <script src="js/app.js"></script>
+-->    
+    
+    <title>Меню</title>
+ </head>
+
+<body ng-controller="pageController as ctrl" ng-cloak>
+    <div class="container">
+        <div class="row">
+            <div class="card-item" ng-repeat="item in ctrl.list" ng-class="{'disabled': item.act == 0}">
+                <div class="card-content">
+                    <div class="col-xs-3 col-sm-2">
+                        <button class="btn" ng-click="item.toggle()"
+                        ng-if="item.act == 1"
+                        ng-class="{'btn-danger': item.sel == 1, 'btn-success': item.sel == 0}">{{ item.sel == 1 ? 'Убрать' : 'Добавить' }}</button>
+                    </div>
+                    <div class="col-xs-9 col-sm-10">
+                        <div class="name" ng-bind="item.nme"></div>
+                        <div class="description" ng-bind="item.nte"></div>
+                        <div class="price" ng-bind="item.prc"></div>
+                    </div>
+                    <div class="clearfix"></div>
+
+                </div>
+            </div>
+            <div class="control-panel">
+                 <div class="col-xs-8 col-sm-9 sum">Сумма: <span> {{ctrl.sum | number : 2}} </span>  Руб.</div>
+                 <div class="col-xs-4 col-sm-3 clear-btn price">
+                     <button class = "btn btn-primary" ng-click="ctrl.clear()">Очистить</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+</body> </html>

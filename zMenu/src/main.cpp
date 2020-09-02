@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 unsigned int E::port = E::PORT;
 QMimeDatabase* E::mime;
+QSqlDatabase* E::sldb;
 
 WBrd* E::Log;
 FMain* E::Main;
@@ -21,6 +22,8 @@ int Item::count = 0;
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QMimeDatabase mime; E::mime = &mime;
+    QSqlDatabase sldb = QSqlDatabase::addDatabase("QSQLITE"); E::sldb = &sldb;
+        sldb.setDatabaseName("db_name.sqlite");
 
     // Установить кодек текста.
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
