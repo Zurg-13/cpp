@@ -80,8 +80,8 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     E::port = E::PORT; ui->edPort->setText(QString::number(E::port));
 
     this->tcp = new QTcpServer(this);
-    srv.bind(this->tcp);
-    srv.route("/<arg>",
+    this->srv.bind(this->tcp);
+    this->srv.route("/<arg>",
     [this](
         const QUrl &url,
         const QHttpServerRequest &req, QHttpServerResponder &&rpdr )
@@ -216,6 +216,7 @@ void FMain::addHandler(QString type, QString path, QColor color, QString text) {
     //todo: hdl_entry
     if(hdl_board == nullptr) { hdl_board = new WHdlBoard(); }
     WHdlEntry *entry = new WHdlEntry(type, path, color, text, this);
+
     connect(entry, &WHdlEntry::remove, this, &FMain::remove_handler_entry);
     hdl_entry.push_back(entry);
 

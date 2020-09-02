@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>507</width>
-    <height>589</height>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
    <item>
     <widget class="QScrollArea" name="sa">
      <property name="sizePolicy">
@@ -25,8 +25,11 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>400</height>
+       <height>100</height>
       </size>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
      </property>
      <property name="widgetResizable">
       <bool>true</bool>
@@ -37,7 +40,7 @@
         <x>0</x>
         <y>0</y>
         <width>487</width>
-        <height>398</height>
+        <height>691</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -48,9 +51,6 @@
       </property>
      </widget>
     </widget>
-   </item>
-   <item>
-    <widget class="QListWidget" name="listWidget"/>
    </item>
   </layout>
  </widget>

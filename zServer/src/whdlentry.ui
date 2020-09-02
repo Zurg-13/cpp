@@ -6,13 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>416</width>
-    <height>176</height>
+    <width>256</width>
+    <height>64</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>0</width>
+    <width>256</width>
+    <height>64</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>256</width>
     <height>64</height>
    </size>
   </property>
@@ -125,7 +137,14 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="QTextEdit" name="teAnswer"/>
+      <widget class="QTextEdit" name="teAnswer">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

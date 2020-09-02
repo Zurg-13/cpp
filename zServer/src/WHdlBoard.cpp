@@ -1,10 +1,9 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <functional>
 
 #include <QScrollArea>
 #include <QVBoxLayout>
-
-#include "dbg.h"
 
 #include "WHdlBoard.h"
 #include "ui_WHdlBoard.h"
@@ -12,6 +11,10 @@
 
 /* WHdlBoard. *****************************************************************/
 /******************************************************************************/
+
+// Вернуть зону скроллинга. ----------------------------------------------------
+//------------------------------------------------------------------------------
+QScrollArea* WHdlBoard::scrl(void) { return ui->sa; }
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -22,24 +25,32 @@ WHdlBoard::WHdlBoard(QWidget *parent) : QWidget(parent), ui(new Ui::WHdlBoard) {
     ui->setupUi(this);
 
     // Скроллинг.
-    QWidget *wgt = new QLabel();
-        wgt->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
-//        wgt->setMaximumHeight(5);
-        wgt->setStyleSheet("border: 4px solid red;");
+    ui->sa->adjustSize();
 
     this->box = new QSplitter(this);
+        this->box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         this->box->setOrientation(Qt::Vertical);
-//        this->box->setStretchFactor();
         this->box->setChildrenCollapsible(false);
-        this->box->setHandleWidth(3);
+        this->box->setHandleWidth(5);
         this->box->setOpaqueResize(true);
-//        this->box->addWidget(wgt);
+//        this->box->addWidget(spr);
+//        this->box->setStretchFactor(0, 1);
 
-    QVBoxLayout *ly = new QVBoxLayout(this->box);
-        ly->setContentsMargins(0, 0, 0, 0);
-        ly->setSpacing(2);
+
+    Spacer *spr = new Spacer(this);
+
+        this->box->addWidget(spr);
+        this->box->setStretchFactor(0, 1);
+
+/*
+    QWidget *wgt = new QWidget;
+    QVBoxLayout *lyt = new QVBoxLayout(wgt);
+        lyt->setContentsMargins(0, 0, 0, 0);
+        lyt->setSpacing(2);
+        lyt->addWidget(this->box);
+*/
+
     ui->sa->setWidget(this->box);
-
 }// WHdlBoard
 
 // Деструктор. -----------------------------------------------------------------
@@ -50,10 +61,15 @@ WHdlBoard::~WHdlBoard() {
 
 // Добавить запись. ------------------------------------------------------------
 //------------------------------------------------------------------------------
-WHdlEntry* WHdlBoard::post(WHdlEntry *entry)
-    { this->box->insertWidget(0, entry); return entry; }
-//    { this->box->insertWidget(this->box->count()-1, entry); return entry; }
-//    { this->ui->listWidget->addItem(QListWidgetItem()) }
+#include <QTableWidgetItem>
+#include <QListWidget>
+#include <QScrollArea>
+WHdlEntry* WHdlBoard::post(WHdlEntry *entry) {
+    entry->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    this->box->insertWidget(0, entry); return entry;
+
+}// post
 
 // Очистить. -------------------------------------------------------------------
 //------------------------------------------------------------------------------

@@ -58,7 +58,7 @@ class FMain : public QMainWindow {
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);
 
-    QHttpServerResponse proc(const QString &path, const QHttpServerRequest &req);
+    QHttpServerResponse proc(const QString&, const QHttpServerRequest&);
 
 };// FMain
 
