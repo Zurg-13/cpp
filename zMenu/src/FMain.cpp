@@ -21,9 +21,9 @@
 
 // Макросы. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
-#define ERR(m) E::err("MAIN " % STR(SYSDATE) % ": " % m)
-#define IMP(m) E::imp("MAIN " % STR(SYSDATE) % ": " % m)
-#define OTH(m) E::oth("MAIN " % STR(SYSDATE) % ": " % m)
+#define ERR(m) E::err(STR("MAIN: ") % m)
+#define IMP(m) E::imp(STR("MAIN: ") % m)
+#define OTH(m) E::oth(STR("MAIN: ") % m)
 
 // Дополнительные функции. ****************************************************/
 /******************************************************************************/
@@ -53,6 +53,7 @@ QHttpServerResponse FMain::proc(
 
     // Вернуть список элементов.
     } else if(path == "list") {
+/*
         QStringList itm;
         for(int i=0; i< ui->lwMenu->count(); i++) {
             itm.append(
@@ -63,6 +64,7 @@ QHttpServerResponse FMain::proc(
         QHttpServerResponse rsp(QString("[" % BLD(itm) % "]").toUtf8());
             rsp.addHeader("Content-Type", "application/json; charset=utf-8");
         return rsp;
+*/
 
     // Задать состояние элемента.
     } else if(path == "item") {
@@ -73,47 +75,108 @@ QHttpServerResponse FMain::proc(
     return QHttpServerResponse(DFT.arg(cnt));
 }// proc
 
+// Связывание обработчиков. ----------------------------------------------------
+//------------------------------------------------------------------------------
+typedef QHttpServerRequest QHttpReq;
+typedef QHttpServerResponse QHttpRsp;
+void FMain::ROUTING(void) {
+
+    // Файлы.
+    this->srv.route("/file/<arg>", [this](const QUrl &url) {
+        OTH("file: " % url.path());
+        return QHttpRsp::fromFile(FSN(this->path, url.path()));
+    });
+
+    // Конфиг.
+    this->srv.route("/conf/<arg>", [this](const QUrl &url) {
+        OTH("conf: " % url.path());
+        return QJsonObject {{
+            { "wsport", this->wss->serverPort() }
+          , { "wsaddr", this->wss->serverAddress().asSTR }
+        }};
+    });
+
+}// ROUTING
+
+// Получено текстовое сообщение. -----------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_ws_txt_msg(QString msg) {
+    FNC << "txt:" << msg;
+
+    QWebSocket *socket = qobject_cast<QWebSocket*>(sender());
+    QJsonObject json = QJsonValue(msg).toObject();
+
+
+}// on_ws_txt_msg
+
+// Получено двоичное сообщение. ------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_ws_bin_msg(QByteArray msg) {
+    FNC << "bin:" << msg;
+}// on_ws_bin_msg
+
+// Ws: потеря соединения. ------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_ws_disconnect() {
+    FNC << "bgn";
+
+    QWebSocket *socket = qobject_cast<QWebSocket*>(sender());
+    if(socket) { socket->deleteLater(); }
+}// on_ws_disconnect
+
+// Ws: новое подключение. ------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_ws_connect() {
+    QWebSocket *socket = this->wss->nextPendingConnection();
+
+    connect(
+        socket, &QWebSocket::textMessageReceived
+      , this, &FMain::on_ws_txt_msg );
+    connect(
+        socket, &QWebSocket::binaryMessageReceived
+      , this, &FMain::on_ws_bin_msg );
+    connect(
+        socket, &QWebSocket::disconnected
+      , this, &FMain::on_ws_disconnect );
+
+}// on_ws_connect
+
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 FMain::~FMain() {
+    delete wss;
     delete ui;
 }//~FMain
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
-FMain::FMain(QWidget *prnt) : QMainWindow(prnt), ui(new Ui::FMain) {
+#include <QStringLiteral>
+FMain::FMain(QWidget *prnt)
+:   QMainWindow(prnt), ui(new Ui::FMain)
+  , wss(new QWebSocketServer("Menu wss", QWebSocketServer::NonSecureMode, this))
+
+{
 
     // Внешний вид.
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/ico.ico"));
+    QTimer::singleShot(0, [this] { E::Log->place(this); E::Log->show(); });
 
     // Инициализация.
     SET_PRM(QCoreApplication::arguments());
     SET_SQL();
+
+    // Сервер.
     QNetworkProxyFactory::setUseSystemConfiguration(false);
-
-    // Связывание обработчиков.
     this->tcp = new QTcpServer(this);
-    this->srv.bind(this->tcp);
+    this->srv.bind(this->tcp); ROUTING();
+    connect(
+        this->wss, &QWebSocketServer::newConnection
+      , this, &FMain::on_ws_connect );
 
-    this->srv.route("/file/<arg>", [this](const QUrl &url) {
-        return QHttpServerResponse::fromFile(FSN(this->path, url.path())); });
-
-    this->srv.route("/<arg>",
-    [this](
-        const QUrl &url,
-        const QHttpServerRequest &req, QHttpServerResponder &&rpdr )
-    {
-        QTimer::singleShot(
-            0, [this, rpdr = std::move(rpdr), path = url.path(), &req = req]()
-        mutable {
-            QHttpServerResponse rsp = this->proc(path, req);
-            if(rpdr.socket() && rpdr.socket()->isValid())
-                { rsp.write(std::move(rpdr)); }
-        });// singleShot
-    });
 
     // Пункты меню.
+/*
     auto LW_ADD = [this](QWidget *wgt){
         QListWidgetItem *item = new QListWidgetItem;
         item->setSizeHint(wgt->sizeHint());
@@ -131,6 +194,7 @@ FMain::FMain(QWidget *prnt) : QMainWindow(prnt), ui(new Ui::FMain) {
     LW_ADD(new Item("Восемь", "Восемь: подробное описание", 125));
     LW_ADD(new Item("Девять", "Девять: подробное описание", 140));
     LW_ADD(new Item("Десять", "Десять: подробное описание", 155));
+*/
 
 }// FMain
 
@@ -149,7 +213,8 @@ void FMain::SET_PRM(const QStringList &args) {
     prsr.addHelpOption();
     prsr.addOptions({
         {{"q", "quit"}, tr("Завершить приложение."), "quit" }
-      , {{"p", "path"}, tr("Задать путь к файловому хранилищу."), "path" }
+      , {{"f", "file"}, tr("Задать путь к файловому хранилищу."), "file" }
+      , {{"l", "sqlt"}, tr("Задать путь к файловому хранилищу."), "file" }
     });
     prsr.process(args);
 
@@ -165,29 +230,45 @@ void FMain::SET_PRM(const QStringList &args) {
 // Активация БД. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::SET_SQL(void) {
-    FNC << R"(/ bgn)";
-
     if(NOT(E::sldb->open())) { ERR(E::sldb->lastError().text()); }
 
-/**/
-    QString item(
+    static const QString ALREDY_EXIST("2");
+    static const QSqlError::ErrorType
+        OK(QSqlError::NoError), STMT(QSqlError::StatementError);
+
+    QStringList tbl {
         "CREATE TABLE item ("
         "  id   INTEGER PRIMARY KEY NOT NULL"
-        ", name VARCHAR(255)"
-        ", desc VARCHAR(255)"
-        ", cost INTEGER )" );
+        ", name VARCHAR(255)        NOT NULL"
+        ", note VARCHAR(255)        NOT NULL"
+        ", cost INTEGER             NOT NULL"
+        ", room INTEGER             NOT NULL"
+        ", type INTEGER             NOT NULL )"
 
-    QSqlQuery query = E::sldb->exec(item);
-    FNC << "| err:" << query.lastError().text() // таблица уже существует
-        << ", cde:" << query.lastError().type() // 2
-        << ", ntv:" << query.lastError().nativeErrorCode(); // 1
+      , "CREATE TABLE type ("
+        "  id   INTEGER PRIMARY KEY NOT NULL"
+        ", name VARCHAR(255)        NOT NULL"
+        ", note VARCHAR(255)        NOT NULL )"
 
-/**/
+      , "CREATE TABLE room ("
+        "  id   INTEGER PRIMARY KEY NOT NULL"
+        ", name VARCHAR(255)        NOT NULL"
+        ", note VARCHAR(255)        NOT NULL )"
+    };
 
-    FNC << R"(\ end)";
+    for(const QString &query: tbl) {
+        QSqlError error = E::sldb->exec(query).lastError();
+        QSqlError::ErrorType etype = error.type();
+
+        if(etype != OK
+        &&(etype != STMT || error.nativeErrorCode() != ALREDY_EXIST) )
+            { ERR(error.text()); }
+    }// query
+
 }// SET_SQL
 
-// Проба. ----------------------------------------------------------------------
+/*
+// Страница. -------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QDesktopServices>
 void FMain::on_btTest_clicked() {
@@ -204,33 +285,71 @@ void FMain::on_btTest_clicked() {
         }//if(addr.protocol() == QAbstractSocket::IPv4Protocol && addr != local)
     }// addr
 }// on_btTest_clicked
+*/
 
-// Пуск / Стоп. ----------------------------------------------------------------
+// Http: Пуск / Стоп. ----------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_btRun_clicked() {
+void FMain::on_btRunHttp_clicked() {
     auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
         ui->btRun->setText(ttl); ui->btRun->setStyleSheet(sht); };
 
-    if(tcp->isListening()) {
-        tcp->close();
+    if(this->tcp->isListening()) {
+        this->tcp->close();
         for(QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>())
             { socket->disconnectFromHost(); }
-
-        E::Log->post(tr("Прослушивание остановлено"))->clr(Qt::lightGray);
-        SET_BTN("Пуск", "color: limegreen;");
+        E::Log->post("Http: Прослушивание остановлено")->clr(Qt::lightGray);
+        SET_BTN("Http: Пуск", "color: limegreen;");
 
     } else {
-        if(tcp->listen(QHostAddress::Any, E::port)) {
+        if(this->tcp->listen(QHostAddress::Any, E::port)) {
             E::Log->rift();
-            E::Log->post(tr("Прослушивание запущено"))->clr(Qt::lightGray);
-            SET_BTN("Стоп", "color: crimson;");
+            E::Log->post("Http: Прослушивание запущено")->clr(Qt::lightGray);
+            SET_BTN("Http: Стоп", "color: crimson;");
         } else {
-            E::Log->post(tr("Ошибка прослушивателя: ") + tcp->errorString())
+            E::Log->post("Http: Ошибка прослушивателя: " + tcp->errorString())
                 ->clr(Qt::red);
         }// else // if(tcp->listen(QHostAddress::Any, port))
     }// else // if(tcp->isListening())
 
-}// on_btRun_clicked
+}// on_btRunHttp_clicked
+
+// Ws: Пуск / Стоп. ------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btRunWs_clicked() {
+    auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
+        ui->btRun->setText(ttl); ui->btRun->setStyleSheet(sht); };
+
+    if(this->wss->isListening()) {
+        this->wss->close();
+        for(QWebSocket *socket: this->wss->findChildren<QWebSocket*>())
+            { socket->disconnect(); }
+
+        E::Log->post("Ws: Прослушивание остановлено")->clr(Qt::lightGray);
+        SET_BTN("Ws: Пуск", "color: limegreen;");
+
+    } else {
+        if(this->wss->listen(QHostAddress::Any)) {
+            E::Log->rift();
+            E::Log->post("Ws: Прослушивание запущено")->clr(Qt::lightGray);
+            SET_BTN("Ws: Стоп", "color: crimson;");
+        } else {
+            E::Log->post("Ws: Ошибка прослушивателя: " + tcp->errorString())
+                ->clr(Qt::red);
+        }// else // if(tcp->listen(QHostAddress::Any, port))
+    }// else // if(tcp->isListening())
+}// on_btRunWs_clicked
+
+// Файл -> Выход. --------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include <QMessageBox>
+void FMain::on_aExit_triggered() {
+    if(QMessageBox::Yes == QMessageBox::question(
+        this, "Подтверждение.", "Действительно выйти ?"
+      , QMessageBox::Yes | QMessageBox::No )) { QApplication::quit(); }
+}// on_aExit_triggered
+
+// Отладка -> Лог. -------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aLog_triggered() { E::Log->place(this); E::Log->show(); }
 
 //------------------------------------------------------------------------------
-

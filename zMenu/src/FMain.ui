@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>903</width>
-    <height>702</height>
+    <width>591</width>
+    <height>90</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Меню</string>
   </property>
   <widget class="QWidget" name="cw">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>2</number>
     </property>
@@ -31,57 +31,7 @@
      <number>2</number>
     </property>
     <item>
-     <widget class="QSplitter" name="spl">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget_2">
-       <layout class="QVBoxLayout" name="lyLft">
-        <property name="spacing">
-         <number>2</number>
-        </property>
-        <item>
-         <widget class="QTableWidget" name="twItem">
-          <property name="minimumSize">
-           <size>
-            <width>192</width>
-            <height>100</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="verticalLayoutWidget">
-       <layout class="QVBoxLayout" name="lyRgt">
-        <property name="spacing">
-         <number>2</number>
-        </property>
-        <item>
-         <widget class="QListWidget" name="lwMenu">
-          <property name="minimumSize">
-           <size>
-            <width>192</width>
-            <height>100</height>
-           </size>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
-          <property name="resizeMode">
-           <enum>QListView::Adjust</enum>
-          </property>
-          <property name="uniformItemSizes">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="lyBtm">
+     <layout class="QHBoxLayout" name="lyTop">
       <property name="spacing">
        <number>2</number>
       </property>
@@ -99,7 +49,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btRun">
+       <widget class="QPushButton" name="btRunHttp">
         <property name="minimumSize">
          <size>
           <width>96</width>
@@ -123,12 +73,12 @@
          <string notr="true">color: limegreen;</string>
         </property>
         <property name="text">
-         <string>Пуск</string>
+         <string>Http: Пуск</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btTest">
+       <widget class="QPushButton" name="btRunWs">
         <property name="minimumSize">
          <size>
           <width>96</width>
@@ -148,8 +98,96 @@
           <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">color: limegreen;</string>
+        </property>
         <property name="text">
-         <string>Проба</string>
+         <string>Ws: Пуск</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="lyBtm">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btMenu">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Меню</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btOrd">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Приём</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btCtrl">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Контроль</string>
         </property>
        </widget>
       </item>
@@ -157,6 +195,52 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="mm">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>591</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mFile">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="aExit"/>
+   </widget>
+   <widget class="QMenu" name="mDebug">
+    <property name="title">
+     <string>Отладка</string>
+    </property>
+    <addaction name="aTest"/>
+    <addaction name="aLog"/>
+   </widget>
+   <widget class="QMenu" name="mHelp">
+    <property name="title">
+     <string>Справка</string>
+    </property>
+   </widget>
+   <addaction name="mFile"/>
+   <addaction name="mHelp"/>
+   <addaction name="mDebug"/>
+  </widget>
+  <action name="aExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="aTest">
+   <property name="text">
+    <string>Проба</string>
+   </property>
+  </action>
+  <action name="aLog">
+   <property name="text">
+    <string>Лог</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

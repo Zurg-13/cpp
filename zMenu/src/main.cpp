@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     translator->load(QString(":/tr/qtbase_ru.qm"));
     app.installTranslator(translator);
 
-    WBrd wgLog; E::Log = &wgLog; E::Log->show();
+    WBrd wgLog; E::Log = &wgLog;
     FMain fmMain; E::Main = &fmMain; E::Main->show();
 
     return app.exec();

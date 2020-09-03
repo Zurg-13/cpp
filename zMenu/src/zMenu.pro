@@ -8,7 +8,7 @@ SRV = ../../_srv
 UNT = ../../_unt
 REP = ../../_rep
 
-QT += core gui widgets network concurrent httpserver sql
+QT += core gui widgets network concurrent httpserver sql websockets
 CONFIG += c++14
 
 TARGET = zMenu
