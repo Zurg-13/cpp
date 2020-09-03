@@ -106,6 +106,37 @@ void WBrd::ctx_menu(const QPoint &pos) {
     delete menu;
 }// ctx_menu
 
+// Разместить с привязкой. -----------------------------------------------------
+//------------------------------------------------------------------------------
+void WBrd::place(const QWidget *wgt, Place plc) {
+    QRect loc = this->frameGeometry();
+    QRect ext = wgt->frameGeometry();
+
+    switch(plc) {
+     case Place::top:
+        this->move(ext.x(), ext.y()-loc.height());
+        this->resize(wgt->width(), this->height()); break;
+
+     case Place::btm:
+        this->move(ext.x(), ext.y()+ext.height());
+        this->resize(wgt->width(), this->height()); break;
+
+     case Place::lft:
+        this->move(ext.x()-loc.width(), ext.y());
+        this->resize(this->width(), wgt->height()); break;
+
+     case Place::rgt:
+        this->move(ext.x()+ext.width(), ext.y());
+        this->resize(this->width(), wgt->height()); break;
+
+     case Place::ovr:
+        this->move(ext.topLeft());
+        this->resize(wgt->size()); break;
+
+    }// switch(pos)
+
+}// place
+
 // Очистить лог. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 void WBrd::on_aClear_triggered() { clear(); }

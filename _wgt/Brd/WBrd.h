@@ -13,6 +13,8 @@ class WBrd : public QWidget {
     Q_OBJECT
 
  public:
+    enum class Place { top, btm, lft, rgt, ovr };
+
     explicit WBrd(QWidget *parent = nullptr);
             ~WBrd();
 
@@ -22,7 +24,9 @@ class WBrd : public QWidget {
 
     WRec* grab(void);
     WRec* free(WRec *rec);
+
     void  clear(void);
+    void  place(const QWidget *wgt, Place plc = Place::btm);
 
  private slots:
     void ctx_menu(const QPoint &pos);

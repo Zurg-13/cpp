@@ -18,8 +18,6 @@ WRec::WRec(const QString &msg, const QString &adv, QWidget *prn)
     ui->setupUi(this);
     ui->teAdv->setVisible(false);
     this->msg(msg); this->adv(adv); this->tme(SYSDATE);
-
-    FNC << "msg:" << msg << ", adv:" << adv;
 }// WRec
 
 // Деструктор. -----------------------------------------------------------------
