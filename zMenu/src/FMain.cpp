@@ -291,7 +291,7 @@ void FMain::on_btTest_clicked() {
 //------------------------------------------------------------------------------
 void FMain::on_btRunHttp_clicked() {
     auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
-        ui->btRun->setText(ttl); ui->btRun->setStyleSheet(sht); };
+        ui->btRunHttp->setText(ttl); ui->btRunHttp->setStyleSheet(sht); };
 
     if(this->tcp->isListening()) {
         this->tcp->close();
@@ -317,7 +317,7 @@ void FMain::on_btRunHttp_clicked() {
 //------------------------------------------------------------------------------
 void FMain::on_btRunWs_clicked() {
     auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
-        ui->btRun->setText(ttl); ui->btRun->setStyleSheet(sht); };
+        ui->btRunWs->setText(ttl); ui->btRunWs->setStyleSheet(sht); };
 
     if(this->wss->isListening()) {
         this->wss->close();
