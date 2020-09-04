@@ -40,11 +40,8 @@
 bool ExecSQL(QSqlQuery &q);
 bool ExecSQL(QSqlQuery *q);
 
-/* Классы. ********************************************************************/
+/* Расширение QSqlQuery. ******************************************************/
 /******************************************************************************/
-
-// Расширение QSqlQuery. -------------------------------------------------------
-//------------------------------------------------------------------------------
 class ZSqlQuery : public QSqlQuery {
 
  public:
@@ -56,14 +53,15 @@ class ZSqlQuery : public QSqlQuery {
                , PREPARE prep = PREPARE::YES );
              ZSqlQuery(void) {}
 
-    void        setSQL  (const QString &sql) { this->sql = sql; un_prep(); }
-    QString     getSQL  (void) { return this->sql; }
-    bool        upd     (void);
-    bool        upd_fst (void){ bool ret = upd(); first(); return ret; }
-    bool        prepare (void);
-    void        un_prep (void){ fl_prp = false; }
-    void        prefirst(void){ seek(-1); } // В положение ПЕРЕД первой записью.
-    bool        is_prep (void){ return fl_prp; }
+    bool upd    (void);
+    bool prepare(void);
+    void setSQL (const QString &sql) { this->sql = sql; un_prep(); }
+    bool upd_fst(void) { bool ret = upd(); first(); return ret; }
+    void pre_fst(void) { seek(-1); } // В положение ПЕРЕД первой записью.
+    void un_prep(void) { fl_prp = false; }
+    bool is_prep(void) { return fl_prp; }
+
+    const QString& getSQL (void) { return this->sql; }
 
     QVariant    curVal  (const QString &fld); // Считать текущее значение.
     QVariant operator [](const QString &fld){ return curVal(fld); }
@@ -77,8 +75,8 @@ class ZSqlQuery : public QSqlQuery {
 
 };// ZSqlQuery
 
-// Расширение QTableView. ------------------------------------------------------
-//------------------------------------------------------------------------------
+/* Расширение QTableView. *****************************************************/
+/******************************************************************************/
 class ZTableView : public QTableView {
 
  public:

@@ -1,0 +1,42 @@
+<mat-card class="example-card">
+    <mat-card-header>
+        <mat-card-title>{{ item.name }}</mat-card-title>
+        <mat-card-subtitle>{{ item.note }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="row">
+            <mat-form-field class="col-sm">
+                <mat-label>Наименование</mat-label>
+                <input matInput placeholder="Введите наименование" [(ngModel)]="item.name" [name]="'name_' + item.id">
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field class="col-sm">
+                <mat-label>Описание</mat-label>
+                <textarea matInput placeholder="Введите описание" [(ngModel)]="item.note" [name]="'note_' + item.id"></textarea>
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field class="col-sm-4">
+                <mat-label>Стоимость</mat-label>
+                <input matInput placeholder="Введите стоимость" [(ngModel)]="item.cost" [name]="'name_' + item.cost">
+            </mat-form-field>
+        </div>
+        <button mat-stroked-button color="primary" 
+                class="attribute-button"
+                (click)="openAttributeEditor('Type')">Type</button>
+        <button mat-stroked-button color="primary" 
+                class="attribute-button"
+                (click)="openAttributeEditor('Room')">Room</button>
+
+        <app-attribute-editor *ngIf="attributeEditorShow" 
+                [(attributeEditorShow)]="attributeEditorShow" 
+                [attributeType]="attributeType"></app-attribute-editor>
+    </mat-card-content>
+    <mat-card-actions>
+    <button mat-button>Сохранить</button>
+    <button mat-button>Добавить</button>
+    <button mat-button>Удалить</button>
+    <button mat-button>Деактивировать</button>
+    </mat-card-actions>
+</mat-card>

@@ -3,6 +3,7 @@
 #include <QTranslator>
 
 #include "env.h" // Глобальная среда приложения.
+#include "ver.h"
 
 #include "Item.h"
 
@@ -21,6 +22,10 @@ int Item::count = 0;
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    QApplication::setApplicationName("z-menu");
+    QApplication::setApplicationVersion(
+        MAJOR_STR "." MINOR_STR "." REVISION_STR );
+
     QMimeDatabase mime; E::mime = &mime;
     QSqlDatabase sldb = QSqlDatabase::addDatabase("QSQLITE"); E::sldb = &sldb;
         sldb.setDatabaseName("db_name.sqlite");

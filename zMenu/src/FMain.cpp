@@ -81,6 +81,17 @@ typedef QHttpServerRequest QHttpReq;
 typedef QHttpServerResponse QHttpRsp;
 void FMain::ROUTING(void) {
 
+    auto RSP = [](const QJsonObject &json) -> QHttpRsp {
+        QHttpRsp rsp(json);
+            rsp.addHeader("Access-Control-Allow-Origin", "*");
+            rsp.addHeader("Access-Control-Allow-Method", "GET");
+        return rsp;
+    };// RSP
+
+//    static const QByteArray header =
+//        "Access-Control-Allow-Origin: *\n"
+//        "Access-Control-Allow-Method: GET\n";
+
     // Файлы.
     this->srv.route("/file/<arg>", [this](const QUrl &url) {
         OTH("file: " % url.path());
@@ -88,45 +99,88 @@ void FMain::ROUTING(void) {
     });
 
     // Конфиг.
-    this->srv.route("/conf/<arg>", [this](const QUrl &url) {
+    this->srv.route("/conf/<arg>", [this, RSP](const QUrl &url) {
         OTH("conf: " % url.path());
-        return QJsonObject {{
-            { "wsport", this->wss->serverPort() }
-          , { "wsaddr", this->wss->serverAddress().asSTR }
-        }};
+        return RSP(QJsonObject {{
+            { "wshost", this->addr().asSTR }
+          , { "wsport", this->wss->serverPort() }
+        }});
     });
+
+    // По умолчанию.
+    this->srv.route("/<arg>", [RSP](const QUrl &url) {
+        OTH("dflt: " % url.path());
+        return RSP(QJsonObject {{
+            { "appname", QApplication::applicationName() }
+          , { "version", QApplication::applicationVersion() }
+          , { "sysdate", SYSDATE.asSTR }
+        }});
+    });
+
 
 }// ROUTING
 
 // Получено текстовое сообщение. -----------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_txt_msg(QString msg) {
-    FNC << "txt:" << msg;
+    E::Log->post("Текстовое сообщение", msg);
 
-    QWebSocket *socket = qobject_cast<QWebSocket*>(sender());
-    QJsonObject json = QJsonValue(msg).toObject();
+    QWebSocket *rsp = qobject_cast<QWebSocket*>(sender());
+    QJsonDocument doc = QJsonDocument::fromJson(msg.asUTF);
+    QJsonObject obj = doc.isNull()
+        ? QJsonObject()
+        : doc.isObject() ? doc.object() : QJsonObject();
 
+    if(obj["method"] == "item") {
+        QJsonArray arr;
+        QJsonDocument doc;
+        QSqlQuery query = E::sldb->exec("SELECT * FROM item");
+
+        if(query.lastError().type() != QSqlError::NoError) {
+            E::Log->post(
+                "Ошибка выполнения запроса: " % query.lastError().text()
+              , query.executedQuery() )->clr(Qt::darkYellow);
+        }// if(query.lastError().type() == QSqlError::NoError)
+
+        while(query.next()) {
+            QJsonObject rec;
+            for(int i=0; i<query.record().count(); i++) {
+                rec.insert(
+                    query.record().fieldName(i)
+                  , QJsonValue::fromVariant(query.value(i)) );
+            }// i
+            arr.push_back(rec);
+        }// while(query.next())
+        doc.setArray(arr);
+
+        rsp->sendTextMessage(doc.toJson());
+    }// if(obj["method"] == "item")
 
 }// on_ws_txt_msg
 
 // Получено двоичное сообщение. ------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_bin_msg(QByteArray msg) {
-    FNC << "bin:" << msg;
+    E::Log->post("Двоичное сообщение", msg);
+
 }// on_ws_bin_msg
 
 // Ws: потеря соединения. ------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_disconnect() {
-    FNC << "bgn";
+    OTH("Ws: Потеря соединения");
 
     QWebSocket *socket = qobject_cast<QWebSocket*>(sender());
     if(socket) { socket->deleteLater(); }
+    if(this->last == socket) { this->last = nullptr; }
+
 }// on_ws_disconnect
 
 // Ws: новое подключение. ------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_connect() {
+    OTH("Ws: Новое подключение");
+
     QWebSocket *socket = this->wss->nextPendingConnection();
 
     connect(
@@ -139,6 +193,7 @@ void FMain::on_ws_connect() {
         socket, &QWebSocket::disconnected
       , this, &FMain::on_ws_disconnect );
 
+    this->last = socket;
 }// on_ws_connect
 
 // Деструктор. -----------------------------------------------------------------
@@ -214,15 +269,15 @@ void FMain::SET_PRM(const QStringList &args) {
     prsr.addOptions({
         {{"q", "quit"}, tr("Завершить приложение."), "quit" }
       , {{"f", "file"}, tr("Задать путь к файловому хранилищу."), "file" }
-      , {{"l", "sqlt"}, tr("Задать путь к файловому хранилищу."), "file" }
+      , {{"l", "sqlt"}, tr("Задать путь к файловому хранилищу."), "sqlt" }
     });
     prsr.process(args);
 
     // quit.
     if(HVE("quit")) { QTimer::singleShot(0, qApp, SLOT(quit())); }
 
-    // path
-    if(HVE("path")) { this->path = VAL("path"); }
+    // file
+    if(HVE("file")) { this->path = VAL("file"); }
     else            { this->path = FSN(APP_DIR, "web"); }
 
 }// SET_PRM
@@ -235,6 +290,7 @@ void FMain::SET_SQL(void) {
     static const QString ALREDY_EXIST("2");
     static const QSqlError::ErrorType
         OK(QSqlError::NoError), STMT(QSqlError::StatementError);
+
 
     QStringList tbl {
         "CREATE TABLE item ("
@@ -254,6 +310,16 @@ void FMain::SET_SQL(void) {
         "  id   INTEGER PRIMARY KEY NOT NULL"
         ", name VARCHAR(255)        NOT NULL"
         ", note VARCHAR(255)        NOT NULL )"
+
+      , "INSERT INTO item (id, name, note, cost, room, type)"
+        "VALUES(1, 'NAME-1', 'NOTE-1', 0, 0, 0)"
+      , "INSERT INTO item (id, name, note, cost, room, type)"
+        "VALUES(2, 'NAME-2', 'NOTE-2', 0, 0, 0)"
+      , "INSERT INTO item (id, name, note, cost, room, type)"
+        "VALUES(3, 'NAME-3', 'NOTE-3', 0, 0, 0)"
+      , "INSERT INTO item (id, name, note, cost, room, type)"
+        "VALUES(4, 'NAME-4', 'NOTE-4', 0, 0, 0)"
+
     };
 
     for(const QString &query: tbl) {
@@ -264,6 +330,22 @@ void FMain::SET_SQL(void) {
         &&(etype != STMT || error.nativeErrorCode() != ALREDY_EXIST) )
             { ERR(error.text()); }
     }// query
+
+/*
+    QSqlQuery item = E::sldb->exec(
+//        "SELECT date('now')"
+        "SELECT * FROM item"
+    );
+
+    FNC << "err:" << item.lastError();
+    while(item.next()) {
+        FNC << "";
+        for(int i=0; i<item.record().count(); i++) {
+            FNC << "nme:" << item.record().fieldName(i)
+                << "val:" << item.value(i);
+        }// i
+    }// while(item.next())
+*/
 
 }// SET_SQL
 
@@ -287,6 +369,17 @@ void FMain::on_btTest_clicked() {
 }// on_btTest_clicked
 */
 
+// Локальный IP-адрес. ---------------------------------------------------------
+//------------------------------------------------------------------------------
+QHostAddress FMain::addr(void) {
+    const QHostAddress &local = QHostAddress(QHostAddress::LocalHost);
+    for(const QHostAddress &addr: QNetworkInterface::allAddresses()) {
+        if(addr.protocol() == QAbstractSocket::IPv4Protocol && addr != local)
+            { return addr; }
+    }// addr
+    return QHostAddress(QHostAddress::LocalHost);
+}// addr
+
 // Http: Пуск / Стоп. ----------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_btRunHttp_clicked() {
@@ -297,17 +390,15 @@ void FMain::on_btRunHttp_clicked() {
         this->tcp->close();
         for(QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>())
             { socket->disconnectFromHost(); }
-        E::Log->post("Http: Прослушивание остановлено")->clr(Qt::lightGray);
+        IMP("Http: Прослушивание остановлено");
         SET_BTN("Http: Пуск", "color: limegreen;");
 
     } else {
         if(this->tcp->listen(QHostAddress::Any, E::port)) {
-            E::Log->rift();
-            E::Log->post("Http: Прослушивание запущено")->clr(Qt::lightGray);
+            IMP("Http: Прослушивание запущено");
             SET_BTN("Http: Стоп", "color: crimson;");
         } else {
-            E::Log->post("Http: Ошибка прослушивателя: " + tcp->errorString())
-                ->clr(Qt::red);
+            ERR("Http: Ошибка прослушивателя: " + tcp->errorString());
         }// else // if(tcp->listen(QHostAddress::Any, port))
     }// else // if(tcp->isListening())
 
@@ -323,18 +414,15 @@ void FMain::on_btRunWs_clicked() {
         this->wss->close();
         for(QWebSocket *socket: this->wss->findChildren<QWebSocket*>())
             { socket->disconnect(); }
-
-        E::Log->post("Ws: Прослушивание остановлено")->clr(Qt::lightGray);
+        IMP("Ws: Прослушивание остановлено");
         SET_BTN("Ws: Пуск", "color: limegreen;");
 
     } else {
         if(this->wss->listen(QHostAddress::Any)) {
-            E::Log->rift();
-            E::Log->post("Ws: Прослушивание запущено")->clr(Qt::lightGray);
+            IMP("Ws: Прослушивание запущено");
             SET_BTN("Ws: Стоп", "color: crimson;");
         } else {
-            E::Log->post("Ws: Ошибка прослушивателя: " + tcp->errorString())
-                ->clr(Qt::red);
+            ERR("Ws: Ошибка прослушивателя: " + tcp->errorString());
         }// else // if(tcp->listen(QHostAddress::Any, port))
     }// else // if(tcp->isListening())
 }// on_btRunWs_clicked
@@ -352,4 +440,40 @@ void FMain::on_aExit_triggered() {
 //------------------------------------------------------------------------------
 void FMain::on_aLog_triggered() { E::Log->place(this); E::Log->show(); }
 
+// Ws: Отправить. --------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <QInputDialog>
+void FMain::on_aWsSend_triggered() {
+    static QString prev;
+
+    if(this->last) {
+        prev = QInputDialog::getMultiLineText(this, "Ws: Передать", "", prev);
+        this->last->sendTextMessage(prev);
+    } else {
+        ERR("Нет подключений");
+    }// else // if(sock)
+
+}// on_aWsSend_triggered
+
+// Отладка -> Проба. -----------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aTest_triggered() {
+    QString msg(R"({"method" : "list"})");
+
+    QJsonDocument doc = QJsonDocument::fromJson(msg.asUTF);
+    QJsonObject obj;
+
+    if(doc.isNull()) {
+        FNC << "json err";
+    } else if(doc.isObject()) {
+        FNC << "json ok";
+        obj = doc.object();
+    } else {
+        FNC << "json not obj";
+    }// else // if(doc.isNull())
+
+    FNC << "method:" << obj["method"];
+}// on_aTest_triggered
+
+//------------------------------------------------------------------------------
+

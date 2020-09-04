@@ -1,0 +1,18 @@
+.content {
+    border: 1px solid #eeeeee;
+    padding: 10px;
+
+    .attribute-list {
+        padding: 5px;
+        border: 1px solid #eeeeee;
+        background-color: #fafafa;
+
+        .control-panel {
+            padding: 10px;
+        }
+    }
+    
+    .control-panel {
+        padding: 10px;
+    }
+}

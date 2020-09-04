@@ -42,7 +42,7 @@ private:
     Ui::WEdit *ui;
     SqlHighlighter *highlighter;
     WOut *out = nullptr;
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QTextEdit::ExtraSelection selection;
     int txt_bgn, txt_end;
 

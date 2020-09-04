@@ -216,6 +216,7 @@
     </property>
     <addaction name="aTest"/>
     <addaction name="aLog"/>
+    <addaction name="aWsSend"/>
    </widget>
    <widget class="QMenu" name="mHelp">
     <property name="title">
@@ -239,6 +240,11 @@
   <action name="aLog">
    <property name="text">
     <string>Лог</string>
+   </property>
+  </action>
+  <action name="aWsSend">
+   <property name="text">
+    <string>Ws: Отправить </string>
    </property>
   </action>
  </widget>

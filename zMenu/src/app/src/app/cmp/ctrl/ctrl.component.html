@@ -1,0 +1,16 @@
+
+<nav class="navbar navbar-dark bg-primary">
+    <span class="navbar-brand">Администрирование</span>
+</nav>
+<div class="container">
+    <div class="list-header">
+        <h2>Список Item</h2>
+    </div>
+    <app-item class="item" *ngFor="let item of items" [item]="item"></app-item>
+    <!-- Кнопка добавления item -->
+    <div class="control-panel">
+        <button mat-raised-button color="primary"
+                (click)="createItem()"
+        >Добавить элемент</button>
+    </div>
+</div>

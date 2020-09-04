@@ -99,7 +99,8 @@ void WEdit::keyPressEvent(QKeyEvent *evt) {
 void WEdit::on_btTest_clicked() {
     FNC << R"(/bgn)";
 
-    ui->edSql->setFocus(); ui->edSql->cursorPositionChanged();
+    this->db.setDatabaseName("db.sqlite");
+    if(NOT(this->db.open())) { FNC << this->db.lastError(); }
 
     FNC << R"(\end)";
 }// on_btTest_clicked
@@ -107,15 +108,21 @@ void WEdit::on_btTest_clicked() {
 // Выполнить запрос. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 void WEdit::on_aExec_triggered() {
-    static QSqlQuery qry(this->db); //todo: !!!
+    QSqlQuery qry(this->db); // todo: !!!
 
     // Выполнение запроса.
     wgLog->add(qry.exec(curSql())
         ? QString("query ok")
         : qry.lastError().text() );
 
-    out->setQuery(qry);
-    out->show();
+    while(qry.next()) {
+        QList<QString> res;
+        for(int i=0; i < qry.record().count(); i++)
+            { res << qry.value(i).asSTR; }
+    }// while(qry.next())
+
+    this->out->setQuery(qry);
+    this->out->show();
 }// on_aExec_triggered
 
 // Извлечь и подготовить запрос. -----------------------------------------------
@@ -182,9 +189,9 @@ void WEdit::on_btCnn_clicked() {
             wgLog->add(db.lastError().text());
         }// if(this->db.open())
 
-        DBG << "ok" << conn->nme();
+        FNC << "ok" << conn->nme();
     } else {
-        DBG << "no";
+        FNC << "no";
     }// else // if(wgSel->sel(lst))
 
 }// on_btCnn_clicked
@@ -215,16 +222,20 @@ void WEdit::on_edSql_cursorPositionChanged() {
     txt_bgn = 0; txt_end = -1;
     while((txt_end = doc->find(sep, txt_bgn).position()-1) > 0) {
 
+/*
         FNC << "txt_end_chr:" << doc->characterAt(txt_end)
             << "txt_bgn:" << txt_bgn << "txt_end:" << txt_end;
+*/
 
         if(txt_bgn <= pos && pos <= txt_end) { break; }
         txt_bgn = txt_end + 2;
     }// while((txt_end = doc->find(sep, txt_bgn).position()) > 0)
     if(txt_end < 0) { txt_end = crs.position(); }
 
+/*
     FNC << "bgn:" << txt_bgn << "end:" << txt_end
         << "pos:" << pos << "chr:" << doc->characterAt(pos);
+*/
 
     selection.cursor.clearSelection();
     selection.cursor.setPosition(txt_bgn, QTextCursor::MoveAnchor);

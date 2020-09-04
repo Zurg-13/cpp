@@ -55,7 +55,7 @@ WConnect::WConnect(QWidget *parent) : QWidget(parent), ui(new Ui::WConnect) {
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 WConnect::~WConnect() {
-    DBG << "~WConnect";
+    FNC << "~WConnect";
 
     delete ui;
 }// ~WConnect

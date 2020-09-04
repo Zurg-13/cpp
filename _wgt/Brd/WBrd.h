@@ -17,6 +17,8 @@ class WBrd : public QWidget {
 
     explicit WBrd(QWidget *parent = nullptr);
             ~WBrd();
+    void  clear(void);
+    void  place(const QWidget *wgt, Place plc = Place::btm);
 
     WRec* post(const QString &msg, const QString &adv = EMPTY_STR);
     WRec* post(WRec *rec);
@@ -24,9 +26,6 @@ class WBrd : public QWidget {
 
     WRec* grab(void);
     WRec* free(WRec *rec);
-
-    void  clear(void);
-    void  place(const QWidget *wgt, Place plc = Place::btm);
 
  private slots:
     void ctx_menu(const QPoint &pos);

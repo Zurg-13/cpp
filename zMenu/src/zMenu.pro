@@ -15,6 +15,7 @@ TARGET = zMenu
 TEMPLATE = app
 
 include($$SRV/Srv/Srv.pri)
+include($$SRV/Sql/Sql.pri)
 include($$WGT/Brd/WBrd.pri)
 include($$REP/About/RAbout.pri)
 

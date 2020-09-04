@@ -29,12 +29,15 @@ class FMain : public QMainWindow {
     void on_btRunWs_clicked();
     void on_aExit_triggered();
     void on_aLog_triggered();
+    void on_aWsSend_triggered();
+    void on_aTest_triggered();
 
- private:
+private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
     QHttpServer srv;
-    QWebSocketServer *wss;
+    QWebSocketServer *wss = nullptr;
+    QWebSocket *last = nullptr;
 
     QString path;
 
@@ -42,6 +45,8 @@ class FMain : public QMainWindow {
     void ROUTING(void);
     void SET_PRM(const QStringList &args);
     QHttpServerResponse proc(const QString&, const QHttpServerRequest&);
+    QHostAddress addr(void);
+
 };
 
 //------------------------------------------------------------------------------
