@@ -15,7 +15,6 @@
 #include "tme.h"
 #include "lst.h"
 
-#include "Item.h"
 #include "FMain.h"
 #include "ui_FMain.h"
 
@@ -51,21 +50,6 @@ QHttpServerResponse FMain::proc(
             rsp.addHeader("Content-Type", "text/html; charset=utf-8");
         return rsp;
 
-    // Вернуть список элементов.
-    } else if(path == "list") {
-/*
-        QStringList itm;
-        for(int i=0; i< ui->lwMenu->count(); i++) {
-            itm.append(
-                static_cast<Item*>(
-                    ui->lwMenu->itemWidget(ui->lwMenu->item(i)))->jsn() );
-        }// i
-
-        QHttpServerResponse rsp(QString("[" % BLD(itm) % "]").toUtf8());
-            rsp.addHeader("Content-Type", "application/json; charset=utf-8");
-        return rsp;
-*/
-
     // Задать состояние элемента.
     } else if(path == "item") {
         QMap<QString, QString> prm(MAP(req.query().queryItems()));
@@ -88,10 +72,6 @@ void FMain::ROUTING(void) {
         return rsp;
     };// RSP
 
-//    static const QByteArray header =
-//        "Access-Control-Allow-Origin: *\n"
-//        "Access-Control-Allow-Method: GET\n";
-
     // Файлы.
     this->srv.route("/file/<arg>", [this](const QUrl &url) {
         OTH("file: " % url.path());
@@ -102,8 +82,8 @@ void FMain::ROUTING(void) {
     this->srv.route("/conf/<arg>", [this, RSP](const QUrl &url) {
         OTH("conf: " % url.path());
         return RSP(QJsonObject {{
-            { "wshost", this->addr().asSTR }
-          , { "wsport", this->wss->serverPort() }
+            { "host", addr().asSTR }
+          , { "port", STR(E::port) }
         }});
     });
 
@@ -116,7 +96,6 @@ void FMain::ROUTING(void) {
           , { "sysdate", SYSDATE.asSTR }
         }});
     });
-
 
 }// ROUTING
 
@@ -171,17 +150,15 @@ void FMain::on_ws_disconnect() {
     OTH("Ws: Потеря соединения");
 
     QWebSocket *socket = qobject_cast<QWebSocket*>(sender());
-    if(socket) { socket->deleteLater(); }
     if(this->last == socket) { this->last = nullptr; }
-
+    if(socket) { socket->deleteLater(); }
 }// on_ws_disconnect
 
 // Ws: новое подключение. ------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_connect() {
     OTH("Ws: Новое подключение");
-
-    QWebSocket *socket = this->wss->nextPendingConnection();
+    QWebSocket *socket = this->srv.nextPendingWebSocketConnection();
 
     connect(
         socket, &QWebSocket::textMessageReceived
@@ -199,18 +176,13 @@ void FMain::on_ws_connect() {
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 FMain::~FMain() {
-    delete wss;
     delete ui;
 }//~FMain
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QStringLiteral>
-FMain::FMain(QWidget *prnt)
-:   QMainWindow(prnt), ui(new Ui::FMain)
-  , wss(new QWebSocketServer("Menu wss", QWebSocketServer::NonSecureMode, this))
-
-{
+FMain::FMain(QWidget *prnt) : QMainWindow(prnt), ui(new Ui::FMain) {
 
     // Внешний вид.
     ui->setupUi(this);
@@ -226,30 +198,8 @@ FMain::FMain(QWidget *prnt)
     this->tcp = new QTcpServer(this);
     this->srv.bind(this->tcp); ROUTING();
     connect(
-        this->wss, &QWebSocketServer::newConnection
+       &this->srv, &QHttpServer::newWebSocketConnection
       , this, &FMain::on_ws_connect );
-
-
-    // Пункты меню.
-/*
-    auto LW_ADD = [this](QWidget *wgt){
-        QListWidgetItem *item = new QListWidgetItem;
-        item->setSizeHint(wgt->sizeHint());
-        this->ui->lwMenu->addItem(item);
-        this->ui->lwMenu->setItemWidget(item, wgt);
-    };// LW_ADD
-
-    LW_ADD(new Item("Раз", "Раз: подробное описание", 20));
-    LW_ADD(new Item("Два", "Два: подробное описание", 35));
-    LW_ADD(new Item("Три", "Три: подробное описание", 50));
-    LW_ADD(new Item("Четыре", "Один: подробное описание", 65));
-    LW_ADD(new Item("Пять", "Пять: подробное описание", 80));
-    LW_ADD(new Item("Шесть", "Шесть: подробное описание", 95));
-    LW_ADD(new Item("Семь", "Семь: подробное описание", 110));
-    LW_ADD(new Item("Восемь", "Восемь: подробное описание", 125));
-    LW_ADD(new Item("Девять", "Девять: подробное описание", 140));
-    LW_ADD(new Item("Десять", "Десять: подробное описание", 155));
-*/
 
 }// FMain
 
@@ -319,7 +269,6 @@ void FMain::SET_SQL(void) {
         "VALUES(3, 'NAME-3', 'NOTE-3', 0, 0, 0)"
       , "INSERT INTO item (id, name, note, cost, room, type)"
         "VALUES(4, 'NAME-4', 'NOTE-4', 0, 0, 0)"
-
     };
 
     for(const QString &query: tbl) {
@@ -331,23 +280,11 @@ void FMain::SET_SQL(void) {
             { ERR(error.text()); }
     }// query
 
-/*
-    QSqlQuery item = E::sldb->exec(
-//        "SELECT date('now')"
-        "SELECT * FROM item"
-    );
-
-    FNC << "err:" << item.lastError();
-    while(item.next()) {
-        FNC << "";
-        for(int i=0; i<item.record().count(); i++) {
-            FNC << "nme:" << item.record().fieldName(i)
-                << "val:" << item.value(i);
-        }// i
-    }// while(item.next())
-*/
-
 }// SET_SQL
+
+// Перемещение окна. -----------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::moveEvent(QMoveEvent */*evt*/) { E::Log->place(this); }
 
 /*
 // Страница. -------------------------------------------------------------------
@@ -380,52 +317,29 @@ QHostAddress FMain::addr(void) {
     return QHostAddress(QHostAddress::LocalHost);
 }// addr
 
-// Http: Пуск / Стоп. ----------------------------------------------------------
+// Пуск / Стоп. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_btRunHttp_clicked() {
+void FMain::on_btRun_clicked() {
     auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
-        ui->btRunHttp->setText(ttl); ui->btRunHttp->setStyleSheet(sht); };
+        ui->btRun->setText(ttl); ui->btRun->setStyleSheet(sht); };
 
     if(this->tcp->isListening()) {
         this->tcp->close();
         for(QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>())
             { socket->disconnectFromHost(); }
         IMP("Http: Прослушивание остановлено");
-        SET_BTN("Http: Пуск", "color: limegreen;");
+        SET_BTN("Пуск", "color: limegreen;");
 
     } else {
         if(this->tcp->listen(QHostAddress::Any, E::port)) {
             IMP("Http: Прослушивание запущено");
-            SET_BTN("Http: Стоп", "color: crimson;");
+            SET_BTN("Стоп", "color: crimson;");
         } else {
-            ERR("Http: Ошибка прослушивателя: " + tcp->errorString());
+            ERR("Ошибка прослушивателя: " + tcp->errorString());
         }// else // if(tcp->listen(QHostAddress::Any, port))
     }// else // if(tcp->isListening())
 
 }// on_btRunHttp_clicked
-
-// Ws: Пуск / Стоп. ------------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::on_btRunWs_clicked() {
-    auto SET_BTN = [&](const QString &ttl, const QString &sht) -> void {
-        ui->btRunWs->setText(ttl); ui->btRunWs->setStyleSheet(sht); };
-
-    if(this->wss->isListening()) {
-        this->wss->close();
-        for(QWebSocket *socket: this->wss->findChildren<QWebSocket*>())
-            { socket->disconnect(); }
-        IMP("Ws: Прослушивание остановлено");
-        SET_BTN("Ws: Пуск", "color: limegreen;");
-
-    } else {
-        if(this->wss->listen(QHostAddress::Any)) {
-            IMP("Ws: Прослушивание запущено");
-            SET_BTN("Ws: Стоп", "color: crimson;");
-        } else {
-            ERR("Ws: Ошибка прослушивателя: " + tcp->errorString());
-        }// else // if(tcp->listen(QHostAddress::Any, port))
-    }// else // if(tcp->isListening())
-}// on_btRunWs_clicked
 
 // Файл -> Выход. --------------------------------------------------------------
 //------------------------------------------------------------------------------

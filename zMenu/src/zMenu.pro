@@ -26,16 +26,13 @@ HEADERS += \
     env.h       \
     ver.h       \
     FMain.h     \
-    Item.h      \
 
 SOURCES += \
     main.cpp    \
     FMain.cpp   \
-    Item.cpp    \
 
 FORMS += \
     FMain.ui    \
-    Item.ui     \
 
 RESOURCES += \
-    res.qrc
+    res.qrc     \

@@ -49,7 +49,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btRunHttp">
+       <widget class="QPushButton" name="btRun">
         <property name="minimumSize">
          <size>
           <width>96</width>
@@ -73,36 +73,7 @@
          <string notr="true">color: limegreen;</string>
         </property>
         <property name="text">
-         <string>Http: Пуск</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btRunWs">
-        <property name="minimumSize">
-         <size>
-          <width>96</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>96</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: limegreen;</string>
-        </property>
-        <property name="text">
-         <string>Ws: Пуск</string>
+         <string> Пуск</string>
         </property>
        </widget>
       </item>

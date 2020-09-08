@@ -76,7 +76,7 @@ angular.module('app', ['ngResource'])
     this.sum = 0;
 
     var config = {
-        getUrl: 'list'
+        getUrl: 'ctrl/list'
     }
 
     var calcSum = function() {
