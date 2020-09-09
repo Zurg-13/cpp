@@ -1,6 +1,5 @@
-/*
-    Описание структуры Item
-*/
+
+// Описание структуры Item
 export interface Item {
     id: number;
     name: string;

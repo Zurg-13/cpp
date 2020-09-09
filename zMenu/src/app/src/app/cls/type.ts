@@ -1,10 +1,8 @@
 import { Attribute } from './attribute';
 
-/*
-    Описание структуры Type
-*/
+// Описание структуры Type
 export class Type implements Attribute {
-    type: string = 'Type';
+    type = 'Type';
     id: number;
     name: string;
     note: string;

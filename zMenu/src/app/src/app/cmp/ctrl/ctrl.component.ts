@@ -57,7 +57,7 @@ export class CtrlComponent implements OnInit {
   }
 
   private subscribeOnMessage(): void {
-    if(this.websocketService.instance != null) {
+    if (this.websocketService.instance != null) {
       this.websocketService.onMessage((data: any) => {
         console.log('subscribe OnMessage');
         console.log(data);

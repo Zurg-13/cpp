@@ -1,9 +1,9 @@
 import { Attribute } from './attribute';
-/*
-    Описание структуры Room
-*/
-export class Room implements Attribute{
-    type: string = 'Room';
+
+// Описание структуры Room
+export class Room implements Attribute {
+
+    type = 'Room';
     id: number;
     name: string;
     note: string;

@@ -15,12 +15,12 @@ export class HttpService {
 
   // Метод отправки GET запроса по указанному URL
   public get(url: string, params?: HttpParams): Observable<Object> {
-    let headers: HttpHeaders = new HttpHeaders();
+    const totalParams: HttpParams = params != null ? params : new HttpParams();
+    const headers: HttpHeaders = new HttpHeaders();
     headers.append('Content-Type', 'application/json');
-    let totalParams: HttpParams = params != null ? params : new HttpParams();
     // Пример добавления параметров руками
     // totalParams.append("paramKey", "paramValue");
-    
+
     return this.http.get(url, { headers: headers, params: totalParams });
   }
 }

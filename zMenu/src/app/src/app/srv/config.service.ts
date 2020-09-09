@@ -6,14 +6,14 @@ import { HttpService } from './http.service';
 */
 
 export interface AppConf {
-  wshost: string,
-  wsport: string,
+  wshost: string;
+  wsport: string;
 }
 
 export interface AppInfo {
-  sysdate: string,
-  appname: string,
-  version: string
+  sysdate: string;
+  appname: string;
+  version: string;
 }
 
 @Injectable({
@@ -76,10 +76,10 @@ export class ConfigService {
       .then((response: AppInfo) => {
           console.log(response);
           this.appInfo = {
-            appname: response.appname,
-            version: response.version,
-            sysdate: response.sysdate
-          }
+            appname: response.appname
+          , version: response.version
+          , sysdate: response.sysdate
+          };
           resolve();
       }).catch((response: any) => {
           console.error(response);
