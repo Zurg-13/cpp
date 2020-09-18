@@ -11,6 +11,8 @@ QMimeDatabase* E::mime;
 
 FMain* E::Main;
 DHeader* E::Header;
+WWs* E::Ws;
+DSel* E::Sel;
 
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -26,6 +28,8 @@ int main(int argc, char *argv[]) {
     translator->load(QString(":/tr/qtbase_ru.qm"));
     app.installTranslator(translator);
 
+    DSel dgSel;  E::Sel = &dgSel;
+//    WWs wgWs; E::Ws = &wgWs;
     DHeader dgHeader; E::Header = &dgHeader;
     FMain fmMain; E::Main = &fmMain;
     E::Main->show();

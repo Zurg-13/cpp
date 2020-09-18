@@ -10,6 +10,7 @@
 #include "WAttention.h"
 #include "WActive.h"
 #include "WBall.h"
+#include "WClientWS.h"
 
 // Глобальные переменные. ------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ WTextBrowzer *wgTextBrowzer;
 WAttention *wgAttention;
 WActive *wgActive;
 WBall *wgBall;
-
+WClientWS *wgWS;
 
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
     WAttention _wgAttention; wgAttention = &_wgAttention;
     WActive _wgActive; wgActive = &_wgActive;
     WBall _wgBall; wgBall = &_wgBall;
+    WClientWS _wgWS; wgWS = &_wgWS;
 
     FMain _fmMain; fmMain = &_fmMain; fmMain->show();
     return app.exec();

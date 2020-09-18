@@ -14,20 +14,21 @@ TARGET = zServer
 TEMPLATE = app
 
 include($$SRV/Srv/Srv.pri)
+include($$DLG/Sel/DSel.pri)
 
 INCLUDEPATH += ../../
 DEPENDPATH  += ../../
 
 HEADERS += \
-    WHdlEntry.h \
     env.h           \
     FMain.h         \
     WHandler.h      \
     DHeader.h       \
-    WLogEntry.h     \
     WLogBoard.h     \
     WHdlBoard.h     \
+    WLogEntry.h     \
     WHdlEntry.h     \
+    WWs.h           \
 
 SOURCES += \
     main.cpp        \
@@ -38,6 +39,7 @@ SOURCES += \
     WLogBoard.cpp   \
     WHdlBoard.cpp   \
     WHdlEntry.cpp   \
+    Wws.cpp         \
 
 FORMS += \
     FMain.ui        \
@@ -47,7 +49,8 @@ FORMS += \
     WLogBoard.ui    \
     WHdlBoard.ui    \
     WLogEntry.ui    \
+    WWs.ui          \
 
 RESOURCES += \
-    res.qrc
+    res.qrc         \
 

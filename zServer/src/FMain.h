@@ -23,10 +23,19 @@ class FMain : public QMainWindow {
     Q_OBJECT
 
  public:
-    explicit FMain(QWidget *parent = nullptr);
             ~FMain();
+    explicit FMain(QWidget *parent = nullptr);
+
+    void       post(const QString &msg, const QColor &clr = QColor());
+    void       post(
+        const QString &inp, const QString &out, const QColor &clr = QColor() );
+    WLogEntry* grab(void);
+    void       free(WLogEntry *entry);
+    void       rift(void);
 
  private slots:
+    void on_ws_connect();
+
     void on_btAdd_clicked();
     void remove_handler(WHandler*);
     void remove_handler_entry(WHdlEntry*);
@@ -41,19 +50,14 @@ class FMain : public QMainWindow {
     void on_aExit_triggered();
     void on_btDebug_clicked();
 
- private:
+    void on_btWs_clicked();
+
+private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
     QHttpServer srv;
     QList<WHandler*> hdl;
     QList<WHdlEntry*> hdl_entry;
-
-    void       post(const QString &msg, const QColor &clr = QColor());
-    void       post(
-        const QString &inp, const QString &out, const QColor &clr = QColor() );
-    WLogEntry* grab(void);
-    void       free(WLogEntry *entry);
-    void       rift(void);
 
     void addHandler(QString type, QString path, QColor color, QString text);
     void clearHdl(void);

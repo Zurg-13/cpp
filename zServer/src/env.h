@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------
 #include <QMimeDatabase>
 
+#include "WWs.h"
+#include "DSel.h"
 #include "FMain.h"
 #include "DHeader.h"
 
@@ -20,6 +22,8 @@ class E {
 
     static FMain *Main;
     static DHeader *Header;
+    static WWs *Ws;
+    static DSel *Sel;
 
 };// E
 

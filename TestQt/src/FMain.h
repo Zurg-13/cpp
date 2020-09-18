@@ -46,6 +46,8 @@ class FMain : public QMainWindow {
     void on_btLogAdv_clicked();
     void on_btBall_clicked();
 
+    void on_btWS_clicked();
+
 private:
     Ui::FMain *ui;
 };// FMain

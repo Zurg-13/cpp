@@ -95,6 +95,13 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         });// singleShot
     });// route
 
+    // Ws.
+    E::Ws = new WWs();
+    ui->lyHdl->addWidget(E::Ws); E::Ws->hide();
+    connect(
+        &this->srv, &QHttpServer::newWebSocketConnection
+      , this, &FMain::on_ws_connect );
+
     // Меню серверов.
     QMenu *mServer = new QMenu(this);
     mServer->addAction(ui->aClearHdl);
@@ -136,7 +143,7 @@ void FMain::remove_handler(WHandler *handler) {
 void FMain::remove_handler_entry(WHdlEntry *hdlr) {
     for(QList<WHdlEntry*>::iterator it  = hdl_entry.begin()
                                   ; it != hdl_entry.end()
-                                  ; it++)
+                                  ; it++ )
     {
         if((*it) == hdlr) { hdl_entry.erase(it); hdlr->deleteLater(); return; }
     }// it
@@ -199,6 +206,24 @@ void FMain::rift(void) { ui->wgLog->rift(); }
 //------------------------------------------------------------------------------
 void FMain::on_btClearLog_clicked() { ui->wgLog->clear(); }
 
+// Установка соединения по Ws. -------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_ws_connect() {
+    QWebSocket *sckt = this->srv.nextPendingWebSocketConnection();
+
+    connect(
+        sckt, &QWebSocket::textMessageReceived
+      , E::Ws, &WWs::on_ws_txt_msg );
+    connect(
+        sckt, &QWebSocket::binaryMessageReceived
+      , E::Ws, &WWs::on_ws_bin_msg );
+    connect(
+        sckt, &QWebSocket::disconnected
+      , E::Ws, &WWs::on_ws_disconnect );
+
+    E::Ws->add(sckt);
+    post(STR("Подключение WS установлено: {") % sckt->origin() % "}");
+}// on_ws_connect
 
 /**/
 //todo: hdl_entry
@@ -309,13 +334,20 @@ WHdlBoard *brd = nullptr;
 void FMain::on_btDebug_clicked() {
     FNC << R"(/ bgn)";
 
-//    static WHdlBoard *brd = nullptr;
+/*
+    static WHdlBoard *brd = nullptr;
     if(brd == nullptr) { brd = new WHdlBoard(this); }
-
-
     brd->show();
+*/
+
+    E::Ws->show();
 
     FNC << R"(\ end)";
 }// on_btDebug_clicked
 
+// Показать WWs. ---------------------------------------------------------------
 //------------------------------------------------------------------------------
+void FMain::on_btWs_clicked() { E::Ws->show(); }
+
+//------------------------------------------------------------------------------
+

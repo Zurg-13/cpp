@@ -19,6 +19,7 @@
 #include "WAttention.h"
 #include "WActive.h"
 #include "WBall.h"
+#include "WClientWS.h"
 
 #include "FMain.h"
 #include "ui_FMain.h"
@@ -32,6 +33,7 @@ extern WTextBrowzer *wgTextBrowzer;
 extern WAttention *wgAttention;
 extern WActive *wgActive;
 extern WBall *wgBall;
+extern WClientWS *wgWS;
 
 extern FMain *fmMain;
 
@@ -364,9 +366,11 @@ void FMain::on_btLogAdv_clicked() {
 
 // WBall. ----------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void FMain::on_btBall_clicked(){
-    wgBall->show();
-}
+void FMain::on_btBall_clicked(){ wgBall->show(); }
+
+// WClientWS. ------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btWS_clicked() { wgWS->show(); }
 
 //------------------------------------------------------------------------------
 

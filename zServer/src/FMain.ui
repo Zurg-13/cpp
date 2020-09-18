@@ -250,6 +250,32 @@ QSplitter { border: 0px; }</string>
            <number>1</number>
           </property>
           <item>
+           <widget class="QPushButton" name="btWs">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>WS</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btAdd">
             <property name="minimumSize">
              <size>
@@ -288,6 +314,13 @@ QSplitter { border: 0px; }</string>
               <width>30</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
              <string>..</string>

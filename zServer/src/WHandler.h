@@ -12,8 +12,8 @@
 namespace Ui { class WHandler; }
 typedef QPair<QString, QString> Header;
 
-// Обработчик. -----------------------------------------------------------------
-//------------------------------------------------------------------------------
+/* Обработчик. ****************************************************************/
+/******************************************************************************/
 class WHandler : public QWidget {
     Q_OBJECT
     enum class WAIT_TYPE { NOT, BTN };
@@ -25,12 +25,12 @@ public:
     ANSWER_TYPE answer_type = ANSWER_TYPE::TEXT;
     WAIT_TYPE wait_type = WAIT_TYPE::NOT;
 
+            ~WHandler();
     explicit WHandler(QWidget *parent = nullptr);
              WHandler(
                 QString type, QString path, QColor color, QString text
               , QWidget *parent = nullptr );
 
-            ~WHandler();
 
     QHttpServerResponse answer(void);
 

@@ -7,7 +7,7 @@ SRV = ../../_srv
 UNT = ../../_unt
 LIB = ../../_lib
 
-QT += core gui widgets #multimedia
+QT += core gui widgets websockets
 CONFIG += c++14
 
 TARGET = TestQt
@@ -25,6 +25,7 @@ HEADERS += \
     FMain.h         \
     WAnimation.h    \
     WBall.h \
+    WClientWS.h \
     WSound.h        \
     FProc.h         \
     WTextBrowzer.h \
@@ -33,6 +34,7 @@ HEADERS += \
 
 SOURCES += \
     WBall.cpp \
+    WClientWS.cpp \
     main.cpp        \
     FMain.cpp       \
     WAnimation.cpp  \
@@ -46,6 +48,7 @@ FORMS += \
     FMain.ui        \
     WAnimation.ui   \
     WBall.ui \
+    WClientWS.ui \
     WSound.ui       \
     FProc.ui        \
     WTextBrowzer.ui \
