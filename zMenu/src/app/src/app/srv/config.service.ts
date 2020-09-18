@@ -6,8 +6,8 @@ import { HttpService } from './http.service';
 */
 
 export interface AppConf {
-  wshost: string;
-  wsport: string;
+  host: string;
+  port: string;
 }
 
 export interface AppInfo {
@@ -45,8 +45,8 @@ export class ConfigService {
   }
 
   // Формирование адреса ws
-  private setWsUrl(wshost: string, wsport: string) {
-    this.wsUrl = 'ws://' + wshost + ':' + wsport;
+  private setWsUrl(host: string, port: string) {
+    this.wsUrl = 'ws://' + host + ':' + port;
   }
 
   // Получение конфигурации от сервера
@@ -54,13 +54,14 @@ export class ConfigService {
     return new Promise<void>((resolve: Function, reject: Function) => {
       this.httpService.get(this.confUrl).toPromise()
       .then((response: AppConf) => {
+          console.log('getAppConf then');
           console.log(response);
           this.appConf = {
-            wshost: response.wshost,
-            wsport: response.wsport
+            host: response.host,
+            port: response.port
           }
           // Формируем адрес для ws
-          this.setWsUrl(response.wshost, response.wsport);
+          this.setWsUrl(response.host, response.port);
           resolve();
       }).catch((response: any) => {
           console.error(response);

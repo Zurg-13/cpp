@@ -40,13 +40,15 @@ export class CtrlComponent implements OnInit {
       return this.configService.getAppConf();
     })
     .then(() => {
+
       // Настраиваем вебсокет
       console.log(this.configService.appConf);
       this.websocketService.closeConnection();
       this.websocketService.create(this.configService.getWsUrl());
       this.websocketService.init();
+
       // Отправляем запрос на получение списка item
-      this.websocketService.sendMessage({method: 'item'});
+      this.websocketService.sendMessage({name: 'item_list', data: null});
 
       // Подписка нашего обработчика сообщений
       this.subscribeOnMessage();
@@ -58,7 +60,8 @@ export class CtrlComponent implements OnInit {
 
   private subscribeOnMessage(): void {
     if (this.websocketService.instance != null) {
-      this.websocketService.onMessage((data: any) => {
+
+      this.websocketService.onMessageObserver.subscribe((data: any) => {
         console.log('subscribe OnMessage');
         console.log(data);
         for(let i = 0; i < data.length; i++) {

@@ -3,6 +3,7 @@ import { webSocket, WebSocketSubject } from "rxjs/webSocket";
 import { Subject, throwError, Observable } from 'rxjs';
 import { catchError, retryWhen, repeatWhen, delay, take, concat  } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { Cmnd } from '../cls/cmnd';
 
 /*
   Сервис для взаимодействия с сервером по протоколу ws (вебсокет)
@@ -18,6 +19,7 @@ export class WebsocketService {
   public wsUrl: string;
   public openObserver: Subject<Event> = new Subject<Event>();
   public closeObserver: Subject<Event> = new Subject<Event>();
+  public onMessageObserver: Subject<Event> = new Subject<Event>(); 
   public router: Router;
   private intervalInstance: any;
 
@@ -51,7 +53,7 @@ export class WebsocketService {
   }
 
   // Отправка запроса на вебсокет
-  public sendMessage(data: any) {
+  public sendMessage(data: Cmnd) {
     if(this.instance) {
       try {
         this.instance.next(data);
@@ -64,47 +66,38 @@ export class WebsocketService {
   }
 
   // Добавление внешнего обработчика на событие onMessage
+  /*
   public onMessage(action: Function) {
-    this.instance.subscribe((message: MessageEvent) => {
-      try {
-        let data: any = JSON.parse(message.data);
-        if(data != null) {
-          action(data);
-        }
-      }
-      catch(ex) {
-        console.log(ex);
-      }
+    this.onMessageObserver.subscribe((data: any) => {
+        action(data);
     });
   }
+  */
 
   // Инициализация основной логики управления соденинением вебсокета
   public init(): void {
     this.instance
     .pipe( 
+
       // Реакция на ошибку присланную по вебсокету
       retryWhen(error => error.pipe(delay(8000), concat(throwError(error))))
     )
     .pipe(
+
       // Реакция на закрытие соединения и попытка его восстановить
       repeatWhen(complete => complete.pipe(delay(8000), concat(throwError(complete))))
     )
-    .subscribe(
+    .subscribe (
+
       // Обработчик по умолчанию, просто для того чтобы было видно что данные пришли,
       // если других обработчиков никто не навесил
       (message: MessageEvent) => {
         // Неотловленная ошибка в этом блоке (subscribe) вызывает обрыв вебсокета, которое автоматически не восстанавливается!
         try {
           console.log('message received: ' + message.data);
-          let data: any = JSON.parse(message.data);
-          if(data != null) {
-            /*
-               Тур разбираем содержимое date и строим логику на основе этого
-            */
-          }
-        }
-        catch(ex) {
-          console.log(ex);
+          this.onMessageObserver.next(JSON.parse(message.data)); 
+        } catch(ex) {
+          console.error(ex);
         }
       },
       (errors: ErrorEvent) => {

@@ -20,6 +20,7 @@ const QString EMPTY_STR("");
 
 #define asID toULongLong()
 #define asDT toDateTime()
+#define asVRT toVariant()
 #define asSTR toString()
 #define asINT toInt()
 #define asFLT toFloat()

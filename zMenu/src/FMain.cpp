@@ -14,6 +14,7 @@
 #include "xml.h"
 #include "tme.h"
 #include "lst.h"
+#include "sql.h"
 
 #include "FMain.h"
 #include "ui_FMain.h"
@@ -26,6 +27,27 @@
 
 // Дополнительные функции. ****************************************************/
 /******************************************************************************/
+
+
+// Преобразование в JSON-объект. -----------------------------------------------
+//------------------------------------------------------------------------------
+QJsonDocument JSON(QSqlQuery &query) {
+    QJsonArray arr;
+    QJsonDocument doc;
+
+    while(query.next()) {
+        QJsonObject rec;
+        for(int i=0; i<query.record().count(); i++) {
+            rec.insert(
+                query.record().fieldName(i)
+              , QJsonValue::fromVariant(query.value(i)) );
+        }// i
+        arr.push_back(rec);
+    }// while(query.next())
+
+    doc.setArray(arr);
+    return doc;
+}// JSON
 
 /* FMain **********************************************************************/
 /******************************************************************************/
@@ -110,10 +132,10 @@ void FMain::on_ws_txt_msg(QString msg) {
         ? QJsonObject()
         : doc.isObject() ? doc.object() : QJsonObject();
 
-    if(obj["method"] == "item") {
-        QJsonArray arr;
-        QJsonDocument doc;
-        QSqlQuery query = E::sldb->exec("SELECT * FROM item");
+    // item_list
+    if(obj["name"] == "item_list") {
+        QSqlQuery query = E::sldb->exec(
+            "SELECT * FROM item" );
 
         if(query.lastError().type() != QSqlError::NoError) {
             E::Log->post(
@@ -121,19 +143,47 @@ void FMain::on_ws_txt_msg(QString msg) {
               , query.executedQuery() )->clr(Qt::darkYellow);
         }// if(query.lastError().type() == QSqlError::NoError)
 
-        while(query.next()) {
-            QJsonObject rec;
-            for(int i=0; i<query.record().count(); i++) {
-                rec.insert(
-                    query.record().fieldName(i)
-                  , QJsonValue::fromVariant(query.value(i)) );
-            }// i
-            arr.push_back(rec);
-        }// while(query.next())
-        doc.setArray(arr);
-
-        rsp->sendTextMessage(doc.toJson());
+        rsp->sendTextMessage(JSON(query).toJson());
     }// if(obj["method"] == "item")
+
+    // item_save
+    if(obj["name"] == "item_save") {
+        QJsonValue data = obj["data"];
+
+        ZSqlQuery query(
+            "\nUPDATE item"
+            "\nSET name = :name, note = :note, cost = :cost"
+            "\n  , type = :type, room = :room"
+            "\nWHERE id = :id"
+          , *E::sldb );
+
+        query(":id", data["id"].asVRT);
+        query(":name", data["name"].asVRT);
+        query(":note", data["note"].asVRT);
+        query(":cost", data["cost"].asVRT);
+        query(":type", data["type"].asVRT);
+        query(":room", data["room"].asVRT);
+        query.upd();
+
+        if(query.lastError().type() != QSqlError::NoError) {
+            E::Log->post(
+                "Ошибка выполнения запроса: " % query.lastError().text()
+              , query.executedQuery() )->clr(Qt::darkYellow);
+            rsp->sendTextMessage(
+                QJsonDocument(QJsonObject({
+                    PR("item", data["id"].asINT)
+                  , PR("cmnd", "item_save")
+                  , PR("err", query.lastError().asTXT)
+                })).toJson() );
+        } else {
+            rsp->sendTextMessage(
+                QJsonDocument(QJsonObject({
+                    PR("item", data["id"].asINT)
+                  , PR("cmnd", "item_save")
+                })).toJson() );
+        }// else // if(query.lastError().type() == QSqlError::NoError)
+
+    }// if(obj["name"] == "item_save")
 
 }// on_ws_txt_msg
 
@@ -219,7 +269,7 @@ void FMain::SET_PRM(const QStringList &args) {
     prsr.addOptions({
         {{"q", "quit"}, tr("Завершить приложение."), "quit" }
       , {{"f", "file"}, tr("Задать путь к файловому хранилищу."), "file" }
-      , {{"l", "sqlt"}, tr("Задать путь к файловому хранилищу."), "sqlt" }
+      , {{"l", "sqlt"}, tr("Задать путь к хранилищу БД."), "sqlt" }
     });
     prsr.process(args);
 
@@ -372,7 +422,7 @@ void FMain::on_aWsSend_triggered() {
 // Отладка -> Проба. -----------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_aTest_triggered() {
-    QString msg(R"({"method" : "list"})");
+    QString msg(R"({"cmnd" : "list"})");
 
     QJsonDocument doc = QJsonDocument::fromJson(msg.asUTF);
     QJsonObject obj;
