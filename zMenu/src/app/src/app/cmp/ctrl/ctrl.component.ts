@@ -48,7 +48,7 @@ export class CtrlComponent implements OnInit {
       this.websocketService.init();
 
       // Отправляем запрос на получение списка item
-      this.websocketService.sendMessage({name: 'item_list', data: null});
+      this.websocketService.sendMessage({cmnd: 'item_list', data: null});
 
       // Подписка нашего обработчика сообщений
       this.subscribeOnMessage();

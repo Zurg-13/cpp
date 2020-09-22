@@ -3,10 +3,13 @@
 
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
+#include <functional>
+
 #include <QMainWindow>
 #include <QtHttpServer>
 #include <QWebSocket>
 #include <QMoveEvent>
+#include <QSqlQuery>
 
 namespace Ui { class FMain; }
 
@@ -45,8 +48,17 @@ class FMain : public QMainWindow {
     void SET_SQL(void);
     void ROUTING(void);
     void SET_PRM(const QStringList &args);
+
     QHttpServerResponse proc(const QString&, const QHttpServerRequest&);
     QHostAddress addr(void);
+
+    // Обработчики.
+    void EXEC(
+        QWebSocket *rsp, const QJsonObject &obj, QSqlQuery &sql
+      , std::function<void(QSqlQuery&)> done );
+
+    void item_list(QWebSocket *rsp, const QJsonObject &obj);
+    void item_save(QWebSocket *rsp, const QJsonObject &obj);
 
 };
 

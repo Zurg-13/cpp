@@ -6,6 +6,8 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QStringBuilder>
+#include <QList>
+#include <QPair>
 
 #include "env.h" // Глобальная среда приложения.
 
@@ -25,12 +27,16 @@
 #define IMP(m) E::imp(STR("MAIN: ") % m)
 #define OTH(m) E::oth(STR("MAIN: ") % m)
 
+#define ARR(j) j.toJson()
+
 // Дополнительные функции. ****************************************************/
 /******************************************************************************/
 
 
 // Преобразование в JSON-объект. -----------------------------------------------
 //------------------------------------------------------------------------------
+QJsonDocument JSON(std::initializer_list<QPair<QString, QJsonValue>> list)
+    { return QJsonDocument(QJsonObject(list)); }
 QJsonDocument JSON(QSqlQuery &query) {
     QJsonArray arr;
     QJsonDocument doc;
@@ -48,6 +54,16 @@ QJsonDocument JSON(QSqlQuery &query) {
     doc.setArray(arr);
     return doc;
 }// JSON
+
+// Приведение к виду ключ-значене. ---------------------------------------------
+//------------------------------------------------------------------------------
+ZPrm PRM(const QJsonValue &json) {
+    ZPrm prmt;
+    QJsonObject::const_iterator etty = json.toObject().constBegin();
+    for(; etty != json.toObject().constEnd(); etty++)
+        { prmt[':' + etty.key()] = etty.value(); }
+    return prmt;
+}// prm
 
 /* FMain **********************************************************************/
 /******************************************************************************/
@@ -124,74 +140,83 @@ void FMain::ROUTING(void) {
 // Получено текстовое сообщение. -----------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_txt_msg(QString msg) {
-    E::Log->post("Текстовое сообщение", msg);
-
+    static QMap<QString, int> route = {
+        {"item_list",1}, {"item_save",2} };
     QWebSocket *rsp = qobject_cast<QWebSocket*>(sender());
     QJsonDocument doc = QJsonDocument::fromJson(msg.asUTF);
     QJsonObject obj = doc.isNull()
         ? QJsonObject()
         : doc.isObject() ? doc.object() : QJsonObject();
 
-    // item_list
-    if(obj["name"] == "item_list") {
-        QSqlQuery query = E::sldb->exec(
-            "SELECT * FROM item" );
+    switch(route[obj["cmnd"].asSTR]) {
+     case  1: item_list(rsp, obj);
+     case  2: item_save(rsp, obj);
+     default:
+        rsp->sendTextMessage(ARR(JSON({
+            PR("cmnd", obj["cmnd"])
+          , PR("err", "Команда не обрабатывается")
+        })));
+    }// switch(route[obj["cmnd"].asSTR])
 
-        if(query.lastError().type() != QSqlError::NoError) {
-            E::Log->post(
-                "Ошибка выполнения запроса: " % query.lastError().text()
-              , query.executedQuery() )->clr(Qt::darkYellow);
-        }// if(query.lastError().type() == QSqlError::NoError)
-
-        rsp->sendTextMessage(JSON(query).toJson());
-    }// if(obj["method"] == "item")
-
-    // item_save
-    if(obj["name"] == "item_save") {
-        QJsonValue data = obj["data"];
-
-        ZSqlQuery query(
-            "\nUPDATE item"
-            "\nSET name = :name, note = :note, cost = :cost"
-            "\n  , type = :type, room = :room"
-            "\nWHERE id = :id"
-          , *E::sldb );
-
-        query(":id", data["id"].asVRT);
-        query(":name", data["name"].asVRT);
-        query(":note", data["note"].asVRT);
-        query(":cost", data["cost"].asVRT);
-        query(":type", data["type"].asVRT);
-        query(":room", data["room"].asVRT);
-        query.upd();
-
-        if(query.lastError().type() != QSqlError::NoError) {
-            E::Log->post(
-                "Ошибка выполнения запроса: " % query.lastError().text()
-              , query.executedQuery() )->clr(Qt::darkYellow);
-            rsp->sendTextMessage(
-                QJsonDocument(QJsonObject({
-                    PR("item", data["id"].asINT)
-                  , PR("cmnd", "item_save")
-                  , PR("err", query.lastError().asTXT)
-                })).toJson() );
-        } else {
-            rsp->sendTextMessage(
-                QJsonDocument(QJsonObject({
-                    PR("item", data["id"].asINT)
-                  , PR("cmnd", "item_save")
-                })).toJson() );
-        }// else // if(query.lastError().type() == QSqlError::NoError)
-
-    }// if(obj["name"] == "item_save")
-
+    E::Log->post("Текстовое сообщение", msg);
 }// on_ws_txt_msg
+
+// Выполнение запросов. --------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::EXEC(
+    QWebSocket *rsp, const QJsonObject &obj, QSqlQuery &sql
+  , std::function<void(QSqlQuery&)> done )
+{
+    if(sql.exec()) {
+        done(sql);
+    } else {
+        E::Log->post(
+            "Ошибка выполнения запроса: " % sql.lastError().asTXT
+          , sql.executedQuery() )->clr(Qt::darkYellow);
+        rsp->sendTextMessage(ARR(JSON({
+            PR("id", (obj["data"])["id"].asINT)
+          , PR("cmnd", obj["cmnd"])
+          , PR("err", sql.lastError().asTXT) })));
+    }// else // if(sql.lastError().type() == QSqlError::NoError)
+}// EXEC
+
+// ОБРАБОТЧИК: Вернуть список элементов меню. ----------------------------------
+//------------------------------------------------------------------------------
+void FMain::item_list(QWebSocket *rsp, const QJsonObject &obj) {
+    static QSqlQuery sItem = ZSqlQuery(
+        "SELECT * FROM item"
+      , *E::sldb );
+
+    EXEC(
+        rsp, obj, sItem
+      , [rsp](QSqlQuery &sql) {
+            rsp->sendTextMessage(ARR(JSON(sql)));
+        });
+}// item_list
+
+// ОБРАБОТЧИК: Сохранить элемент меню. -----------------------------------------
+//------------------------------------------------------------------------------
+void FMain::item_save(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery uItem = ZSqlQuery(
+        "\n UPDATE item"
+        "\n SET name = :name, note = :note, cost = :cost"
+        "\n   , type = :type, room = :room"
+        "\n WHERE id = :id"
+      , *E::sldb );
+
+    EXEC(
+        rsp, obj, uItem(PRM(obj["data"]))
+      , [rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("item", (obj["data"])["id"].asINT)
+              , PR("cmnd", obj["cmnd"]) })));
+        });
+}// item_save
 
 // Получено двоичное сообщение. ------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::on_ws_bin_msg(QByteArray msg) {
     E::Log->post("Двоичное сообщение", msg);
-
 }// on_ws_bin_msg
 
 // Ws: потеря соединения. ------------------------------------------------------

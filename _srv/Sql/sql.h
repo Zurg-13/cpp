@@ -20,7 +20,7 @@
 #define DB(n) QSqlDatabase::database(n)
 #define BV(n, v) bindValue(n, v)
 #define UPD(q) do { q.upd(); q.first(); } while(false)
-#define EXEC(q) ExecSQL(q)
+#define EXE(q) ExecSQL(q)
 
 #define IDX(m, n) qobject_cast<QSqlQueryModel*>(m)->record().indexOf(n)
 #define PRX(p) qobject_cast<QSortFilterProxyModel*>(p)
@@ -42,36 +42,25 @@ bool ExecSQL(QSqlQuery *q);
 
 /* Расширение QSqlQuery. ******************************************************/
 /******************************************************************************/
+typedef QMap<QString, QVariant> ZPrm;
 class ZSqlQuery : public QSqlQuery {
 
  public:
-    enum class PREPARE {YES, NOT };
+    ZSqlQuery(const QString &sql, const QSqlDatabase &db);
 
-    explicit ZSqlQuery(const QSqlDatabase &db): QSqlQuery(db) {}
-             ZSqlQuery(
-                 const QString &sql, const QSqlDatabase &db
-               , PREPARE prep = PREPARE::YES );
-             ZSqlQuery(void) {}
+    ZSqlQuery& exe(const ZPrm &prm = ZPrm(), bool *ok = nullptr);
+    ZSqlQuery& fst(void) { first(); return *this; }
+    ZSqlQuery& pre(void) { seek(-1); return *this; } // ПЕРЕД первой записью.
 
-    bool upd    (void);
-    bool prepare(void);
-    void setSQL (const QString &sql) { this->sql = sql; un_prep(); }
-    bool upd_fst(void) { bool ret = upd(); first(); return ret; }
-    void pre_fst(void) { seek(-1); } // В положение ПЕРЕД первой записью.
-    void un_prep(void) { fl_prp = false; }
-    bool is_prep(void) { return fl_prp; }
+    ZSqlQuery& operator ()(const QString &fld, const QVariant &val);
+    ZSqlQuery& operator ()(const QString &fld, const qulonglong val);
+    ZSqlQuery& operator ()(const QMap<QString, QVariant> &prm);
 
-    const QString& getSQL (void) { return this->sql; }
-
-    QVariant    curVal  (const QString &fld); // Считать текущее значение.
-    QVariant operator [](const QString &fld){ return curVal(fld); }
-
-    void operator ()(const QString &fld, const QVariant &val);
-    void operator ()(const QString &fld, const qulonglong val);
+    QVariant   val        (const QString &fld); // Считать текущее значение.
+    QVariant   operator [](const QString &fld){ return val(fld); }
 
  private:
-    bool fl_prp = false;
-    QString sql;
+    void verify_fld_name(const QString &name);
 
 };// ZSqlQuery
 

@@ -6,12 +6,13 @@
 #include <QHeaderView>
 
 #include "sql.h"
+#include "lst.h"
 
 
 /* Служебные функции. *********************************************************/
 /******************************************************************************/
-const QString SQL_ERR_MSG("Ошибка SQL-запроса (%1)");
-const QString SQL_NME_MSG("Ошибка именования");
+const QString ERR_SQL_MSG("Ошибка SQL-запроса (%1)");
+const QString ERR_NME_PRM("Ошибка именования параметров");
 
 // Найти положение символа конца строки "\0". ----------------------------------
 //------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ int FIND_END(const QString &str){
 
 // Расширенное сообщение (содержит скрываемые детели).--------------------------
 //------------------------------------------------------------------------------
-void ExtMsg(const QString &txt, const QString &inf, const QString &dtl) {
+void MSG_EXT(const QString &txt, const QString &inf, const QString &dtl) {
     QMessageBox mb;
     mb.setStandardButtons(QMessageBox::NoButton);
 
@@ -37,21 +38,16 @@ void ExtMsg(const QString &txt, const QString &inf, const QString &dtl) {
     mb.exec();
 }// ExtMsg
 
-// Список объявленных параметров со значениями.---------------------------------
+// Значения связанных с запросом параметров. -----------------------------------
 //------------------------------------------------------------------------------
-QString BoundParams(const QSqlQuery &q){
-    QString ret("\n\n ПАРАМЕТРЫ ==============\n");
-    QMap<QString, QVariant> prm = q.boundValues();
-    QList<QString> key = prm.keys();
-
-    QList<QString>::iterator it = key.begin(), end = key.end();
-    while(it != end){
-        ret += (*it) + " = " + prm[(*it)].toString() + "\n";
-        it++;
-    }// while(bgn != end)
-
-    return ret;
-}// BindParams
+QString BND_PRM(const QSqlQuery &q) {
+    return
+        QString("\n\n ПАРАМЕТРЫ ==============\n")
+      + BLD(
+            LST(q.boundValues())
+          , [](const QPair<QString, QVariant> &pr) -> QString
+                { return  pr.first + "=" + pr.second.toString(); }, "\n" );
+}// BND_PRM
 
 // Выполненть SQL запрос.-------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -59,10 +55,16 @@ bool ExecSQL(QSqlQuery *q) { return ExecSQL(*q); }
 bool ExecSQL(QSqlQuery &q) {
     if(!q.exec()){
         QString msg(q.lastError().databaseText());
-        ExtMsg(
-            SQL_ERR_MSG.arg(q.lastError().nativeErrorCode())
+        MSG_EXT(
+            ERR_SQL_MSG.arg(q.lastError().nativeErrorCode())
           , msg.left(FIND_END(msg)) + "\n" + q.lastError().driverText()
-          , q.lastQuery() + BoundParams(q));
+          , q.lastQuery()
+              + QString("\n\n ПАРАМЕТРЫ ==============\n")
+              + BLD(LST(
+                    q.boundValues())
+                  , [](const QPair<QString, QVariant> &pr) -> QString
+                        { return  pr.first + "=" + pr.second.toString(); }
+                  , ", " ));
         return false;
     }// if(!q.exec())
     return true;
@@ -74,63 +76,53 @@ bool ExecSQL(QSqlQuery &q) {
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
-ZSqlQuery::ZSqlQuery(
-    const QString &sql, const QSqlDatabase &db, ZSqlQuery::PREPARE prep )
-  : QSqlQuery(db), sql(sql)
-{ if(prep == PREPARE::YES) { prepare(); } }
+ZSqlQuery::ZSqlQuery(const QString &sql, const QSqlDatabase &db) : QSqlQuery(db)
+    { prepare(sql); }
 
-//Назначение параметров(ULONGLONG).---------------------------------------------
+//Назначение параметров. -------------------------------------------------------
 //------------------------------------------------------------------------------
-void ZSqlQuery::operator () (const QString &fld, const qulonglong var ) {
-    if(fld[0] != ':') {
+void ZSqlQuery::verify_fld_name(const QString &name) {
+    if(':' != name.front()) {
         QMessageBox::critical(
-            nullptr, SQL_NME_MSG, fld+"\n" + this->lastQuery() );
-    }// if(fld[0] != ':')
+            nullptr, ERR_NME_PRM, name + "\n" + this->lastQuery() );
+    }// if(':' != name.front())
+}// verify_fld_name
 
-    this->bindValue(fld, QString::number(var));
-}// operator ()
-
-//Назначение параметров(VARIANT).-----------------------------------------------
-//------------------------------------------------------------------------------
-void ZSqlQuery::operator () (const QString &fld, const QVariant &var ) {
-    if(fld[0] != ':') {
-        QMessageBox::critical(
-            nullptr, SQL_NME_MSG, fld+"\n" + this->lastQuery() );
-    }// if(fld[0] != ':')
-    this->bindValue(fld, var);
+ZSqlQuery& ZSqlQuery::operator () (const QString &fld, const qulonglong val)
+    { verify_fld_name(fld); this->BV(fld, QString::number(val)); return *this; }
+ZSqlQuery& ZSqlQuery::operator () (const QString &fld, const QVariant &val )
+    { verify_fld_name(fld); this->BV(fld, val); return *this; }
+ZSqlQuery& ZSqlQuery::operator ()(const QMap<QString, QVariant> &prm) {
+    QMap<QString, QVariant>::const_iterator entt = prm.constBegin();
+    for(; entt != prm.constEnd(); entt++)
+        { verify_fld_name(entt.key()); this->BV(entt.key(), entt.value()); }
+    return *this;
 }// operator ()
 
 //Обращение по имени поля.------------------------------------------------------
 //------------------------------------------------------------------------------
-QVariant ZSqlQuery::curVal(const QString &fld)
+QVariant ZSqlQuery::val(const QString &fld)
     { return this->record().value(fld); }
-
-//Подготовить прикреплённый запрос.---------------------------------------------
-//------------------------------------------------------------------------------
-bool ZSqlQuery::prepare(void)
-    { fl_prp = QSqlQuery::prepare(sql); return fl_prp; }
 
 //Обновить.---------------------------------------------------------------------
 //------------------------------------------------------------------------------
-bool ZSqlQuery::upd(void) {
-    bool ret;
+ZSqlQuery& ZSqlQuery::exe(const ZPrm &prm, bool *ok) {
+    operator()(prm);
 
-    if(!fl_prp) { prepare(); }
+    if(exec()) {
+        if(ok) { *ok = true; }
+    } else {
+        if(ok) { *ok = false; }
 
-    ret = this->exec();
-
-    //Игнорируем ошибки подключения.
-    if(!ret && this->lastError().type() != QSqlError::ConnectionError) {
         QString msg(this->lastError().databaseText());
-        ExtMsg(
-            SQL_ERR_MSG.arg(this->lastError().nativeErrorCode())
+        MSG_EXT(
+            ERR_SQL_MSG.arg(this->lastError().nativeErrorCode())
           , msg.left(FIND_END(msg)) + "\n" + this->lastError().driverText()
-          , this->lastQuery() + BoundParams(*this));
-    }// if(!ret)
+          , this->lastQuery() + BND_PRM(*this));
+    }// if(exec())
 
-    return ret;
+    return *this;
 }// upd
-
 
 /* ZTableView *****************************************************************/
 /******************************************************************************/

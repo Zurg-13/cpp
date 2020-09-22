@@ -248,6 +248,8 @@ void FMain::on_bt_clicked() {
     this->setGeometry(0, 0, 800, 50);
 */
 
+    DBG << "tst:" << this->test_var_val;
+
     this->test_var_val = "123";
     DBG << "val:" << this->test_var;
 

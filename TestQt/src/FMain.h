@@ -13,8 +13,8 @@ namespace Ui { class FMain; }
 /******************************************************************************/
 class FMain : public QMainWindow {
     Q_OBJECT
+    QString test_var_val = QString(3, '#');
 
-    QString test_var_val;
   public:
     const QString &test_var = test_var_val;
 
