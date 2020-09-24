@@ -37,9 +37,8 @@
 //------------------------------------------------------------------------------
 QJsonDocument JSON(std::initializer_list<QPair<QString, QJsonValue>> list)
     { return QJsonDocument(QJsonObject(list)); }
-QJsonDocument JSON(QSqlQuery &query) {
+QJsonArray JSON(QSqlQuery &query) {
     QJsonArray arr;
-    QJsonDocument doc;
 
     while(query.next()) {
         QJsonObject rec;
@@ -51,8 +50,7 @@ QJsonDocument JSON(QSqlQuery &query) {
         arr.push_back(rec);
     }// while(query.next())
 
-    doc.setArray(arr);
-    return doc;
+    return arr;
 }// JSON
 
 // Приведение к виду ключ-значене. ---------------------------------------------
@@ -60,8 +58,10 @@ QJsonDocument JSON(QSqlQuery &query) {
 ZPrm PRM(const QJsonValue &json) {
     ZPrm prmt;
     QJsonObject::const_iterator etty = json.toObject().constBegin();
-    for(; etty != json.toObject().constEnd(); etty++)
-        { prmt[':' + etty.key()] = etty.value(); }
+    for(; etty != json.toObject().constEnd(); etty++) {
+        prmt[':' + etty.key()] = etty->isDouble() ? QVariant(etty->toDouble())
+                                                  : QVariant(etty->toString());
+    }// etty
     return prmt;
 }// prm
 
@@ -141,7 +141,11 @@ void FMain::ROUTING(void) {
 //------------------------------------------------------------------------------
 void FMain::on_ws_txt_msg(QString msg) {
     static QMap<QString, int> route = {
-        {"item_list",1}, {"item_save",2} };
+        {"item_list",1}, {"item_save",2}, {"item_post",3}
+      , {"type_list",4}, {"type_save",5}, {"type_post",6}
+      , {"room_list",7}, {"room_save",8}, {"room_post",9}
+    };
+
     QWebSocket *rsp = qobject_cast<QWebSocket*>(sender());
     QJsonDocument doc = QJsonDocument::fromJson(msg.asUTF);
     QJsonObject obj = doc.isNull()
@@ -149,8 +153,8 @@ void FMain::on_ws_txt_msg(QString msg) {
         : doc.isObject() ? doc.object() : QJsonObject();
 
     switch(route[obj["cmnd"].asSTR]) {
-     case  1: item_list(rsp, obj);
-     case  2: item_save(rsp, obj);
+     case  1: item_list(rsp, obj); break;
+     case  2: item_save(rsp, obj); break;
      default:
         rsp->sendTextMessage(ARR(JSON({
             PR("cmnd", obj["cmnd"])
@@ -180,18 +184,35 @@ void FMain::EXEC(
     }// else // if(sql.lastError().type() == QSqlError::NoError)
 }// EXEC
 
+// ОБРАБОТЧИК: Создать новый элемент меню. -------------------------------------
+//------------------------------------------------------------------------------
+void FMain::item_post(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery iItem = ZSqlQuery(
+        "\n INSERT INTO item "
+                  "(name, note, cost, stat, hide, type, room)"
+        "\n VALUES(:name,:note,:cost,:stat,:hide,:type,:room)", *E::sldb );
+    static ZSqlQuery sItemID = ZSqlQuery(
+        "\n SELECT seq FROM sqlite_sequence WHERE name='item'", *E::sldb );
+
+    EXEC(
+        rsp, obj, iItem(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("item",sItemID.exe().fst()["seq"].asINT) }))); });
+}// item_post
+
 // ОБРАБОТЧИК: Вернуть список элементов меню. ----------------------------------
 //------------------------------------------------------------------------------
 void FMain::item_list(QWebSocket *rsp, const QJsonObject &obj) {
     static QSqlQuery sItem = ZSqlQuery(
-        "SELECT * FROM item"
-      , *E::sldb );
-
+        "SELECT * FROM item", *E::sldb);
     EXEC(
         rsp, obj, sItem
-      , [rsp](QSqlQuery &sql) {
-            rsp->sendTextMessage(ARR(JSON(sql)));
-        });
+      ,[rsp, obj](QSqlQuery &sql) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("list", JSON(sql)) }))); });
 }// item_list
 
 // ОБРАБОТЧИК: Сохранить элемент меню. -----------------------------------------
@@ -201,17 +222,72 @@ void FMain::item_save(QWebSocket *rsp, const QJsonObject &obj) {
         "\n UPDATE item"
         "\n SET name = :name, note = :note, cost = :cost"
         "\n   , type = :type, room = :room"
-        "\n WHERE id = :id"
-      , *E::sldb );
-
+        "\n WHERE id = :id", *E::sldb );
     EXEC(
         rsp, obj, uItem(PRM(obj["data"]))
-      , [rsp, obj](QSqlQuery&) {
+      ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
-                PR("item", (obj["data"])["id"].asINT)
-              , PR("cmnd", obj["cmnd"]) })));
-        });
+                PR("cmnd", obj["cmnd"])
+              , PR("item",(obj["data"])["id"].asINT) }))); });
 }// item_save
+
+// ОБРАБОТЧИК: Вернуть список типов. -------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::type_list(QWebSocket *rsp, const QJsonObject &obj) {
+    static QSqlQuery sType = ZSqlQuery(
+        "SELECT * FROM type", *E::sldb);
+    EXEC(
+        rsp, obj, sType
+      ,[rsp, obj](QSqlQuery &sql) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("list", JSON(sql)) }))); });
+}// type_list
+
+// ОБРАБОТЧИК: Сохраить тип. ---------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::type_save(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery uType = ZSqlQuery(
+        "\n UPDATE type"
+        "\n SET name = :name, note = :note"
+        "\n WHERE id = :id", *E::sldb );
+    EXEC(
+        rsp, obj, uType(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("type",(obj["data"])["id"].asINT) }))); });
+}// type_save
+
+// ОБРАБОТЧИК: Вернуть список размещений. --------------------------------------
+//------------------------------------------------------------------------------
+void FMain::room_list(QWebSocket *rsp, const QJsonObject &obj) {
+    static QSqlQuery sRoom = ZSqlQuery(
+        "SELECT * FROM room", *E::sldb);
+    EXEC(
+        rsp, obj, sRoom
+      ,[rsp, obj](QSqlQuery &sql) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("list", JSON(sql))
+            })));
+        });
+}// room_list
+
+// ОБРАБОТЧИК: Сохранить размещение. -------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::room_save(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery uRoom = ZSqlQuery(
+        "\n UPDATE room"
+        "\n SET name = :name, note = :note"
+        "\n WHERE id = :id", *E::sldb );
+    EXEC(
+        rsp, obj, uRoom(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("room",(obj["data"])["id"].asINT) }))); });
+}// room_save
 
 // Получено двоичное сообщение. ------------------------------------------------
 //------------------------------------------------------------------------------
@@ -316,34 +392,26 @@ void FMain::SET_SQL(void) {
     static const QSqlError::ErrorType
         OK(QSqlError::NoError), STMT(QSqlError::StatementError);
 
-
     QStringList tbl {
         "CREATE TABLE item ("
-        "  id   INTEGER PRIMARY KEY NOT NULL"
-        ", name VARCHAR(255)        NOT NULL"
-        ", note VARCHAR(255)        NOT NULL"
-        ", cost INTEGER             NOT NULL"
-        ", room INTEGER             NOT NULL"
-        ", type INTEGER             NOT NULL )"
+        "  id   INTEGER PRIMARY KEY AUTOINCREMENT"
+        ", name TEXT    NOT NULL"
+        ", note TEXT    NOT NULL"
+        ", cost INTEGER NOT NULL"
+        ", stat INTEGER NOT NULL"
+        ", hide INTEGER NOT NULL"
+        ", room INTEGER NOT NULL"
+        ", type INTEGER NOT NULL )"
 
       , "CREATE TABLE type ("
-        "  id   INTEGER PRIMARY KEY NOT NULL"
-        ", name VARCHAR(255)        NOT NULL"
-        ", note VARCHAR(255)        NOT NULL )"
+        "  id   INTEGER PRIMARY KEY AUTOINCREMENT"
+        ", name TEXT    NOT NULL"
+        ", note TEXT    NOT NULL )"
 
       , "CREATE TABLE room ("
-        "  id   INTEGER PRIMARY KEY NOT NULL"
-        ", name VARCHAR(255)        NOT NULL"
-        ", note VARCHAR(255)        NOT NULL )"
-
-      , "INSERT INTO item (id, name, note, cost, room, type)"
-        "VALUES(1, 'NAME-1', 'NOTE-1', 0, 0, 0)"
-      , "INSERT INTO item (id, name, note, cost, room, type)"
-        "VALUES(2, 'NAME-2', 'NOTE-2', 0, 0, 0)"
-      , "INSERT INTO item (id, name, note, cost, room, type)"
-        "VALUES(3, 'NAME-3', 'NOTE-3', 0, 0, 0)"
-      , "INSERT INTO item (id, name, note, cost, room, type)"
-        "VALUES(4, 'NAME-4', 'NOTE-4', 0, 0, 0)"
+        "  id   INTEGER PRIMARY KEY AUTOINCREMENT"
+        ", name TEXT    NOT NULL"
+        ", note TEXT    NOT NULL )"
     };
 
     for(const QString &query: tbl) {
@@ -402,12 +470,12 @@ void FMain::on_btRun_clicked() {
         this->tcp->close();
         for(QTcpSocket *socket: this->tcp->findChildren<QTcpSocket*>())
             { socket->disconnectFromHost(); }
-        IMP("Http: Прослушивание остановлено");
+        IMP("Прослушивание остановлено");
         SET_BTN("Пуск", "color: limegreen;");
 
     } else {
         if(this->tcp->listen(QHostAddress::Any, E::port)) {
-            IMP("Http: Прослушивание запущено");
+            IMP("Прослушивание запущено");
             SET_BTN("Стоп", "color: crimson;");
         } else {
             ERR("Ошибка прослушивателя: " + tcp->errorString());
@@ -463,6 +531,53 @@ void FMain::on_aTest_triggered() {
 
     FNC << "method:" << obj["method"];
 }// on_aTest_triggered
+
+// Тестовое заполнение БД. -----------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aTestFillDB_triggered() {
+    static const QString ALREDY_EXIST("2");
+    static const QSqlError::ErrorType
+        OK(QSqlError::NoError), STMT(QSqlError::StatementError);
+
+    QStringList tbl {
+        "INSERT INTO item (name, note, cost, stat, hide, room, type)"
+        "VALUES('NAME-1', 'NOTE-1', 0, 0, 0, 0, 0)"
+      , "INSERT INTO item (name, note, cost, stat, hide, room, type)"
+        "VALUES('NAME-2', 'NOTE-2', 0, 0, 0, 0, 0)"
+      , "INSERT INTO item (name, note, cost, stat, hide, room, type)"
+        "VALUES('NAME-3', 'NOTE-3', 0, 0, 0, 0, 0)"
+      , "INSERT INTO item (name, note, cost, stat, hide, room, type)"
+        "VALUES('NAME-4', 'NOTE-4', 0, 0, 0, 0, 0)"
+
+      , "INSERT INTO type (name, note)"
+        "VALUES('Нет', 'Тип не задан')"
+      , "INSERT INTO type (name, note)"
+        "VALUES('Меню', 'Меню')"
+      , "INSERT INTO type (name, note)"
+        "VALUES('Пицца', 'Пицца')"
+
+      , "INSERT INTO room (name, note)"
+        "VALUES('Нет', 'Размещение не задано')"
+      , "INSERT INTO room (name, note)"
+        "VALUES('Салат', 'Салаты')"
+      , "INSERT INTO room (name, note)"
+        "VALUES('Первое', 'Первые блюда')"
+      , "INSERT INTO room (name, note)"
+        "VALUES('Второе', 'Вторые блюда')"
+      , "INSERT INTO room (name, note)"
+        "VALUES('Десерт', 'Десерты')"
+    };
+
+    for(const QString &query: tbl) {
+        QSqlError error = E::sldb->exec(query).lastError();
+        QSqlError::ErrorType etype = error.type();
+
+        if(etype != OK
+        &&(etype != STMT || error.nativeErrorCode() != ALREDY_EXIST) )
+            { ERR(error.text()); }
+    }// query
+
+}// on_aTestFillDB_triggered
 
 //------------------------------------------------------------------------------
 

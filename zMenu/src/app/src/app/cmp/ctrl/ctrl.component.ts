@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Item } from 'src/app/cls/Item';
 import { ConfigService } from 'src/app/srv/config.service';
 import { WebsocketService } from 'src/app/srv/websocket.service';
+import { ModelService } from 'src/app/srv/model.service';
 
 
 @Component({
@@ -11,12 +12,15 @@ import { WebsocketService } from 'src/app/srv/websocket.service';
 })
 export class CtrlComponent implements OnInit {
 
+/*  
   public items: Item[] = []; // Список редактируемых карточек item
+*/  
 
   constructor(
-    private configService: ConfigService,
-    private websocketService: WebsocketService
-  ) { }
+    private configService: ConfigService
+  , private websocketService: WebsocketService
+  , public modelService: ModelService
+  ) {}
 
   ngOnInit(): void {
     // Ручное добавление элементов item, для отладки интерфейса (можно удалить)
@@ -62,19 +66,27 @@ export class CtrlComponent implements OnInit {
     if (this.websocketService.instance != null) {
 
       this.websocketService.onMessageObserver.subscribe((data: any) => {
-        console.log('subscribe OnMessage');
+        if(data.cmnd != "item_list") { return; }
+
         console.log(data);
-        for(let i = 0; i < data.length; i++) {
-          let currentItem = data[i];
+
+        for(let i = 0; i < data.list.length; i++) {
+          let currentItem = data.list[i];
           let newItem: Item = {
-            id: currentItem.id,
-            name: currentItem.name,
-            note: currentItem.note,
-            cost: currentItem.cost,
-            room: currentItem.room,
-            type: currentItem.type
+            id: currentItem.id
+          , name: currentItem.name
+          , note: currentItem.note
+          , cost: currentItem.cost
+          , stat: currentItem.stat
+          , hide: currentItem.hide
+          , room: currentItem.room
+          , type: currentItem.type
           };
+
+          this.modelService.setItem(newItem);
+/*          
           this.items.push(newItem);
+*/          
         }
       });
     }
@@ -91,6 +103,7 @@ export class CtrlComponent implements OnInit {
       То-есть, сперва выполнить запрос к серверу для создания,
       а он уже вернёт id.
     */
+/*   
     let newIndex = this.items.length;
 
     let newItem: Item = {
@@ -103,6 +116,7 @@ export class CtrlComponent implements OnInit {
     };
     
     this.items.push(newItem);
+*/    
   }
 
 }

@@ -42,6 +42,14 @@
     <string>Проба</string>
    </property>
   </action>
+  <action name="aOver">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Поверх всех</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

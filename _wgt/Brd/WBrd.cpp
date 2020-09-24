@@ -98,7 +98,8 @@ void  WBrd::clear(void) {
 void WBrd::ctx_menu(const QPoint &pos) {
     QMenu* menu = new QMenu();
 
-    menu->addAction(ui->aTest);
+//    menu->addAction(ui->aTest);
+    menu->addAction(ui->aOver);
     menu->addSeparator(); //----------------
     menu->addAction(ui->aClear);
     menu->exec(ui->sa->mapToGlobal(pos));
@@ -149,6 +150,18 @@ void WBrd::on_aTest_triggered() {
 
     FNC << R"(\ end)";
 }// on_aTest_triggered
+
+// Порверх всех окон. ----------------------------------------------------------
+//------------------------------------------------------------------------------
+void WBrd::on_aOver_triggered() {
+    QAction *actn = SENDER(QAction*);
+
+    if(windowFlags() & Qt::WindowStaysOnTopHint) { actn->setChecked(false); }
+    else                                         { actn->setChecked(true); }
+
+    this->setWindowFlags(windowFlags() ^ Qt::WindowStaysOnTopHint);
+    this->show();
+}// on_aOver_triggered
 
 //------------------------------------------------------------------------------
 

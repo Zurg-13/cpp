@@ -1,5 +1,9 @@
-<mat-card class="example-card col-xs-12 col-sm-6 sol-md-4 col-lg-2">
 <!--
+<mat-card class="example-card col-xs-12 col-sm-6 sol-md-4 col-lg-2">
+-->    
+<mat-card class="example-card">
+
+        <!--
     <mat-card-header>
         <mat-card-title>{{ item.name }}</mat-card-title>
         <mat-card-subtitle>{{ item.note }}</mat-card-subtitle>
@@ -47,7 +51,9 @@
     <button mat-button
         (click)="cancelChange()">Отмена</button>
 
-    <button mat-button>Добавить</button>
+    <button mat-button
+        (click)="newItem()">Добавить</button>
+
     <button mat-button>Удалить</button>
     <button mat-button>Деактивировать</button>
     </mat-card-actions>

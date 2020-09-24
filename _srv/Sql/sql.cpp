@@ -93,9 +93,9 @@ ZSqlQuery& ZSqlQuery::operator () (const QString &fld, const qulonglong val)
 ZSqlQuery& ZSqlQuery::operator () (const QString &fld, const QVariant &val )
     { verify_fld_name(fld); this->BV(fld, val); return *this; }
 ZSqlQuery& ZSqlQuery::operator ()(const QMap<QString, QVariant> &prm) {
-    QMap<QString, QVariant>::const_iterator entt = prm.constBegin();
-    for(; entt != prm.constEnd(); entt++)
-        { verify_fld_name(entt.key()); this->BV(entt.key(), entt.value()); }
+    QMap<QString, QVariant>::const_iterator etty = prm.constBegin();
+    for(; etty != prm.constEnd(); etty++)
+        { verify_fld_name(etty.key()); this->BV(etty.key(), etty.value()); }
     return *this;
 }// operator ()
 

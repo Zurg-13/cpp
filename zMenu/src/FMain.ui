@@ -188,6 +188,7 @@
     <addaction name="aTest"/>
     <addaction name="aLog"/>
     <addaction name="aWsSend"/>
+    <addaction name="aTestFillDB"/>
    </widget>
    <widget class="QMenu" name="mHelp">
     <property name="title">
@@ -216,6 +217,11 @@
   <action name="aWsSend">
    <property name="text">
     <string>Ws: Отправить </string>
+   </property>
+  </action>
+  <action name="aTestFillDB">
+   <property name="text">
+    <string>Тестовое заполнение БД</string>
    </property>
   </action>
  </widget>

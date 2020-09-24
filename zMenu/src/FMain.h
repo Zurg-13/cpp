@@ -38,7 +38,9 @@ class FMain : public QMainWindow {
     void on_aWsSend_triggered();
     void on_aTest_triggered();
 
- private:
+    void on_aTestFillDB_triggered();
+
+private:
     Ui::FMain *ui;
     QTcpServer *tcp = nullptr;
     QHttpServer srv;
@@ -55,10 +57,18 @@ class FMain : public QMainWindow {
     // Обработчики.
     void EXEC(
         QWebSocket *rsp, const QJsonObject &obj, QSqlQuery &sql
-      , std::function<void(QSqlQuery&)> done );
+      , std::function<void(QSqlQuery&)> done);
 
+
+    void item_post(QWebSocket *rsp, const QJsonObject &obj);
     void item_list(QWebSocket *rsp, const QJsonObject &obj);
     void item_save(QWebSocket *rsp, const QJsonObject &obj);
+
+    void room_list(QWebSocket *rsp, const QJsonObject &obj);
+    void room_save(QWebSocket *rsp, const QJsonObject &obj);
+
+    void type_list(QWebSocket *rsp, const QJsonObject &obj);
+    void type_save(QWebSocket *rsp, const QJsonObject &obj);
 
 };
 

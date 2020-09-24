@@ -4,6 +4,7 @@ import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
 import { CtrlComponent } from '../ctrl.component';
 import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast';
+import { ModelService } from 'src/app/srv/model.service';
 
 @Component({
   selector: 'app-item',
@@ -19,7 +20,10 @@ export class ItemComponent implements OnInit {
   public attributeEditorShow: boolean = false;
   public attributeType: string;
 
-  constructor(private ws: WebsocketService) { 
+  constructor(
+    private ws: WebsocketService
+  , public modelService: ModelService) 
+  { 
       this.saveState();
   }
 
@@ -27,12 +31,17 @@ export class ItemComponent implements OnInit {
 
     this.ws.onMessageObserver.subscribe((data: any) => {
 
-      if(this.item.id == data.item.id) {
-        
-        if(data.err == null) {
-          this.saveState();
-        }
 
+      switch(data["cmnd"]) {
+        case "item_save":
+          if(this.item.id == data.item.id) 
+            { if(data.err == null) { this.saveState(); }}
+        break;
+         
+        case "item_post":
+          if(this.item.id == null) 
+            { if(data.err == null) { this.item.id = data.item.id; }}
+        break;
       }
 
     });
@@ -47,7 +56,9 @@ export class ItemComponent implements OnInit {
 
   // Сохранить состояние. ------------------------------------------------------
   //----------------------------------------------------------------------------
-  private saveState(): void { this.prev = Object.assign({}, this.item); }
+  private saveState(): void { 
+    this.prev = Object.assign({}, this.item); 
+  }
 
   // Восстановить состояние. ---------------------------------------------------
   //----------------------------------------------------------------------------
@@ -56,11 +67,10 @@ export class ItemComponent implements OnInit {
   // Сохранить элемент меню. ---------------------------------------------------
   //----------------------------------------------------------------------------
   public saveItem(): void {
-    this.item.type = 0; 
-    this.item.room = 0; 
-
-    this.ws.sendMessage(new Cmnd("item_save", this.item));
-
+    if(this.item.id == null) 
+      { this.ws.sendMessage(new Cmnd("item_post", this.item)); }
+    else 
+      { this.ws.sendMessage(new Cmnd("item_save", this.item)); }
   }// saveItem
 
   // Отменить изменения. -------------------------------------------------------
@@ -69,4 +79,15 @@ export class ItemComponent implements OnInit {
     this.restState();
   }// cancelChange
 
-}
+  // Добавить элемент. ---------------------------------------------------------
+  //----------------------------------------------------------------------------
+  public newItem(): void {
+      this.modelService.insItem(
+        this.item.id
+      , new Item(
+          null
+        , null, null, null
+        , 0, 1, this.item.type, this.item.room) );
+  }// addItem
+
+}// ItemComponent

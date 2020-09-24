@@ -17,6 +17,7 @@ const QString EMPTY_STR("");
 /* Макросы ********************************************************************/
 /******************************************************************************/
 #define APP_DIR QApplication::applicationDirPath()
+#define SENDER(T) qobject_cast<T>(sender())
 
 #define asID toULongLong()
 #define asDT toDateTime()

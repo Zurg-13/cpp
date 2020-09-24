@@ -32,6 +32,8 @@ class WBrd : public QWidget {
     void on_aClear_triggered();
     void on_aTest_triggered();
 
+    void on_aOver_triggered();
+
 private:
     Ui::WBrd *ui;
     QWidget *box = nullptr;

@@ -10,12 +10,16 @@
     </div>
 -->    
 
-    <app-item class="item" *ngFor="let item of items" [item]="item"></app-item>
+    <app-item class="item" 
+        *ngFor="let item of modelService.getList()" 
+        [item]="item"></app-item>
     
     <!-- Кнопка добавления item -->
+<!--
     <div class="control-panel">
         <button mat-raised-button color="primary"
                 (click)="createItem()"
         >Добавить элемент</button>
     </div>
+-->    
 </div>
