@@ -3,6 +3,9 @@ import { Attribute } from 'src/app/cls/attribute';
 import { Type } from 'src/app/cls/type';
 import { Item } from 'src/app/cls/item';
 import { Room } from 'src/app/cls/room';
+import { WebsocketService } from 'src/app/srv/websocket.service';
+import { Cmnd } from 'src/app/cls/cmnd';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -14,46 +17,48 @@ export class AttributeEditorComponent implements OnInit {
 
   @Input() attributeType: string;
   @Input() attributeEditorShow: boolean;
+  @Input() item: Item;
+
   @Output() attributeEditorShowChange: EventEmitter<any> = new EventEmitter<any>();
+  @Output() itemChange: EventEmitter<any> = new EventEmitter<any>();
 
-  public attribute: Attribute;
-  public attributes: Attribute[] = [];
+  public atr: Attribute[] = [];
 
-  constructor() { }
+  private r_sb: Subscription;  
+  private t_sb: Subscription;  
+
+  constructor(private ws: WebsocketService) { }
 
   ngOnInit(): void {
     console.log('attributeType: ' + this.attributeType);
     console.log('attributeEditorShow = ' + this.attributeEditorShow);
     switch(this.attributeType) {
-      case 'Room':
-        this.attribute = new Room(0, null, null);
 
-        // FIXME: Удалить после отладки
-        for(let i = 0; i < 5; i++) {
-          this.attributes.push(new Room(i, 'room_' + i, null));
-        }
-        console.log('Тип Room');
+      case 'Room':
+        this.ws.sendMessage(new Cmnd("room_list", null));
+        this.r_sb = this.r_sb ? this.r_sb
+        : this.ws.onMessageObserver.subscribe((data: any) => {
+          if("room_list" == data.cmnd) 
+            { this.atr = data.list; } 
+
+        });
         break;
 
       case 'Type':
-        this.attribute = new Type(0, null, null);
-
-        // FIXME: Удалить после отладки
-        for(let i = 0; i < 5; i++) {
-          this.attributes.push(new Type(i, 'type_' + i, null));
-        }
-        console.log('Тип Type');
-        console.log(this.attributes);
+        this.ws.sendMessage(new Cmnd("type_list", null));
+        this.t_sb = this.t_sb ? this.t_sb
+        : this.ws.onMessageObserver.subscribe((data: any) => {
+          if("type_list" == data.cmnd) 
+            { this.atr = data.list; }          
+        });
         break;
 
       default:
         console.log('Неизвестный тип атрибута');
     }
-
-    
   }
 
-  public addAttribute(): void {
+  public addAttr(): void {
     let newAttribute: Attribute = null;
     switch(this.attributeType) {
       case 'Room':
@@ -68,13 +73,27 @@ export class AttributeEditorComponent implements OnInit {
       default:
         console.log('Неизвестный тип атрибута');
     }
-     this.attributes.push(newAttribute);
+     this.atr.push(newAttribute);
   }
 
   public close(): void {
     this.attributeEditorShow = false;
     this.attributeEditorShowChange.emit(this.attributeEditorShow);
-    console.log('close.');
   }
 
+  public sel(attr: Attribute): void {
+    switch(this.attributeType) {
+      case "Type": 
+        this.item.type = attr.id; 
+        this.item.tnme = attr.name;
+        break;
+
+      case "Room": 
+        this.item.room = attr.id; 
+        this.item.rnme = attr.name;
+        break;
+    }
+    this.itemChange.emit(this.item);
+    this.close();
+  }
 }

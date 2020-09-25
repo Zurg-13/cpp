@@ -1,7 +1,9 @@
 <!--
 <mat-card class="example-card col-xs-12 col-sm-6 sol-md-4 col-lg-2">
 -->    
-<mat-card class="example-card">
+
+<mat-card class="example-card"
+    [ngClass]="{'selected': modelService.item_slct && modelService.item_slct.id == item.id}">
 
         <!--
     <mat-card-header>
@@ -15,7 +17,7 @@
         <div class="row">
             <mat-form-field class="col-sm">
                 <mat-label>Наименование</mat-label>
-                <input matInput placeholder="Введите наименование" [(ngModel)]="item.name" [name]="'name_' + item.id">
+                <input #name matInput placeholder="Введите наименование" [(ngModel)]="item.name" [name]="'name_' + item.id">
             </mat-form-field> </div>
 
         <div class="row">
@@ -32,30 +34,42 @@
 
         <button mat-stroked-button color="primary" 
                 class="attribute-button"
-                (click)="openAttributeEditor('Room')">Размещение</button>
+                (click)="openAttributeEditor('Room')">
+            {{ item.room == 0 ? 'Место' : item.rnme }}</button>
 
         <button mat-stroked-button color="primary" 
                 class="attribute-button"
-                (click)="openAttributeEditor('Type')">Тип</button>
+                (click)="openAttributeEditor('Type')">
+            {{ item.type == 0 ? 'Тип' : item.tnme }}</button>
 
-        <app-attribute-editor *ngIf="attributeEditorShow" 
+        <button mat-stroked-button color="primary"
+            class="attribute-button"
+            >Снять</button>
+
+        <button mat-stroked-button color="primary"
+            class="attribute-button"
+            >Скрыть</button>
+
+        <app-attribute-editor *ngIf="attributeEditorShow && modelService.item_slct && modelService.item_slct.id == item.id" 
                 [(attributeEditorShow)]="attributeEditorShow" 
+                [(item)]="item"
                 [attributeType]="attributeType"></app-attribute-editor>
 
     </mat-card-content>
-    <mat-card-actions>
-        
-    <button mat-button 
-        (click)="saveItem()">Сохранить</button>
 
-    <button mat-button
-        (click)="cancelChange()">Отмена</button>
+    <mat-card-actions *ngIf="modelService.item_slct && modelService.item_slct.id == item.id"> 
 
-    <button mat-button
-        (click)="newItem()">Добавить</button>
+        <button mat-button 
+            (click)="saveItem()">Сохранить</button>
 
-    <button mat-button>Удалить</button>
-    <button mat-button>Деактивировать</button>
+        <button mat-button
+            (click)="cancelChange()">Отмена</button>
+
+        <button mat-button
+            (click)="newItem()">Добавить</button>
+
+        <button mat-button
+            (click)="del()">Удалить</button>
     </mat-card-actions>
 
 </mat-card>

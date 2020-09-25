@@ -12,7 +12,8 @@
 
     <app-item class="item" 
         *ngFor="let item of modelService.getList()" 
-        [item]="item"></app-item>
+        [item]="item"
+        (click)="modelService.item_slct=item"></app-item>
     
     <!-- Кнопка добавления item -->
 <!--

@@ -1,10 +1,13 @@
 <div class="content">
     <div class="attribute-list">
-        <app-attribute *ngFor="let attribute of attributes"
-                       [attribute]="attribute"></app-attribute>
+        <app-attribute *ngFor="let attr of atr"
+            [attr]="attr"
+            [type]="attributeType"
+            [item]="item"
+            ></app-attribute>
         <div class="control-panel">
             <button mat-raised-button color="primary"
-                    (click)="addAttribute()">Добавить элемент</button>
+                (click)="addAttr()">Добавить элемент</button>
         </div>
     </div>
 

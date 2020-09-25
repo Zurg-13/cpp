@@ -63,13 +63,17 @@ private:
     void item_post(QWebSocket *rsp, const QJsonObject &obj);
     void item_list(QWebSocket *rsp, const QJsonObject &obj);
     void item_save(QWebSocket *rsp, const QJsonObject &obj);
+    void item_drop(QWebSocket *rsp, const QJsonObject &obj);
 
+    void room_post(QWebSocket *rsp, const QJsonObject &obj);
     void room_list(QWebSocket *rsp, const QJsonObject &obj);
     void room_save(QWebSocket *rsp, const QJsonObject &obj);
+    void room_drop(QWebSocket *rsp, const QJsonObject &obj);
 
+    void type_post(QWebSocket *rsp, const QJsonObject &obj);
     void type_list(QWebSocket *rsp, const QJsonObject &obj);
     void type_save(QWebSocket *rsp, const QJsonObject &obj);
-
+    void type_drop(QWebSocket *rsp, const QJsonObject &obj);
 };
 
 //------------------------------------------------------------------------------

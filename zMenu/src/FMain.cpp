@@ -141,9 +141,9 @@ void FMain::ROUTING(void) {
 //------------------------------------------------------------------------------
 void FMain::on_ws_txt_msg(QString msg) {
     static QMap<QString, int> route = {
-        {"item_list",1}, {"item_save",2}, {"item_post",3}
-      , {"type_list",4}, {"type_save",5}, {"type_post",6}
-      , {"room_list",7}, {"room_save",8}, {"room_post",9}
+        {"item_list", 1}, {"item_save", 2}, {"item_post", 3}, {"item_drop", 4}
+      , {"type_list", 5}, {"type_save", 6}, {"type_post", 7}, {"type_drop", 8}
+      , {"room_list", 9}, {"room_save",10}, {"room_post",11}, {"room_drop",12}
     };
 
     QWebSocket *rsp = qobject_cast<QWebSocket*>(sender());
@@ -155,6 +155,19 @@ void FMain::on_ws_txt_msg(QString msg) {
     switch(route[obj["cmnd"].asSTR]) {
      case  1: item_list(rsp, obj); break;
      case  2: item_save(rsp, obj); break;
+     case  3: item_post(rsp, obj); break;
+     case  4: item_drop(rsp, obj); break;
+
+     case  5: type_list(rsp, obj); break;
+     case  6: type_save(rsp, obj); break;
+     case  7: type_post(rsp, obj); break;
+     case  8: type_drop(rsp, obj); break;
+
+     case  9: room_list(rsp, obj); break;
+     case 10: room_save(rsp, obj); break;
+     case 11: room_post(rsp, obj); break;
+     case 12: room_drop(rsp, obj); break;
+
      default:
         rsp->sendTextMessage(ARR(JSON({
             PR("cmnd", obj["cmnd"])
@@ -199,14 +212,18 @@ void FMain::item_post(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("item",sItemID.exe().fst()["seq"].asINT) }))); });
+              , PR("id", sItemID.exe().fst()["seq"].asINT) }))); });
 }// item_post
 
 // ОБРАБОТЧИК: Вернуть список элементов меню. ----------------------------------
 //------------------------------------------------------------------------------
 void FMain::item_list(QWebSocket *rsp, const QJsonObject &obj) {
     static QSqlQuery sItem = ZSqlQuery(
-        "SELECT * FROM item", *E::sldb);
+        "\n SELECT item.*, type.name AS tnme, room.name AS rnme"
+        "\n FROM item"
+        "\n LEFT JOIN type ON item.type = type.id"
+        "\n LEFT JOIN room ON item.room = room.id"
+      , *E::sldb);
     EXEC(
         rsp, obj, sItem
       ,[rsp, obj](QSqlQuery &sql) {
@@ -228,8 +245,38 @@ void FMain::item_save(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("item",(obj["data"])["id"].asINT) }))); });
+              , PR("id",(obj["data"])["id"].asINT) }))); });
 }// item_save
+
+// Сбросить элемент меню. ------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::item_drop(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery dItem = ZSqlQuery(
+        "DELETE FROM item WHERE id = :id", *E::sldb );
+    EXEC(
+        rsp, obj, dItem(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("id",(obj["data"])["id"].asINT) }))); });
+}// item_drop
+
+// ОБРАБОТЧИК: Создать новый тип. ----------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::type_post(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery iType = ZSqlQuery(
+        "\n INSERT INTO item(name, note)"
+        "\n VALUES(:name,:note)", *E::sldb );
+    static ZSqlQuery sTypeID = ZSqlQuery(
+        "\n SELECT seq FROM sqlite_sequence WHERE name='type'", *E::sldb );
+
+    EXEC(
+        rsp, obj, iType(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("id",sTypeID.exe().fst()["seq"].asINT) }))); });
+}// type_post
 
 // ОБРАБОТЧИК: Вернуть список типов. -------------------------------------------
 //------------------------------------------------------------------------------
@@ -256,8 +303,38 @@ void FMain::type_save(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("type",(obj["data"])["id"].asINT) }))); });
+              , PR("id",(obj["data"])["id"].asINT) }))); });
 }// type_save
+
+// Сбросить тип. ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::type_drop(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery dType = ZSqlQuery(
+        "DELETE FROM type WHERE id = :id", *E::sldb );
+    EXEC(
+        rsp, obj, dType(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("id",(obj["data"])["id"].asINT) }))); });
+}// type_drop
+
+// ОБРАБОТЧИК: Создать новое размещение. ---------------------------------------
+//------------------------------------------------------------------------------
+void FMain::room_post(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery iRoom = ZSqlQuery(
+        "\n INSERT INTO room(name, note)"
+        "\n VALUES(:name,:note)", *E::sldb );
+    static ZSqlQuery sTypeID = ZSqlQuery(
+        "\n SELECT seq FROM sqlite_sequence WHERE name='room'", *E::sldb );
+
+    EXEC(
+        rsp, obj, iRoom(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("id",sTypeID.exe().fst()["seq"].asINT) }))); });
+}// type_post
 
 // ОБРАБОТЧИК: Вернуть список размещений. --------------------------------------
 //------------------------------------------------------------------------------
@@ -286,8 +363,21 @@ void FMain::room_save(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("room",(obj["data"])["id"].asINT) }))); });
+              , PR("id",(obj["data"])["id"].asINT) }))); });
 }// room_save
+
+// Сбросить размещение. --------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::room_drop(QWebSocket *rsp, const QJsonObject &obj) {
+    static ZSqlQuery dRoom = ZSqlQuery(
+        "DELETE FROM room WHERE id = :id", *E::sldb );
+    EXEC(
+        rsp, obj, dRoom(PRM(obj["data"]))
+      ,[rsp, obj](QSqlQuery&) {
+            rsp->sendTextMessage(ARR(JSON({
+                PR("cmnd", obj["cmnd"])
+              , PR("id",(obj["data"])["id"].asINT) }))); });
+}// room_drop
 
 // Получено двоичное сообщение. ------------------------------------------------
 //------------------------------------------------------------------------------
@@ -412,6 +502,12 @@ void FMain::SET_SQL(void) {
         "  id   INTEGER PRIMARY KEY AUTOINCREMENT"
         ", name TEXT    NOT NULL"
         ", note TEXT    NOT NULL )"
+
+      , "INSERT INTO type (id, name, note)"
+        "VALUES(0, 'Нет', 'Тип не задан')"
+
+      , "INSERT INTO room (id, name, note)"
+        "VALUES(0, 'Нет', 'Размещение не задано')"
     };
 
     for(const QString &query: tbl) {
@@ -550,14 +646,10 @@ void FMain::on_aTestFillDB_triggered() {
         "VALUES('NAME-4', 'NOTE-4', 0, 0, 0, 0, 0)"
 
       , "INSERT INTO type (name, note)"
-        "VALUES('Нет', 'Тип не задан')"
-      , "INSERT INTO type (name, note)"
         "VALUES('Меню', 'Меню')"
       , "INSERT INTO type (name, note)"
         "VALUES('Пицца', 'Пицца')"
 
-      , "INSERT INTO room (name, note)"
-        "VALUES('Нет', 'Размещение не задано')"
       , "INSERT INTO room (name, note)"
         "VALUES('Салат', 'Салаты')"
       , "INSERT INTO room (name, note)"

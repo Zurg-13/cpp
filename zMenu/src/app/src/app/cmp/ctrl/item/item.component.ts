@@ -1,10 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Item } from 'src/app/cls/Item';
 import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
 import { CtrlComponent } from '../ctrl.component';
 import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast';
 import { ModelService } from 'src/app/srv/model.service';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-item',
@@ -13,8 +14,13 @@ import { ModelService } from 'src/app/srv/model.service';
 })
 export class ItemComponent implements OnInit {
 
-  @Input() item: Item;
+  @ViewChild('name') 
+  nameInput: ElementRef;
 
+  @Input() 
+  item: Item;
+
+  private subs: Subscription;  
   private prev: Item;
 
   public attributeEditorShow: boolean = false;
@@ -28,30 +34,37 @@ export class ItemComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.ws.onMessageObserver.subscribe((data: any) => {
-
-
-      switch(data["cmnd"]) {
+      switch(data.cmnd) {
         case "item_save":
-          if(this.item.id == data.item.id) 
+          if(this.item.id == data.id) 
             { if(data.err == null) { this.saveState(); }}
         break;
          
         case "item_post":
           if(this.item.id == null) 
-            { if(data.err == null) { this.item.id = data.item.id; }}
+            { if(data.err == null) { this.item.id = data.id; }}
         break;
       }
-
     });
-
   }
 
+  ngAfterViewInit() {
+    if(this.item.id == null) 
+      { setTimeout(() => { this.nameInput.nativeElement.focus(); }, 0) }      
+  } 
+
   public openAttributeEditor(attributeType: string): void {
-    console.log(attributeType);
+    if(this.attributeType == attributeType) { 
+      this.attributeEditorShow = !this.attributeEditorShow; 
+    } else if(this.attributeEditorShow = true) { 
+      this.attributeEditorShow = false; 
+      setTimeout(() => { this.attributeEditorShow = true; }, 0);
+    } else {
+      this.attributeEditorShow = true;
+    }
+
     this.attributeType = attributeType;
-    this.attributeEditorShow = true;
   }
 
   // Сохранить состояние. ------------------------------------------------------
@@ -82,12 +95,23 @@ export class ItemComponent implements OnInit {
   // Добавить элемент. ---------------------------------------------------------
   //----------------------------------------------------------------------------
   public newItem(): void {
-      this.modelService.insItem(
-        this.item.id
-      , new Item(
-          null
-        , null, null, null
-        , 0, 1, this.item.type, this.item.room) );
+    let item = new Item(
+      null
+    , null, null, null, 0, 1
+    , this.item.type, this.item.tnme
+    , this.item.room, this.item.rnme);
+    this.modelService.insItem(this.item.id, item);
   }// addItem
+
+  // Удалить элемент. ----------------------------------------------------------
+  //----------------------------------------------------------------------------
+  public del() { 
+    this.subs = this.subs ? this.subs 
+    : this.ws.onMessageObserver.subscribe((data: any) => {
+      if("item_drop" == data.cmnd && this.item.id == data.id)
+        { this.modelService.delItem(this.item.id); }
+    });
+    this.ws.sendMessage(new Cmnd("item_drop", this.item)); 
+  }// del
 
 }// ItemComponent

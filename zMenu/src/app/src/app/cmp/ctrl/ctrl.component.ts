@@ -74,13 +74,11 @@ export class CtrlComponent implements OnInit {
           let currentItem = data.list[i];
           let newItem: Item = {
             id: currentItem.id
-          , name: currentItem.name
-          , note: currentItem.note
+          , name: currentItem.name, note: currentItem.note
           , cost: currentItem.cost
-          , stat: currentItem.stat
-          , hide: currentItem.hide
-          , room: currentItem.room
-          , type: currentItem.type
+          , stat: currentItem.stat, hide: currentItem.hide
+          , room: currentItem.room, rnme: currentItem.rnme
+          , type: currentItem.type, tnme: currentItem.tnme
           };
 
           this.modelService.setItem(newItem);
