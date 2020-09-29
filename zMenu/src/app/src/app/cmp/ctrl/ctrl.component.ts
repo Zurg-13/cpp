@@ -12,10 +12,6 @@ import { ModelService } from 'src/app/srv/model.service';
 })
 export class CtrlComponent implements OnInit {
 
-/*  
-  public items: Item[] = []; // Список редактируемых карточек item
-*/  
-
   constructor(
     private configService: ConfigService
   , private websocketService: WebsocketService
@@ -23,18 +19,6 @@ export class CtrlComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Ручное добавление элементов item, для отладки интерфейса (можно удалить)
-    // for(let i = 0; i < 5; i++) {
-    //   let newItem: Item = {
-    //     id: i,
-    //     name: 'Имя ' + i,
-    //     note: 'Описание' + i,
-    //     cost: 99,
-    //     room: null,
-    //     type: null
-    //   };
-    //   this.items.push(newItem);
-    // }
 
     // Послать запрос на сервер и получить конфигурацию
     this.configService.load()

@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Attribute } from 'src/app/cls/attribute';
-import { Type } from 'src/app/cls/type';
+
 import { Item } from 'src/app/cls/item';
-import { Room } from 'src/app/cls/room';
+import { Attr } from 'src/app/cls/attr';
 import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
 import { Subscription } from 'rxjs';
+import { AttrService } from 'src/app/srv/attr.service';
 
 
 @Component({
@@ -15,23 +15,30 @@ import { Subscription } from 'rxjs';
 })
 export class AttributeEditorComponent implements OnInit {
 
+
   @Input() attributeType: string;
+/*  
   @Input() attributeEditorShow: boolean;
+*/  
+
   @Input() item: Item;
 
+/*  
   @Output() attributeEditorShowChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() itemChange: EventEmitter<any> = new EventEmitter<any>();
-
   public atr: Attribute[] = [];
+*/  
 
   private r_sb: Subscription;  
   private t_sb: Subscription;  
 
-  constructor(private ws: WebsocketService) { }
+  constructor(
+    private ws: WebsocketService
+  , public  attrService: AttrService
+  ) {}
 
   ngOnInit(): void {
-    console.log('attributeType: ' + this.attributeType);
-    console.log('attributeEditorShow = ' + this.attributeEditorShow);
+
     switch(this.attributeType) {
 
       case 'Room':
@@ -39,8 +46,7 @@ export class AttributeEditorComponent implements OnInit {
         this.r_sb = this.r_sb ? this.r_sb
         : this.ws.onMessageObserver.subscribe((data: any) => {
           if("room_list" == data.cmnd) 
-            { this.atr = data.list; } 
-
+            { this.attrService.setList(data.list); } 
         });
         break;
 
@@ -49,7 +55,7 @@ export class AttributeEditorComponent implements OnInit {
         this.t_sb = this.t_sb ? this.t_sb
         : this.ws.onMessageObserver.subscribe((data: any) => {
           if("type_list" == data.cmnd) 
-            { this.atr = data.list; }          
+            { this.attrService.setList(data.list); }          
         });
         break;
 
@@ -59,29 +65,26 @@ export class AttributeEditorComponent implements OnInit {
   }
 
   public addAttr(): void {
-    let newAttribute: Attribute = null;
+    let newAttribute: Attr;
     switch(this.attributeType) {
       case 'Room':
-        newAttribute = new Room(0, null, null);
-        console.log('Тип Room');
+        newAttribute = new Attr(null, null, null, "Room");
         break;
 
       case 'Type':
-        newAttribute = new Type(0, null, null);
+        newAttribute = new Attr(0, null, null, "Type");
         break;
 
       default:
         console.log('Неизвестный тип атрибута');
     }
-     this.atr.push(newAttribute);
+
+    this.attrService.addElem(newAttribute);
   }
 
-  public close(): void {
-    this.attributeEditorShow = false;
-    this.attributeEditorShowChange.emit(this.attributeEditorShow);
-  }
+  public hide(): void { this.attrService.hide(); }
 
-  public sel(attr: Attribute): void {
+  public sel(attr: Attr): void {
     switch(this.attributeType) {
       case "Type": 
         this.item.type = attr.id; 
@@ -93,7 +96,7 @@ export class AttributeEditorComponent implements OnInit {
         this.item.rnme = attr.name;
         break;
     }
-    this.itemChange.emit(this.item);
-    this.close();
+
+    this.hide();
   }
 }

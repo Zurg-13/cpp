@@ -5,7 +5,7 @@
 <mat-card class="example-card"
     [ngClass]="{'selected': modelService.item_slct && modelService.item_slct.id == item.id}">
 
-        <!--
+<!--
     <mat-card-header>
         <mat-card-title>{{ item.name }}</mat-card-title>
         <mat-card-subtitle>{{ item.note }}</mat-card-subtitle>
@@ -50,10 +50,10 @@
             class="attribute-button"
             >Скрыть</button>
 
-        <app-attribute-editor *ngIf="attributeEditorShow && modelService.item_slct && modelService.item_slct.id == item.id" 
-                [(attributeEditorShow)]="attributeEditorShow" 
-                [(item)]="item"
-                [attributeType]="attributeType"></app-attribute-editor>
+        <app-attribute-editor *ngIf="attrService.vsbl && modelService.item_slct && modelService.item_slct.id == item.id" 
+            [item]="item"
+            [attributeType]="attributeType"
+            ></app-attribute-editor>
 
     </mat-card-content>
 

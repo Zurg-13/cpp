@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Attribute } from 'src/app/cls/attribute';
 import { ModelService } from 'src/app/srv/model.service';
 import { Item } from 'src/app/cls/Item';
+import { Attr } from 'src/app/cls/Attr';
+import { AttrService } from 'src/app/srv/attr.service';
 
 @Component({
   selector: 'app-attribute',
@@ -10,12 +11,12 @@ import { Item } from 'src/app/cls/Item';
 })
 export class AttributeComponent implements OnInit {
 
-  @Input() attr: Attribute;
-  @Input() type: string;
+  @Input() attr: Attr;
   @Input() item: Item;
 
   constructor(
     public modelService: ModelService
+  , public attrService: AttrService
   ) { }
 
   ngOnInit(): void {
@@ -24,7 +25,7 @@ export class AttributeComponent implements OnInit {
 
   public sel(): void {
 
-    switch(this.type) {
+    switch(this.attr.type) {
       case "Type": 
         this.modelService.updItemType(
           this.item.id, this.attr.id, this.attr.name ); 
@@ -36,6 +37,18 @@ export class AttributeComponent implements OnInit {
         break;
     }
 
+  }
+
+  public del(): void {
+
+  }
+
+  public new(): void {
+
+  }
+
+  public upd(): void {
+    
   }
 
 

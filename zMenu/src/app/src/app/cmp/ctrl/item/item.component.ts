@@ -6,6 +6,7 @@ import { CtrlComponent } from '../ctrl.component';
 import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast';
 import { ModelService } from 'src/app/srv/model.service';
 import { Subscription, interval } from 'rxjs';
+import { AttrService } from 'src/app/srv/attr.service';
 
 @Component({
   selector: 'app-item',
@@ -28,6 +29,7 @@ export class ItemComponent implements OnInit {
 
   constructor(
     private ws: WebsocketService
+  , public attrService: AttrService  
   , public modelService: ModelService) 
   { 
       this.saveState();
@@ -55,13 +57,14 @@ export class ItemComponent implements OnInit {
   } 
 
   public openAttributeEditor(attributeType: string): void {
+
     if(this.attributeType == attributeType) { 
-      this.attributeEditorShow = !this.attributeEditorShow; 
-    } else if(this.attributeEditorShow = true) { 
-      this.attributeEditorShow = false; 
-      setTimeout(() => { this.attributeEditorShow = true; }, 0);
+        this.attrService.vsbl = !this.attrService.vsbl;
+    } else if(this.attrService.vsbl) { 
+      this.attrService.hide();
+      setTimeout(() => { this.attrService.show(); }, 0);
     } else {
-      this.attributeEditorShow = true;
+      this.attrService.show();
     }
 
     this.attributeType = attributeType;
