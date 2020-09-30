@@ -1,18 +1,22 @@
 <div class="content">
+
+<!--
     <div class="attribute-list">
+    -->        
+
         <app-attribute *ngFor="let attr of attrService.getList()"
             [attr]="attr"
             [item]="item"
             [attributeType]="attributeType"
-            ></app-attribute>
-        <div class="control-panel">
-            <button mat-raised-button color="primary"
-                (click)="addAttr()">Добавить</button>
-        </div>
+            (click)="attrService.slct=attr"></app-attribute>
+<!--
     </div>
+-->    
 
+<!--
     <div class="control-panel">
         
         <button mat-button (click)="hide()">Скрыть</button>
     </div>
+-->    
 </div>

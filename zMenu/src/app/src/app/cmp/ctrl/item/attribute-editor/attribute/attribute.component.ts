@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModelService } from 'src/app/srv/model.service';
-import { Item } from 'src/app/cls/Item';
-import { Attr } from 'src/app/cls/Attr';
+import { Item } from 'src/app/cls/item';
+import { Attr } from 'src/app/cls/attr';
 import { AttrService } from 'src/app/srv/attr.service';
 
 @Component({
@@ -17,15 +17,12 @@ export class AttributeComponent implements OnInit {
   constructor(
     public modelService: ModelService
   , public attrService: AttrService
-  ) { }
+  ) {}
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void {}
 
   public sel(): void {
-
-    switch(this.attr.type) {
+    switch(this.attrService.type) {
       case "Type": 
         this.modelService.updItemType(
           this.item.id, this.attr.id, this.attr.name ); 
@@ -35,7 +32,13 @@ export class AttributeComponent implements OnInit {
         this.modelService.updItemRoom(
           this.item.id, this.attr.id, this.attr.name ); 
         break;
+      
+      default: 
+          console.error("Неизвестный тип атрибута: " + this.attrService.type);
+
     }
+
+    this.attrService.hide();
 
   }
 

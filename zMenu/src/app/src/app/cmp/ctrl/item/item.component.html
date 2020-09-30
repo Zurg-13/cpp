@@ -58,8 +58,9 @@
     </mat-card-content>
 
     <mat-card-actions *ngIf="modelService.item_slct && modelService.item_slct.id == item.id"> 
-
+        
         <button mat-button 
+            [ngClass]="{'active-clr': isChanged()}"
             (click)="saveItem()">Сохранить</button>
 
         <button mat-button

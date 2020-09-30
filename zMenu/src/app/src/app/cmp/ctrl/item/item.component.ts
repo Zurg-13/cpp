@@ -2,8 +2,6 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Item } from 'src/app/cls/Item';
 import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
-import { CtrlComponent } from '../ctrl.component';
-import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast';
 import { ModelService } from 'src/app/srv/model.service';
 import { Subscription, interval } from 'rxjs';
 import { AttrService } from 'src/app/srv/attr.service';
@@ -31,9 +29,7 @@ export class ItemComponent implements OnInit {
     private ws: WebsocketService
   , public attrService: AttrService  
   , public modelService: ModelService) 
-  { 
-      this.saveState();
-  }
+    {}
 
   ngOnInit(): void {
     this.ws.onMessageObserver.subscribe((data: any) => {
@@ -54,6 +50,8 @@ export class ItemComponent implements OnInit {
   ngAfterViewInit() {
     if(this.item.id == null) 
       { setTimeout(() => { this.nameInput.nativeElement.focus(); }, 0) }      
+    else
+      { this.saveState(); }
   } 
 
   public openAttributeEditor(attributeType: string): void {
@@ -72,13 +70,26 @@ export class ItemComponent implements OnInit {
 
   // Сохранить состояние. ------------------------------------------------------
   //----------------------------------------------------------------------------
-  private saveState(): void { 
-    this.prev = Object.assign({}, this.item); 
-  }
+  private saveState(): void {  this.prev = Object.assign({}, this.item); }
 
   // Восстановить состояние. ---------------------------------------------------
   //----------------------------------------------------------------------------
   private restState(): void { this.item = Object.assign({}, this.prev); }
+
+  // Проверка на наличие изменений. --------------------------------------------
+  //----------------------------------------------------------------------------
+  public isChanged(): boolean { 
+      let tmp = !( 
+         this.prev != undefined && this.item != undefined
+      && this.prev.name === this.item.name
+      && this.prev.note === this.item.note
+      && this.prev.cost === this.item.cost
+      && this.prev.type === this.item.type
+      && this.prev.room === this.item.room);
+
+      console.log("isChange: " + tmp);
+      return tmp;
+  }
 
   // Сохранить элемент меню. ---------------------------------------------------
   //----------------------------------------------------------------------------
@@ -87,13 +98,13 @@ export class ItemComponent implements OnInit {
       { this.ws.sendMessage(new Cmnd("item_post", this.item)); }
     else 
       { this.ws.sendMessage(new Cmnd("item_save", this.item)); }
+
+    this.attrService.hide();
   }// saveItem
 
   // Отменить изменения. -------------------------------------------------------
   //----------------------------------------------------------------------------
-  public cancelChange(): void {
-    this.restState();
-  }// cancelChange
+  public cancelChange(): void { this.restState(); this.attrService.hide(); }
 
   // Добавить элемент. ---------------------------------------------------------
   //----------------------------------------------------------------------------
@@ -102,7 +113,8 @@ export class ItemComponent implements OnInit {
       null
     , null, null, null, 0, 1
     , this.item.type, this.item.tnme
-    , this.item.room, this.item.rnme);
+    , this.item.room, this.item.rnme );
+
     this.modelService.insItem(this.item.id, item);
   }// addItem
 

@@ -46,7 +46,7 @@ export class AttributeEditorComponent implements OnInit {
         this.r_sb = this.r_sb ? this.r_sb
         : this.ws.onMessageObserver.subscribe((data: any) => {
           if("room_list" == data.cmnd) 
-            { this.attrService.setList(data.list); } 
+            { this.attrService.setList(data.list, this.attributeType); } 
         });
         break;
 
@@ -55,7 +55,7 @@ export class AttributeEditorComponent implements OnInit {
         this.t_sb = this.t_sb ? this.t_sb
         : this.ws.onMessageObserver.subscribe((data: any) => {
           if("type_list" == data.cmnd) 
-            { this.attrService.setList(data.list); }          
+            { this.attrService.setList(data.list, this.attributeType); }          
         });
         break;
 
