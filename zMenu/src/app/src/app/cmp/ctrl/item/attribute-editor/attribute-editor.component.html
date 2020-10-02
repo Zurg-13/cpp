@@ -4,11 +4,11 @@
     <div class="attribute-list">
     -->        
 
-        <app-attribute *ngFor="let attr of attrService.getList()"
+        <app-attribute *ngFor="let attr of attr_svc.getList()"
             [attr]="attr"
             [item]="item"
             [attributeType]="attributeType"
-            (click)="attrService.slct=attr"></app-attribute>
+            (click)="attr_svc.slct=attr"></app-attribute>
 <!--
     </div>
 -->    

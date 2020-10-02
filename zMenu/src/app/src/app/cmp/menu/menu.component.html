@@ -1,1 +1,11 @@
-<p>menu works!</p>
+<nav class="navbar navbar-dark bg-primary">
+    <span class="navbar-brand">Меню</span>
+</nav>
+<div class="container">
+
+    <app-room class="room" 
+        *ngFor="let room of menu_svc.menu" 
+        [room]="room"
+        ></app-room>
+
+</div>

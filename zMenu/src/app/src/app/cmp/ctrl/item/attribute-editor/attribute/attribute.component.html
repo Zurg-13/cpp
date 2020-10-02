@@ -20,12 +20,12 @@
 
 
     </mat-card-content>
-    <mat-card-actions *ngIf="attrService.slct && attrService.slct.id == attr.id">
+    <mat-card-actions *ngIf="attr_svc.slct && attr_svc.slct.id == attr.id">
         <button mat-button 
             (click)="upd()">Сохранить</button>
 
         <button mat-button
-            (click)="new()">Добавить</button>
+            (click)="add()">Добавить</button>
 
         <button mat-button
             (click)="del()">Удалить</button>

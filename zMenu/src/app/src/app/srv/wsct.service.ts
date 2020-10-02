@@ -5,14 +5,12 @@ import { catchError, retryWhen, repeatWhen, delay, take, concat  } from 'rxjs/op
 import { Router } from '@angular/router';
 import { Cmnd } from '../cls/cmnd';
 
-/*
-  Сервис для взаимодействия с сервером по протоколу ws (вебсокет)
-*/
 
-@Injectable({
-  providedIn: 'root'
-})
-export class WebsocketService {
+@Injectable({ providedIn: 'root'})
+
+/* WS: Сервис для взаимодействия с сервером. **********************************/
+/******************************************************************************/
+export class WsctService {
 
   public instance: WebSocketSubject<any>;
   public connectionStatus: boolean = false;
@@ -51,28 +49,19 @@ export class WebsocketService {
       this.instance = null;
     }
   }
-
-  // Отправка запроса на вебсокет
-  public sendMessage(data: Cmnd) {
+    
+  // WS: Отправка запроса. ----------------------------------------------------
+  //---------------------------------------------------------------------------
+  public send(data: Cmnd) {
     if(this.instance) {
       try {
         this.instance.next(data);
         console.log('Сообщение отправлено request = ' + data);
-      }
-      catch(ex) {
+      } catch(ex) {
         console.error(ex);
-      }
-    }
-  }
-
-  // Добавление внешнего обработчика на событие onMessage
-  /*
-  public onMessage(action: Function) {
-    this.onMessageObserver.subscribe((data: any) => {
-        action(data);
-    });
-  }
-  */
+      }// catch(ex)
+    }// if(this.instance)
+  }// send
 
   // Инициализация основной логики управления соденинением вебсокета
   public init(): void {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigService, AppInfo } from 'src/app/srv/config.service';
+import { ConfService, AppInfo } from 'src/app/srv/conf.service';
 
 @Component({
   selector: 'app-test',
@@ -8,28 +8,28 @@ import { ConfigService, AppInfo } from 'src/app/srv/config.service';
 })
 export class TestComponent implements OnInit {
 
-  public appInfo: AppInfo;
-
+  public info: AppInfo;
+  
   constructor(
-    private configService: ConfigService
-    ) { 
+    private conf_svc: ConfService
+  ) { 
     console.log('controller test');
   }
 
   // Метод для получения информации о приложении через http (используя наш сервис обёртку)
   private getAppInfo(): void {
-    this.configService.getAppInfo()
+    this.conf_svc.getAppInfo()
     .then(() => {
-      this.appInfo = this.configService.appInfo;
+      this.info = this.conf_svc.info;
     })
     .catch(() => {
-
+      console.error('Запрос конфигурации не прошел');
     });
   }
 
   ngOnInit(): void {
-    // Послать запрос на сервер и получить версию приложения
-    this.configService.load()
+
+    this.conf_svc.load()
     .then(() => {
       console.log('Конфигурация обработана');
       this.getAppInfo();
@@ -38,5 +38,4 @@ export class TestComponent implements OnInit {
       console.log('Ошибка получения конфигурации');
     });
   }
-
 }

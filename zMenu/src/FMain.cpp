@@ -129,9 +129,9 @@ void FMain::ROUTING(void) {
     this->srv.route("/<arg>", [RSP](const QUrl &url) {
         OTH("dflt: " % url.path());
         return RSP(QJsonObject {{
-            { "appname", QApplication::applicationName() }
-          , { "version", QApplication::applicationVersion() }
-          , { "sysdate", SYSDATE.asSTR }
+            { "name", QApplication::applicationName() }
+          , { "vrsn", QApplication::applicationVersion() }
+          , { "date", SYSDATE.asSTR }
         }});
     });
 
@@ -275,7 +275,8 @@ void FMain::type_post(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("id",sTypeID.exe().fst()["seq"].asINT) }))); });
+              , PR("id",(obj["data"])["id"].asINT)
+              , PR("sign",sTypeID.exe().fst()["seq"].asINT) }))); });
 }// type_post
 
 // ОБРАБОТЧИК: Вернуть список типов. -------------------------------------------
@@ -325,7 +326,7 @@ void FMain::room_post(QWebSocket *rsp, const QJsonObject &obj) {
     static ZSqlQuery iRoom = ZSqlQuery(
         "\n INSERT INTO room(name, note)"
         "\n VALUES(:name,:note)", *E::sldb );
-    static ZSqlQuery sTypeID = ZSqlQuery(
+    static ZSqlQuery sRoomID = ZSqlQuery(
         "\n SELECT seq FROM sqlite_sequence WHERE name='room'", *E::sldb );
 
     EXEC(
@@ -333,7 +334,8 @@ void FMain::room_post(QWebSocket *rsp, const QJsonObject &obj) {
       ,[rsp, obj](QSqlQuery&) {
             rsp->sendTextMessage(ARR(JSON({
                 PR("cmnd", obj["cmnd"])
-              , PR("id",sTypeID.exe().fst()["seq"].asINT) }))); });
+              , PR("id",(obj["data"])["id"].asINT)
+              , PR("sign",sRoomID.exe().fst()["seq"].asINT) }))); });
 }// type_post
 
 // ОБРАБОТЧИК: Вернуть список размещений. --------------------------------------

@@ -2,11 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Item } from 'src/app/cls/item';
 import { Attr } from 'src/app/cls/attr';
-import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
 import { Subscription } from 'rxjs';
 import { AttrService } from 'src/app/srv/attr.service';
-
+import { WsctService } from 'src/app/srv/wsct.service';
 
 @Component({
   selector: 'app-attribute-editor',
@@ -15,55 +14,49 @@ import { AttrService } from 'src/app/srv/attr.service';
 })
 export class AttributeEditorComponent implements OnInit {
 
-
   @Input() attributeType: string;
-/*  
-  @Input() attributeEditorShow: boolean;
-*/  
-
   @Input() item: Item;
-
-/*  
-  @Output() attributeEditorShowChange: EventEmitter<any> = new EventEmitter<any>();
-  @Output() itemChange: EventEmitter<any> = new EventEmitter<any>();
-  public atr: Attribute[] = [];
-*/  
 
   private r_sb: Subscription;  
   private t_sb: Subscription;  
 
+  // Конструктор. --------------------------------------------------------------
+  //----------------------------------------------------------------------------
   constructor(
-    private ws: WebsocketService
-  , public  attrService: AttrService
+    private wsct_svc: WsctService
+  , public  attr_svc: AttrService
   ) {}
 
+  // Выполняется при инициализации. --------------------------------------------
+  //----------------------------------------------------------------------------
   ngOnInit(): void {
 
     switch(this.attributeType) {
 
       case 'Room':
-        this.ws.sendMessage(new Cmnd("room_list", null));
+        this.wsct_svc.send(new Cmnd("room_list", null));
         this.r_sb = this.r_sb ? this.r_sb
-        : this.ws.onMessageObserver.subscribe((data: any) => {
+        : this.wsct_svc.onMessageObserver.subscribe((data: any) => {
           if("room_list" == data.cmnd) 
-            { this.attrService.setList(data.list, this.attributeType); } 
+            { this.attr_svc.setList(data.list, this.attributeType); } 
         });
         break;
 
       case 'Type':
-        this.ws.sendMessage(new Cmnd("type_list", null));
+        this.wsct_svc.send(new Cmnd("type_list", null));
         this.t_sb = this.t_sb ? this.t_sb
-        : this.ws.onMessageObserver.subscribe((data: any) => {
+        : this.wsct_svc.onMessageObserver.subscribe((data: any) => {
           if("type_list" == data.cmnd) 
-            { this.attrService.setList(data.list, this.attributeType); }          
+            { this.attr_svc.setList(data.list, this.attributeType); }          
         });
         break;
 
       default:
         console.log('Неизвестный тип атрибута');
     }
-  }
+  }// ngOnInit
 
+/*  
   public addAttr(): void {
     let newAttribute: Attr;
     switch(this.attributeType) {
@@ -81,8 +74,9 @@ export class AttributeEditorComponent implements OnInit {
 
     this.attrService.addElem(newAttribute);
   }
+*/  
 
-  public hide(): void { this.attrService.hide(); }
+  public hide(): void { this.attr_svc.hide(); }
 
   public sel(attr: Attr): void {
     switch(this.attributeType) {

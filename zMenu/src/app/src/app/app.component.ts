@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigService } from './srv/config.service';
+import { ConfService } from './srv/conf.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +9,7 @@ import { ConfigService } from './srv/config.service';
 export class AppComponent implements OnInit {
 
   constructor(
-    private configService: ConfigService
+    private conf_svc: ConfService
   ) {
 
   }

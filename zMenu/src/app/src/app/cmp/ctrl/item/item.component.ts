@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Item } from 'src/app/cls/Item';
-import { WebsocketService } from 'src/app/srv/websocket.service';
 import { Cmnd } from 'src/app/cls/cmnd';
-import { ModelService } from 'src/app/srv/model.service';
 import { Subscription, interval } from 'rxjs';
 import { AttrService } from 'src/app/srv/attr.service';
+import { ItemService } from 'src/app/srv/item.service';
+import { WsctService } from 'src/app/srv/wsct.service';
 
 @Component({
   selector: 'app-item',
@@ -26,13 +26,13 @@ export class ItemComponent implements OnInit {
   public attributeType: string;
 
   constructor(
-    private ws: WebsocketService
-  , public attrService: AttrService  
-  , public modelService: ModelService) 
+    public wsct_svc: WsctService
+  , public attr_svc: AttrService  
+  , public item_svc: ItemService) 
     {}
 
   ngOnInit(): void {
-    this.ws.onMessageObserver.subscribe((data: any) => {
+    this.wsct_svc.onMessageObserver.subscribe((data: any) => {
       switch(data.cmnd) {
         case "item_save":
           if(this.item.id == data.id) 
@@ -57,12 +57,12 @@ export class ItemComponent implements OnInit {
   public openAttributeEditor(attributeType: string): void {
 
     if(this.attributeType == attributeType) { 
-        this.attrService.vsbl = !this.attrService.vsbl;
-    } else if(this.attrService.vsbl) { 
-      this.attrService.hide();
-      setTimeout(() => { this.attrService.show(); }, 0);
+        this.attr_svc.vsbl = !this.attr_svc.vsbl;
+    } else if(this.attr_svc.vsbl) { 
+      this.attr_svc.hide();
+      setTimeout(() => { this.attr_svc.show(); }, 0);
     } else {
-      this.attrService.show();
+      this.attr_svc.show();
     }
 
     this.attributeType = attributeType;
@@ -87,7 +87,6 @@ export class ItemComponent implements OnInit {
       && this.prev.type === this.item.type
       && this.prev.room === this.item.room);
 
-      console.log("isChange: " + tmp);
       return tmp;
   }
 
@@ -95,16 +94,16 @@ export class ItemComponent implements OnInit {
   //----------------------------------------------------------------------------
   public saveItem(): void {
     if(this.item.id == null) 
-      { this.ws.sendMessage(new Cmnd("item_post", this.item)); }
+      { this.wsct_svc.send(new Cmnd("item_post", this.item)); }
     else 
-      { this.ws.sendMessage(new Cmnd("item_save", this.item)); }
+      { this.wsct_svc.send(new Cmnd("item_save", this.item)); }
 
-    this.attrService.hide();
+    this.attr_svc.hide();
   }// saveItem
 
   // Отменить изменения. -------------------------------------------------------
   //----------------------------------------------------------------------------
-  public cancelChange(): void { this.restState(); this.attrService.hide(); }
+  public cancelChange(): void { this.restState(); this.attr_svc.hide(); }
 
   // Добавить элемент. ---------------------------------------------------------
   //----------------------------------------------------------------------------
@@ -115,18 +114,18 @@ export class ItemComponent implements OnInit {
     , this.item.type, this.item.tnme
     , this.item.room, this.item.rnme );
 
-    this.modelService.insItem(this.item.id, item);
+    this.item_svc.insItem(this.item.id, item);
   }// addItem
 
   // Удалить элемент. ----------------------------------------------------------
   //----------------------------------------------------------------------------
   public del() { 
     this.subs = this.subs ? this.subs 
-    : this.ws.onMessageObserver.subscribe((data: any) => {
+    : this.wsct_svc.onMessageObserver.subscribe((data: any) => {
       if("item_drop" == data.cmnd && this.item.id == data.id)
-        { this.modelService.delItem(this.item.id); }
+        { this.item_svc.delItem(this.item.id); }
     });
-    this.ws.sendMessage(new Cmnd("item_drop", this.item)); 
+    this.wsct_svc.send(new Cmnd("item_drop", this.item)); 
   }// del
 
 }// ItemComponent

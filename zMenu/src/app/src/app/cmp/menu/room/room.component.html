@@ -1,0 +1,10 @@
+<div> {{room.name}} </div>
+
+<div class="container">
+
+    <app-dish class="dish" 
+        *ngFor="let dish of room.itm" 
+        [dish]="dish"
+        ></app-dish>
+
+</div>

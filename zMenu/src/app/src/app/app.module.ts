@@ -16,6 +16,8 @@ import { FormsModule } from '@angular/forms';
 import { AttributeEditorComponent } from './cmp/ctrl/item/attribute-editor/attribute-editor.component';
 import { AttributeComponent } from './cmp/ctrl/item/attribute-editor/attribute/attribute.component';
 import { HttpClientModule } from '@angular/common/http';
+import { RoomComponent } from './cmp/menu/room/room.component';
+import { DishComponent } from './cmp/menu/room/dish/dish.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { HttpClientModule } from '@angular/common/http';
     MenuComponent,
     ItemComponent,
     AttributeEditorComponent,
-    AttributeComponent
+    AttributeComponent,
+    RoomComponent,
+    DishComponent
   ],
   imports: [
     BrowserModule,

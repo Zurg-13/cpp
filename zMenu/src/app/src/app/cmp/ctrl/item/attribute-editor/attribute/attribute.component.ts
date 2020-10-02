@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModelService } from 'src/app/srv/model.service';
 import { Item } from 'src/app/cls/item';
 import { Attr } from 'src/app/cls/attr';
 import { AttrService } from 'src/app/srv/attr.service';
+import { WsctService } from 'src/app/srv/wsct.service';
+import { ItemService } from 'src/app/srv/item.service';
 
 @Component({
   selector: 'app-attribute',
@@ -15,44 +16,39 @@ export class AttributeComponent implements OnInit {
   @Input() item: Item;
 
   constructor(
-    public modelService: ModelService
-  , public attrService: AttrService
+    public item_svc: ItemService
+  , public attr_svc: AttrService
+  , public wsct_svc: WsctService
   ) {}
 
   ngOnInit(): void {}
 
+  // Выбрать элемент. ----------------------------------------------------------
+  //----------------------------------------------------------------------------
   public sel(): void {
-    switch(this.attrService.type) {
+    switch(this.attr_svc.type) {
       case "Type": 
-        this.modelService.updItemType(
+        this.item_svc.updItemType(
           this.item.id, this.attr.id, this.attr.name ); 
         break;
 
       case "Room": 
-        this.modelService.updItemRoom(
+        this.item_svc.updItemRoom(
           this.item.id, this.attr.id, this.attr.name ); 
         break;
       
       default: 
-          console.error("Неизвестный тип атрибута: " + this.attrService.type);
+          console.error("Неизвестный тип атрибута: " + this.attr_svc.type);
 
-    }
+    }// switch(this.attrService.type)
 
-    this.attrService.hide();
+    this.attr_svc.hide();
+  }// sel
 
-  }
+  // Управление состоянием. ----------------------------------------------------
+  //----------------------------------------------------------------------------
+  public del(): void { this.attr_svc.drop(this.attr); }
+  public add(): void { this.attr_svc.post(this.attr); }
+  public upd(): void { this.attr_svc.save(this.attr); }
 
-  public del(): void {
-
-  }
-
-  public new(): void {
-
-  }
-
-  public upd(): void {
-    
-  }
-
-
-}
+}// AttributeComponent

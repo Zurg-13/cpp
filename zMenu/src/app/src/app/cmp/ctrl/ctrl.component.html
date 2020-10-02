@@ -4,23 +4,9 @@
 </nav>
 <div class="container">
 
-<!-- 
-    <div class="list-header">
-        <h2>Список Item</h2>
-    </div>
--->    
-
     <app-item class="item" 
-        *ngFor="let item of modelService.getList()" 
+        *ngFor="let item of item_svc.getList()" 
         [item]="item"
-        (click)="modelService.item_slct=item"></app-item>
-    
-    <!-- Кнопка добавления item -->
-<!--
-    <div class="control-panel">
-        <button mat-raised-button color="primary"
-                (click)="createItem()"
-        >Добавить элемент</button>
-    </div>
--->    
+        (click)="item_svc.slct=item"></app-item>
+
 </div>
