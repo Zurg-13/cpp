@@ -24,8 +24,7 @@ export class MenuComponent implements OnInit {
       this.menu_svc.load_list(); 
       this.subs.unsubscribe();
     });
+  }// ngOnInit
 
-  }
-
-}
+}// MenuComponent
 

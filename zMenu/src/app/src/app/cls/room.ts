@@ -5,10 +5,11 @@ export class Room {
     id: number;
     name: string; 
     note: string;
-    itm: Item[];
+    itm: Item[] = [];
 
     constructor(id: number, name: string, note: string) {
         this.id = id;
         this.name = name; this.note = note;
     }// constructor
+
 }
