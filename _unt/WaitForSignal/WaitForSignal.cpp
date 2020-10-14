@@ -9,8 +9,8 @@
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
-WaitForSignal::WaitForSignal(QObject &object, const char *signal) : tout(false)
-    { connect(&object, signal, &eloop, SLOT(quit())); }
+WaitForSignal::WaitForSignal(QObject *object, const char *signal) : tout(false)
+    { connect(object, signal, &eloop, SLOT(quit())); }
 
 // Ожидание прихода сигнала. ---------------------------------------------------
 //------------------------------------------------------------------------------

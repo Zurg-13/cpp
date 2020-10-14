@@ -11,7 +11,7 @@ class WaitForSignal : public QObject {
     Q_OBJECT
 
 public:
-    WaitForSignal(QObject &object, const char *signal);
+    WaitForSignal(QObject *object, const char *signal);
     bool wait(int timeoutMs); // false - если время вышло.
 
 public slots:
