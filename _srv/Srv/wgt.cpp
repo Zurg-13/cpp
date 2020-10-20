@@ -1,7 +1,7 @@
 // INCLUDE ---------------------------------------------------------------------
 //------------------------------------------------------------------------------
-#include <QLayoutItem>
-#include <QLayout>
+#include <QtWidgets/QLayoutItem>
+#include <QtWidgets/QLayout>
 
 #include "wgt.h"
 

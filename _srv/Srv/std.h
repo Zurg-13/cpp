@@ -6,8 +6,8 @@
 #include <QFile>
 #include <QString>
 #include <QTextStream>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 
 /* Константы. *****************************************************************/
 /******************************************************************************/
