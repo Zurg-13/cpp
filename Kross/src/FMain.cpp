@@ -2,6 +2,7 @@
 
 #include <QMessageBox>
 #include <QDateTime>
+#include <QRandomGenerator>
 
 #include <qmath.h>
 
@@ -53,18 +54,15 @@ void FMain::calc(QPushButton *btn, QList<Section*> &sec) {
 // Сброс. ----------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void FMain::reset(void) {
-    auto LBL = [](QList<Section*> &sec) -> void {
-        for(Section *section : sec) { section->reset(); }
-    };
+    auto LBL = [](QList<Section*> &sec) -> void
+        { for(Section *section : sec) { section->reset(); }};
 
-    auto BTN = [](QPushButton* btn) -> void {
-        btn->setText("+"); btn->setStyleSheet(BCG + BLU + ";");
-    };
+    auto BTN = [](QPushButton* btn) -> void
+        { btn->setText("+"); btn->setStyleSheet(BCG + BLU + ";"); };
 
     LBL(lft_btm); LBL(rgt_top); LBL(center); LBL(lft_btm); LBL(rgt_btm);
     BTN(ui->bt22); BTN(ui->bt24); BTN(ui->bt33); BTN(ui->bt42); BTN(ui->bt44);
-    ui->lbStp->setText("Шаги");
-    ui->lbCnt->setText("Счёт");
+    ui->lbStp->setText("Шаги"); ui->lbCnt->setText("Счёт");
     ui->lbReit->setText("Рейт");
 
     ui->wgChainTop->reset();
@@ -77,7 +75,11 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     ui->setupUi(this);
     ui->lbReit->setWordWrap(true);
 
+
+
+//    QRandomGenerator::global()->seed(SYSDATE.toMSecsSinceEpoch());
     qsrand(SYSDATE.toMSecsSinceEpoch());
+
     lft.init(ui->wgChainTop, ui->wgLft, {0}, 2, WLine::Direct::LFT_TO_RGT);
     rgt.init(ui->wgChainTop, ui->wgRgt, {0}, 2, WLine::Direct::RGT_TO_LFT);
     top.init(ui->wgChainTop, ui->wgTop, {0}, 2, WLine::Direct::TOP_TO_BTM);

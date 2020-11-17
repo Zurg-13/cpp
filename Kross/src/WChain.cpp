@@ -73,11 +73,15 @@ void WChain::init(int num, WChain::Direct direct) {
     this->calc_x = &WChain::calc_x_top_btm;
 
     switch(this->direct) {
-      case Direct::TOP_TO_BTM:
+     case Direct::TOP_TO_BTM:
         calc_y = &WChain::calc_y_top_btm; break;
 
-      case Direct::BTM_TO_TOP:
+     case Direct::BTM_TO_TOP:
         calc_y = &WChain::calc_y_btm_top; break;
+
+     default:
+        FNC << "Не обрабатывается";
+
     }// switch(direct)
 
 }// init
@@ -120,4 +124,23 @@ void WChain::resizeEvent(QResizeEvent *evt) {
     recalc(); redraw();
 }// resizeEvent
 
+// Задать цвет (+). ------------------------------------------------------------
 //------------------------------------------------------------------------------
+void WChain::setClr_pls(const QColor &clr) {
+
+}
+
+// Задать цвет (0). ------------------------------------------------------------
+//------------------------------------------------------------------------------
+void WChain::setClr_nil(const QColor &clr) {
+
+}
+
+// Задать цвет (-). ------------------------------------------------------------
+//------------------------------------------------------------------------------
+void WChain::setClr_mns(const QColor &clr) {
+
+}
+
+//------------------------------------------------------------------------------
+

@@ -4,8 +4,10 @@
 // INCLUDE. --------------------------------------------------------------------
 //------------------------------------------------------------------------------
 #include <QWidget>
-//#include <QLabel>
 #include <QResizeEvent>
+#include <QRandomGenerator>
+#include <QColor>
+#include <QFont>
 
 #include "Plate.h"
 
@@ -61,6 +63,10 @@ private:
         { return (hgt - off) - (hSze + (cnt / col)*hSze); }
     int calc_y_btm_top(int cnt)
         { return off + (cnt / col) * hSze; }
+
+    void setClr_pls(const QColor &clr);
+    void setClr_nil(const QColor &clr);
+    void setClr_mns(const QColor &clr);
 
 };// WChain
 

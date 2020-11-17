@@ -18,7 +18,7 @@ int WLine::grab(QList<int> idx) {
     for(int index: idx) {
         QLabel *label = lbl.at(index);
 
-        ret += INT(label->text());  // todo: Расшитить класс QLabel.
+        ret += INT(label->text());  // todo: Расширить класс QLabel.
 
         lbl.removeAt(index); delete label;
         add();
@@ -91,25 +91,28 @@ void WLine::set(Direct direct) {
     this->direct = direct;
 
     switch(this->direct) {
-      case Direct::LFT_TO_RGT:
+     case Direct::LFT_TO_RGT:
         calc_w = &WLine::calc_w_hor; calc_h = &WLine::calc_h_hor;
         calc_x = &WLine::calc_x_lft_rgt; calc_y = &WLine::calc_y_lft_rgt;
         break;
 
-      case Direct::RGT_TO_LFT:
+     case Direct::RGT_TO_LFT:
         calc_w = &WLine::calc_w_hor; calc_h = &WLine::calc_h_hor;
         calc_x = &WLine::calc_x_rgt_lft; calc_y = &WLine::calc_y_rgt_lft;
         break;
 
-      case Direct::TOP_TO_BTM:
+     case Direct::TOP_TO_BTM:
         calc_w = &WLine::calc_w_vrt; calc_h = &WLine::calc_h_vrt;
         calc_x = &WLine::calc_x_top_btm; calc_y = &WLine::calc_y_top_btm;
         break;
 
-      case Direct::BTM_TO_TOP:
+     case Direct::BTM_TO_TOP:
         calc_w = &WLine::calc_w_vrt; calc_h = &WLine::calc_h_vrt;
         calc_x = &WLine::calc_x_btm_top; calc_y = &WLine::calc_y_btm_top;
         break;
+
+     default:
+        FNC << "Не обрабатывается";
 
     }// switch(this->direct)
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
+    <width>498</width>
     <height>703</height>
    </rect>
   </property>
@@ -347,7 +347,7 @@ font-size: 26pt;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>553</width>
+     <width>498</width>
      <height>20</height>
     </rect>
    </property>
@@ -373,9 +373,27 @@ font-size: 26pt;</string>
     <addaction name="separator"/>
     <addaction name="aTest"/>
    </widget>
+   <widget class="QMenu" name="mDecor">
+    <property name="title">
+     <string>Оформление</string>
+    </property>
+    <addaction name="aBtnClr"/>
+    <addaction name="aBtnFnt"/>
+    <addaction name="separator"/>
+    <addaction name="aPltFnt"/>
+    <addaction name="aTskFnt"/>
+    <addaction name="aTskClr_pls"/>
+    <addaction name="aTskClr_nil"/>
+    <addaction name="aTskClr_mns"/>
+    <addaction name="separator"/>
+    <addaction name="aBackground"/>
+    <addaction name="separator"/>
+    <addaction name="aBaseFnt"/>
+   </widget>
    <addaction name="mFile"/>
    <addaction name="mDifficulity"/>
    <addaction name="mDebug"/>
+   <addaction name="mDecor"/>
   </widget>
   <action name="aExit">
    <property name="text">
@@ -400,6 +418,51 @@ font-size: 26pt;</string>
   <action name="aTest">
    <property name="text">
     <string>Проба</string>
+   </property>
+  </action>
+  <action name="aBtnClr">
+   <property name="text">
+    <string>Цвет кнопок</string>
+   </property>
+  </action>
+  <action name="aBtnFnt">
+   <property name="text">
+    <string>Шрифт кнопок</string>
+   </property>
+  </action>
+  <action name="aPltFnt">
+   <property name="text">
+    <string>Шрифт плашек</string>
+   </property>
+  </action>
+  <action name="aTskFnt">
+   <property name="text">
+    <string>Шрифт задания</string>
+   </property>
+  </action>
+  <action name="aTskClr_pls">
+   <property name="text">
+    <string>Цвет задания (+)</string>
+   </property>
+  </action>
+  <action name="aTskClr_nil">
+   <property name="text">
+    <string>Цвет задания (0)</string>
+   </property>
+  </action>
+  <action name="aTskClr_mns">
+   <property name="text">
+    <string>Цвет задания (-)</string>
+   </property>
+  </action>
+  <action name="aBackground">
+   <property name="text">
+    <string>Фон</string>
+   </property>
+  </action>
+  <action name="aBaseFnt">
+   <property name="text">
+    <string>Основной шрифт</string>
    </property>
   </action>
  </widget>
