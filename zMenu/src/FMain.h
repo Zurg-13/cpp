@@ -74,7 +74,8 @@ private:
     void type_list(QWebSocket *rsp, const QJsonObject &obj);
     void type_save(QWebSocket *rsp, const QJsonObject &obj);
     void type_drop(QWebSocket *rsp, const QJsonObject &obj);
-};
+
+};// FMain
 
 //------------------------------------------------------------------------------
 #endif // FMAIN_H
