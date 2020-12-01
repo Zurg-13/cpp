@@ -9,21 +9,29 @@
 // Деструктор. -----------------------------------------------------------------
 //------------------------------------------------------------------------------
 Part::~Part() {
-    for(Part *part: this->chld) { delete part; }
-    FNC << this->name;
+    for(Part *part: this->dsc) { delete part; }
+    FNC << this->name << "end";
 }//~Part
 
 // Конструктор. ----------------------------------------------------------------
 //------------------------------------------------------------------------------
 Part::Part(
-        const QString &name, const QList<double> &data
-      , std::function<void(QPainter &pntr)> fdrw, int x, int y
-      , const QList<Part*> chld )
-    : name(name), data(data), fdrw(fdrw), x(x), y(y), chld(chld)
+    const QString &name, const QList<Form> &dna
+  , std::function<void(int &x, int &y)> morf
+  , std::function<void(
+        QPainter &pntr, const QList<Form> &dna, int x, int y)> fdrw
+  , const QList<Part*> dsc )
+:   name(name), dna(dna), morf(morf), fdrw(fdrw), dsc(dsc)
 {
-
+    FNC << "bgn";
 }// Part
 
-
+// Отрисовка. ------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Part::draw(QPainter &pntr, int x, int y) {
+    this->morf(x, y);
+    this->fdrw(pntr, this->dna, x, y);
+    for(Part *part: this->dsc) { part->draw(pntr, x, y); }
+}// draw
 
 //------------------------------------------------------------------------------

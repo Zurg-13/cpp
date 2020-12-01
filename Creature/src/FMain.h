@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QPainter>
 
+#include "Part.h"
+
 namespace Ui { class FMain; }
 
 /* Главная форма. *************************************************************/
@@ -25,6 +27,7 @@ class FMain : public QMainWindow {
 
  private:
     Ui::FMain *ui;
+    Part *tail;
 
 };// FMain
 

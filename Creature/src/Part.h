@@ -9,26 +9,37 @@
 #include <QString>
 #include <QList>
 
+/* Состояние + допустимое отклонение. *****************************************/
+/******************************************************************************/
+struct Form {
+    double std, val, dev;
+    Form(double std, double val, double dev) : std(std), val(val), dev(dev) {}
+    Form(double std, double dev) : std(std), val(std), dev(dev) {}
+};// Form
+
 /* Часть. *********************************************************************/
 /******************************************************************************/
 class Part {
 
  public:
-    virtual ~Part();
-             Part(
-                const QString &name, const QList<double> &data
-              , std::function<void(QPainter &pntr)> fdrw, int x, int y
-              , const QList<Part*> chld );
 
-    void virtual draw(QPainter &pntr) = 0;
+    virtual~Part();
+            Part(const QString &name, const QList<Form> &dna
+              , std::function<void(int &x, int &y)> morf
+              , std::function<void(
+                    QPainter &pntr, const QList<Form> &dna, int x, int y)> fdrw
+              , const QList<Part*> dsc = QList<Part*>() );
+
+    void draw(QPainter &pntr, int x, int y);
 
  private:
+
     QString name;
-    int x, y;
-    Part *prnt;
-    QList<double> data;
-    QList<Part*> chld;
-    std::function<void(QPainter &pntr)> fdrw;
+    QList<Form> dna;
+    std::function<void(int &x, int &y)> morf;
+    std::function<void(
+        QPainter &pntr, const QList<Form> &dna, int x, int y)> fdrw;
+    QList<Part*> dsc;
 
 };// Part
 
