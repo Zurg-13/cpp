@@ -2,4 +2,5 @@
 *.user.*
 *.*pre1
 *.autosave
+*.zip
 bld-*-

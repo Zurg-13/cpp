@@ -54,7 +54,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::SolidPattern));
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
             int L = dna[0].val, W = dna[1].val;
             pntr.drawEllipse(x, y, L, W);
@@ -67,7 +67,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::SolidPattern));
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
             int W = dna[0].val, H = dna[0].std;
             pntr.drawEllipse(x-W/2, y-H/2, W, H);
@@ -79,86 +79,123 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
       , [](int &x, int &y){ Q_UNUSED(x); y = y-50; }
       , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             Q_UNUSED(pntr); Q_UNUSED(dna); Q_UNUSED(x); Q_UNUSED(y)
+
+            pntr.drawRect(x-2, y-2, 4, 4);
+
         }, {
 
     new Part(
         "Уши", {
-            Form(M_PI/2, 0.5) // наклон
-          , Form(30, 0.5) // длина
-          , Form(30, 0.5) // ширина
+            Form(5*M_PI/4, 0.5) // наклон
+          , Form(40, 0.5) // длина
+          , Form(15, 0.5) // ширина
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
-              pntr.setPen(Qt::black);
-              pntr.setBrush(QBrush(Qt::gray, Qt::SolidPattern));
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
-              qreal a = dna[0].val;
-              int xB = dna[2].val*qCos(a+M_PI/2);
-              int yB = dna[2].val*qSin(a+M_PI/2);
-              int xT = dna[1].val*qCos(a), yT = dna[1].val*qSin(a);
+            qreal a = dna[0].val;
+            qreal xT = dna[1].val*qCos(a), yT = dna[1].val*qSin(a);
+            qreal xM = dna[2].val*qCos(a+M_PI/2);
+            qreal yM = dna[2].val*qSin(a+M_PI/2);
+            qreal xB = dna[2].val*qCos(a-M_PI/2);
+            qreal yB = dna[2].val*qSin(a-M_PI/2);
 
+/*
+            int sX = x-10, sY = y-10;
+            pntr.drawText(sX+xB, sY+yB, "B");
+            pntr.drawText(sX+xT, sY+yT, "T");
+            pntr.drawText(sX+xM, sY+yM, "M");
+*/
+            QPointF lft[3] = {
+                {x-10+xB, y-10+yB}, {x-10+xT, y-10+yT}, {x-10+xM, y-10+yM}
+            };
 
-              QPointF lft[3] = {
-                  {(qreal)x, (qreal)y - 20}
-                , {(qreal)x-30, (qreal)y-40}
-                , {(qreal)x-25, (qreal)y}};
-              pntr.drawPolygon(lft, 3);
+/*
+            QPointF lft[3] = {
+                {(qreal)x, (qreal)y - 20}
+              , {(qreal)x-30, (qreal)y-40}
+              , {(qreal)x-25, (qreal)y}
+            };
+*/
 
-              QPointF rgt[3] = {
-                  {(qreal)x, (qreal)y-20}
-                , {(qreal)x+30, (qreal)y-40}
-                , {(qreal)x+25, (qreal)y}};
-              pntr.drawPolygon(rgt, 3);
+            pntr.drawPolygon(lft, 3);
+
+            QPointF rgt[3] = {
+                {x+10-xB, y-10+yB}, {x+10-xT, y-10+yT}, {x+10-xM, y-10+yM}
+            };
+
+/*
+            QPointF rgt[3] = {
+                {(qreal)x, (qreal)y-20}
+              , {(qreal)x+30, (qreal)y-40}
+              , {(qreal)x+25, (qreal)y}};
+*/
+            pntr.drawPolygon(rgt, 3);
           })
 
   , new Part(
-          "Морда", { Form(0, 1), Form(0, 1) }, STAB
-        , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
-              pntr.setPen(Qt::black);
-              pntr.setBrush(QBrush(Qt::gray, Qt::SolidPattern));
-
-              pntr.drawEllipse(x-30, y-30, 60, 60);
-          })
-
-  , new Part(
-          "Глаза", { Form(0, 1), Form(0, 1) }, STAB
-        , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
-              pntr.setPen(Qt::black);
-              pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
-
-              pntr.drawEllipse(x-13-5, y-13-5, 10, 10);
-              pntr.drawEllipse(x+13-5, y-13-5, 10, 10);
-          })
+        "Морда", { Form(0, 1), Form(0, 1) }, STAB
+      , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.drawEllipse(x-30, y-30, 60, 60);
+        })
 
   , new Part(
-          "Усы", { Form(0, 1), Form(0, 1) }, STAB
-        , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
-              pntr.setPen(Qt::black);
-              pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+        "Глаза", {
+            Form(10, 0.5) // размер
+        }
+      , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
-              int count = 7;
-              qreal S = M_PI/6,  D = S/count;
-              pntr.drawEllipse(x-7, y+5-7, 14, 14);
-              for(int i=0; i<count; i++) {
-                    pntr.drawLine(
-                        x+15*qCos(i*D - S/2), y+5+15*qSin(i*D - S/2)
-                      , x+65*qCos(i*D - S/2), y+5+65*qSin(i*D - S/2));
-                    pntr.drawLine(
-                        x-15*qCos(i*D - S/2), y+5+15*qSin(i*D - S/2)
-                      , x-65*qCos(i*D - S/2), y+5+65*qSin(i*D - S/2));
+            qreal S = dna[0].val;
+
+            pntr.drawEllipse(x-13-S/2, y-13-S/2, S, S);
+            pntr.drawEllipse(x+13-S/2, y-13-S/2, S, S);
+        })
+
+  , new Part(
+        "Усы", {
+            Form(M_PI/6, 0.5) // сектор
+          , Form(65, 0.5)   // длина
+          , Form(7, 0.5)    // количество
+        }
+      , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+
+            int count = dna[2].val;
+            qreal S = dna[0].val,  D = S/count;
+            qreal L = dna[1].val, P = 15;
+
+            pntr.drawEllipse(x-7, y+5-7, 14, 14);
+            for(int i=0; i<count; i++) {
+                pntr.drawLine(
+                    x+P*qCos(i*D - S/2), y+5+P*qSin(i*D - S/2)
+                  , x+L*qCos(i*D - S/2), y+5+L*qSin(i*D - S/2));
+                pntr.drawLine(
+                    x-P*qCos(i*D - S/2), y+5+P*qSin(i*D - S/2)
+                  , x-L*qCos(i*D - S/2), y+5+L*qSin(i*D - S/2));
               }// i
-
-          })
+        })
 
     })
 
   , new Part(
-        "Ноги", { Form(0, 1), Form(0, 1) }, STAB
-      , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
+        "Ноги", {
+            Form(40, 0.5) // длина
+          , Form(10, 0.5) // ширина
+        }
+      , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
             pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
-            pntr.drawEllipse(x-20-5, y, 10, 40);
-            pntr.drawEllipse(x+20-5, y, 10, 40);
+            qreal L = dna[0].val, W =  dna[1].val;
+
+            pntr.drawEllipse(x-20-W/2, y, W, L);
+            pntr.drawEllipse(x+20-W/2, y, W, L);
         })
 
   , new Part(

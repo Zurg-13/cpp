@@ -12,9 +12,9 @@
 /* Состояние + допустимое отклонение. *****************************************/
 /******************************************************************************/
 struct Form {
-    double std, val, dev;
-    Form(double std, double val, double dev) : std(std), val(val), dev(dev) {}
-    Form(double std, double dev) : std(std), val(std), dev(dev) {}
+    qreal std, val, dev;
+    Form(qreal std, qreal val, qreal dev) : std(std), val(val), dev(dev) {}
+    Form(qreal std, qreal dev) : std(std), val(std), dev(dev) {}
 };// Form
 
 /* Часть. *********************************************************************/
