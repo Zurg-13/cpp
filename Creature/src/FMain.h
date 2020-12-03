@@ -24,8 +24,12 @@ class FMain : public QMainWindow {
 
  private slots:
     void on_aExit_triggered();
+    void on_aLog_triggered();
+    void on_btGen_clicked();
 
- private:
+    void on_btReset_clicked();
+
+private:
     Ui::FMain *ui;
     Part *tail;
 

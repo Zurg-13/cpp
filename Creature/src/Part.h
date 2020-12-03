@@ -22,6 +22,8 @@ struct Form {
 class Part {
 
  public:
+    QList<Form> dna;
+    QList<Part*> dsc;
 
     virtual~Part();
             Part(const QString &name, const QList<Form> &dna
@@ -33,13 +35,10 @@ class Part {
     void draw(QPainter &pntr, int x, int y);
 
  private:
-
     QString name;
-    QList<Form> dna;
     std::function<void(int &x, int &y)> morf;
     std::function<void(
         QPainter &pntr, const QList<Form> &dna, int x, int y)> fdrw;
-    QList<Part*> dsc;
 
 };// Part
 

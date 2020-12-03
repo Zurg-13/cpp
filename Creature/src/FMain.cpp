@@ -4,6 +4,7 @@
 
 #include <QTimer>
 #include <QtMath>
+//#include <QRandomGenerator>
 
 #include "env.h" // Глобальная среда приложения.
 #include "std.h"
@@ -41,8 +42,64 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
     // Внешний вид.
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/ico.ico"));
-    QTimer::singleShot(0, [this] { E::Log->place(this); E::Log->show(); });
+//    QTimer::singleShot(0, [this] { E::Log->place(this); E::Log->show(); });
 
+    this->tail = new Part(
+        "Начало", {}, [](int &x, int &y) { Q_UNUSED(x); Q_UNUSED(y); }
+      , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.drawEllipse(x-50, y-50, 100, 100);
+            pntr.drawText(x, y, "Сброс - начать заново.");
+            pntr.drawText(x, y+30, "Генерация - внести изменения.");
+        });
+
+}// FMain
+
+// Файл -> Выход. --------------------------------------------------------------
+//------------------------------------------------------------------------------
+#include <QMessageBox>
+void FMain::on_aExit_triggered() {
+    if(QMessageBox::Yes == QMessageBox::question(
+        this, "Подтверждение.", "Действительно выйти ?"
+      , QMessageBox::Yes | QMessageBox::No )) { QApplication::quit(); }
+}// on_aExit_triggered
+
+// Событие отрисовки. ----------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::paintEvent(QPaintEvent */*evt*/) {
+    QPainter pntr(this);
+
+    this->tail->draw(pntr, 150, 150);
+
+
+}// paintEvent
+
+// Показать лог. ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_aLog_triggered() { E::Log->place(this); E::Log->show(); }
+
+// Генерация. ------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void morf(Part *part) {
+    for(Form &form: part->dna) {
+        qreal val = form.val;
+
+//        qreal rnd = QRandomGenerator::global()->generateDouble() - 0.5;
+        qreal rnd = 0.5 - (qreal)qrand()/RAND_MAX;
+        form.val = val + (val/10)*rnd;
+    }// form
+
+    for(Part *chld: part->dsc) { morf(chld); }
+}// morf
+
+void FMain::on_btGen_clicked() {
+    morf(this->tail); repaint();
+}// on_btGen_clicked
+
+// Сбросить. -------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void FMain::on_btReset_clicked() {
     // Сборка существа.
     const std::function<void(int &x, int &y)> STAB = [](int &x, int &y)
         { Q_UNUSED(x); Q_UNUSED(y); };
@@ -54,7 +111,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(QColor(0xd77d31), Qt::SolidPattern));
 
             int L = dna[0].val, W = dna[1].val;
             pntr.drawEllipse(x, y, L, W);
@@ -67,7 +124,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(QColor(0xd77d31), Qt::SolidPattern));
 
             int W = dna[0].val, H = dna[0].std;
             pntr.drawEllipse(x-W/2, y-H/2, W, H);
@@ -92,7 +149,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(Qt::gray, Qt::SolidPattern));
 
             qreal a = dna[0].val;
             qreal xT = dna[1].val*qCos(a), yT = dna[1].val*qSin(a);
@@ -138,7 +195,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         "Морда", { Form(0, 1), Form(0, 1) }, STAB
       , [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(QColor(0xd77d31), Qt::SolidPattern));
             pntr.drawEllipse(x-30, y-30, 60, 60);
         })
 
@@ -147,13 +204,17 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
             Form(10, 0.5) // размер
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
-            pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
-
             qreal S = dna[0].val;
 
+            pntr.setPen(Qt::black);
+            pntr.setBrush(QBrush(QColor(0x75c1ff), Qt::SolidPattern));
             pntr.drawEllipse(x-13-S/2, y-13-S/2, S, S);
             pntr.drawEllipse(x+13-S/2, y-13-S/2, S, S);
+
+
+            pntr.setBrush(QBrush(Qt::black, Qt::SolidPattern));
+            pntr.drawEllipse(x-13-2, y-13-2, 4, 4);
+            pntr.drawEllipse(x+13-2, y-13-2, 4, 4);
         })
 
   , new Part(
@@ -164,7 +225,6 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
 
             int count = dna[2].val;
             qreal S = dna[0].val,  D = S/count;
@@ -190,7 +250,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
       , STAB, [](QPainter &pntr, const QList<Form> &dna, int x, int y) {
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(QColor(0xd77d31), Qt::SolidPattern));
 
             qreal L = dna[0].val, W =  dna[1].val;
 
@@ -204,7 +264,7 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
             int size = 120;
 
             pntr.setPen(Qt::black);
-            pntr.setBrush(QBrush(Qt::gray, Qt::NoBrush));
+            pntr.setBrush(QBrush(QColor(0xd77d31), Qt::NoBrush));
 
             pntr.drawRect(x-size, y-size, size*2, size*2);
         })
@@ -214,26 +274,8 @@ FMain::FMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::FMain) {
         }
     );
 
-}// FMain
-
-// Файл -> Выход. --------------------------------------------------------------
-//------------------------------------------------------------------------------
-#include <QMessageBox>
-void FMain::on_aExit_triggered() {
-    if(QMessageBox::Yes == QMessageBox::question(
-        this, "Подтверждение.", "Действительно выйти ?"
-      , QMessageBox::Yes | QMessageBox::No )) { QApplication::quit(); }
-}// on_aExit_triggered
-
-// Событие отрисовки. ----------------------------------------------------------
-//------------------------------------------------------------------------------
-void FMain::paintEvent(QPaintEvent */*evt*/) {
-    QPainter pntr(this);
-
-    this->tail->draw(pntr, 150, 150);
-
-
-}// paintEvent
+    repaint();
+}// on_btReset_clicked
 
 //------------------------------------------------------------------------------
 
