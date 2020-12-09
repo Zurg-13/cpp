@@ -29,6 +29,8 @@ class FMain : public QMainWindow {
 
     void on_btReset_clicked();
 
+    void on_btClr_clicked();
+
 private:
     Ui::FMain *ui;
     Part *tail;

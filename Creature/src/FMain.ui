@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
-    <height>274</height>
+    <width>723</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,6 +42,22 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="lbImg">
+      <property name="minimumSize">
+       <size>
+        <width>335</width>
+        <height>335</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Окрас</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QVBoxLayout" name="lyRgt">
@@ -113,6 +129,32 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="btClr">
+        <property name="minimumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>96</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Окрас</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -122,7 +164,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>502</width>
+     <width>723</width>
      <height>20</height>
     </rect>
    </property>

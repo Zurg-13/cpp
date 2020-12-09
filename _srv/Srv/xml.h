@@ -48,8 +48,8 @@ QMap<QString, QString> MAP(
 
 // Подмена символов: & = &amp, < = &lt, > = &gt. -------------------------------
 //------------------------------------------------------------------------------
-QString  ESCPG(const QString &xml);
-QString  UNESC(const QString &txt);
+QString ESCPG(const QString &xml);
+QString UNESC(const QString &txt);
 
 //------------------------------------------------------------------------------
 #endif // XML_H

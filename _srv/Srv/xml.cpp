@@ -163,5 +163,4 @@ QString UNESC(const QString &txt) {
     return bld.join(QString());
 }// UNESC
 
-
 //------------------------------------------------------------------------------

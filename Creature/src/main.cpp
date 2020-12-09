@@ -1,3 +1,4 @@
+
 #include <QApplication>
 #include <QTextCodec>
 #include <QTranslator>
@@ -5,14 +6,19 @@
 #include "env.h" // Глобальная среда приложения.
 #include "ver.h"
 
+
+
 // Инициализация статических переменных среды. ---------------------------------
 //------------------------------------------------------------------------------
 WBrd* E::Log;
 FMain* E::Main;
 
+
+
 // Главная функция. ------------------------------------------------------------
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
+
     QApplication app(argc, argv);
     QApplication::setApplicationName("z-menu");
     QApplication::setApplicationVersion(
